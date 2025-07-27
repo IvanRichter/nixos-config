@@ -19,4 +19,7 @@ with pkgs; [
 
   # IDEs
   vscode
+
+  # Terminal
+  ghostty
 ]
