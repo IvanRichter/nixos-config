@@ -9,7 +9,13 @@
   outputs = { self, nixpkgs, flake-utils, ... }: {
     nixosConfigurations.desktop = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
-      modules = [ ./hosts/desktop/desktop.nix ];
+      modules = [
+        ./hosts/desktop/desktop.nix
+      ];
+
+      specialArgs = {
+        starshipToml = ./dotfiles/starship.toml;
+      };
     };
   };
 }
