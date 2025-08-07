@@ -13,4 +13,5 @@ with pkgs; [
   jq
   nix-output-monitor
   fastfetch
+  usbutils
 ]
