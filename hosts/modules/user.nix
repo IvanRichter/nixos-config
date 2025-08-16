@@ -22,6 +22,10 @@
     enableCompletion = true;
     autosuggestions.enable = true;
     syntaxHighlighting.enable = true;
+    shellAliases = {
+      pbcopy = "wl-copy";
+      pbpaste = "wl-paste";
+    };
     promptInit = ''
       eval "$(starship init zsh)"
     '';

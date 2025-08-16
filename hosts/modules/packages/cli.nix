@@ -14,4 +14,5 @@ with pkgs; [
   nix-output-monitor
   fastfetch
   usbutils
+  wl-clipboard
 ]
