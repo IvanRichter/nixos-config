@@ -9,6 +9,7 @@
     ../modules/fonts.nix
     ../modules/graphics.nix
     ../modules/gui.nix
+    ../modules/memory.nix
     ../modules/networking.nix
     ../modules/docker.nix
     ../modules/packages.nix
