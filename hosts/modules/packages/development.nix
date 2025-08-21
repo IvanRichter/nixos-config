@@ -2,7 +2,7 @@
 
 with pkgs; [
   # Programming languages & runtimes
-  nodejs_20
+  nodejs_24
   rustup
   python3
   pnpm
@@ -13,9 +13,10 @@ with pkgs; [
   pkg-config
   openssl
 
-  # Cloud SDKs & dev tools
+  # Dev tools
   google-cloud-sdk
   terraform
+  pulumi-bin
 
   # IDEs
   vscode
