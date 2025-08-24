@@ -19,12 +19,17 @@
 
   # Fix blurry Chrome on Wayland by disabling scaling
   environment.sessionVariables = {
-
     NIXOS_OZONE_WL = "1";
     MOZ_ENABLE_WAYLAND = "1";
 
+    # Tell Chrome to use Wayland window decorations
+    CHROME_VERSION_EXTRA_FLAGS = "--force-device-scale-factor=1 --enable-features=WaylandWindowDecorations \
+                                  --ignore-gpu-blocklist --enable-gpu-rasterization --enable-zero-copy --use-gl=desktop \
+                                  --enable-features=VaapiVideoDecoder,CanvasOopRasterization";
 
-    CHROME_VERSION_EXTRA_FLAGS = "--force-device-scale-factor=1 --enable-features=WaylandWindowDecorations";
+    # VAAPI on NVIDIA needs this
+    LIBVA_DRIVER_NAME = "nvidia";
+    NVD_BACKEND = "direct";
   };
 
   environment.variables = {
