@@ -5,30 +5,25 @@
 
   users.users.ivan = {
     isNormalUser = true;
-    shell = pkgs.zsh;
+    shell = pkgs.fish;
     ignoreShellProgramCheck = true;
     extraGroups = [ "wheel" "networkmanager" "docker" ];
     packages = with pkgs; [
       syncthing
-      zsh
-      zsh-autosuggestions
-      zsh-syntax-highlighting
+      fish
       starship
     ];
   };
 
-  programs.zsh = {
+  programs.fish = {
     enable = true;
-    enableCompletion = true;
-    autosuggestions.enable = true;
-    syntaxHighlighting.enable = true;
+    interactiveShellInit = ''
+      starship init fish | source
+    '';
     shellAliases = {
       pbcopy = "wl-copy";
       pbpaste = "wl-paste";
     };
-    promptInit = ''
-      eval "$(starship init zsh)"
-    '';
   };
 
   services.syncthing = {
