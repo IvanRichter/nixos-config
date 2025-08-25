@@ -12,7 +12,7 @@ with pkgs; [
   file
   jq
   nix-output-monitor
-  fastfetch
+  macchina
   usbutils
   wl-clipboard
 ]

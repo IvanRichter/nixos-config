@@ -23,6 +23,7 @@
     shellAliases = {
       pbcopy = "wl-copy";
       pbpaste = "wl-paste";
+      neofetch = "macchina";
     };
   };
 
