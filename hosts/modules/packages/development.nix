@@ -17,6 +17,7 @@ with pkgs; [
   google-cloud-sdk
   terraform
   pulumi-bin
+  dbmate
 
   # IDEs
   vscode
