@@ -5,7 +5,7 @@
     package = config.boot.kernelPackages.nvidiaPackages.stable;
     modesetting.enable = true;
     open = false;
-    powerManagement.enable = true;
+    powerManagement.enable = false;
   };
 
   hardware.graphics.enable = true;
