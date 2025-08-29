@@ -17,9 +17,11 @@
   services.flatpak.enable = true;
   programs.xwayland.enable = true;
 
-  # Fix blurry Chrome on Wayland by disabling scaling
+  # Fix Wayland things
   environment.sessionVariables = {
     NIXOS_OZONE_WL = "1";
+
+    ELECTRON_OZONE_PLATFORM_HINT = "wayland";
     MOZ_ENABLE_WAYLAND = "1";
 
     # Tell Chrome to use Wayland window decorations
