@@ -23,5 +23,5 @@ with pkgs; [
   vscode
 
   # Terminal
-  ghostty
+  wezterm
 ]

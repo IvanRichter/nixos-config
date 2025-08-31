@@ -16,6 +16,9 @@
     pkgs.shared-mime-info        # update-mime-database
     pkgs.desktop-file-utils      # update-desktop-database
   ];
+  
+  # WezTerm
+  home.file.".config/wezterm/wezterm.lua".source = ../dotfiles/wezterm.lua;
 
   # 1) The desktop entry that launches FreeRDP with sane flags
   xdg.desktopEntries."rdp-open" = {
