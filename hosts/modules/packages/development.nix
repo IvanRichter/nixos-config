@@ -3,9 +3,9 @@
 with pkgs; [
   # Programming languages & runtimes
   nodejs_24
+  corepack_24
   rustup
   python3
-  pnpm
 
   # Build tools & compilers
   gcc
