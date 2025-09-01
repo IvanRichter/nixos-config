@@ -3,7 +3,6 @@ with pkgs; [
   wget
   curl
   git
-  htop
   nano
   unzip
   zip
@@ -15,4 +14,11 @@ with pkgs; [
   macchina
   usbutils
   wl-clipboard
+  eza
+  bat
+  ripgrep
+  fd
+  bottom
+  dog
+  zoxide
 ]
