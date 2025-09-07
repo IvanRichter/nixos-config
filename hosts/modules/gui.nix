@@ -17,17 +17,19 @@
   services.flatpak.enable = true;
   programs.xwayland.enable = true;
 
+  # Modern graphics toggle (replaces old hardware.opengl.enable)
+  hardware.graphics.enable = true;
+  hardware.graphics.extraPackages = with pkgs; [
+    vulkan-loader        
+    vulkan-validation-layers
+  ];
+
   # Fix Wayland things
   environment.sessionVariables = {
     NIXOS_OZONE_WL = "1";
 
     ELECTRON_OZONE_PLATFORM_HINT = "wayland";
     MOZ_ENABLE_WAYLAND = "1";
-
-    # Tell Chrome to use Wayland window decorations
-    CHROME_VERSION_EXTRA_FLAGS = "--force-device-scale-factor=1 --enable-features=WaylandWindowDecorations \
-                                  --enable-gpu-rasterization --enable-zero-copy --use-gl=desktop \
-                                  --enable-features=VaapiVideoDecoder,CanvasOopRasterization";
 
     # VAAPI on NVIDIA needs this
     LIBVA_DRIVER_NAME = "nvidia";
