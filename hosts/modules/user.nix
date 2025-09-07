@@ -7,7 +7,7 @@
     isNormalUser = true;
     shell = pkgs.fish;
     ignoreShellProgramCheck = true;
-    extraGroups = [ "wheel" "networkmanager" "docker" ];
+    extraGroups = [ "wheel" "networkmanager" "docker" "video" "render" ];
     packages = with pkgs; [
       syncthing
       fish

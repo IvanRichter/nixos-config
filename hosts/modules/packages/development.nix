@@ -18,6 +18,9 @@ with pkgs; [
   terraform
   pulumi-bin
   dbmate
+  vulkan-tools
+  libva-utils 
+  mesa-demos
 
   # IDEs
   vscode

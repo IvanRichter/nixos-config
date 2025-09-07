@@ -6,7 +6,7 @@
     package = config.boot.kernelPackages.nvidiaPackages.stable;  
     modesetting.enable = true;    
     open = true;                 
-    powerManagement.enable = false;  
+    powerManagement.enable = true;  
   };
 
   # Mesa/VAAPI
@@ -15,9 +15,7 @@
     enable32Bit = true;  
     extraPackages = with pkgs; [
       nvidia-vaapi-driver  
-      libva
-      libvdpau
-      vaapiVdpau          
+      libva    
     ];
   };
 
