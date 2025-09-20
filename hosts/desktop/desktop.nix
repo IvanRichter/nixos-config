@@ -3,6 +3,7 @@
 {
   imports = [
     ./hardware-configuration.nix
+    ./razer.nix
 
     ../modules/nix.nix
     ../modules/user.nix
