@@ -21,4 +21,5 @@ with pkgs; [
   bottom
   dog
   zoxide
+  evtest
 ]
