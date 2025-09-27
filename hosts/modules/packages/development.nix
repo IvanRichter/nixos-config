@@ -1,5 +1,15 @@
 { pkgs }:
 
+let
+  dataform = pkgs.writeShellApplication {
+    name = "dataform";
+    runtimeInputs = [ pkgs.nodejs_24 ];
+    text = ''
+      exec npx -y @dataform/cli@latest "$@"
+    '';
+  };
+in
+
 with pkgs; [
   # Programming languages & runtimes
   nodejs_24
@@ -22,6 +32,7 @@ with pkgs; [
   vulkan-tools
   libva-utils 
   mesa-demos
+  dataform
 
   # IDEs
   vscode
