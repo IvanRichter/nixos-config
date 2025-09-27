@@ -15,6 +15,7 @@ with pkgs; [
 
   # Dev tools
   google-cloud-sdk
+  google-cloud-sql-proxy
   terraform
   pulumi-bin
   dbmate
