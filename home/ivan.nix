@@ -20,7 +20,7 @@
   # WezTerm
   home.file.".config/wezterm/wezterm.lua".source = ../dotfiles/wezterm.lua;
 
-  # 1) The desktop entry that launches FreeRDP with sane flags
+  # Desktop entry that launches FreeRDP with sane flags
   xdg.desktopEntries."rdp-open" = {
     name = "RDP (FreeRDP)";
     exec = "${pkgs.freerdp}/bin/xfreerdp %u /cert:ignore /dynamic-resolution +clipboard /sound:sys:pulse";
@@ -31,7 +31,7 @@
     terminal = false;
   };
 
-  # 2) Force KDE to actually know what *.rdp is
+  # *.rdp mime-info
   home.file.".local/share/mime/packages/rdp.xml".text = ''
     <?xml version="1.0" encoding="UTF-8"?>
     <mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
@@ -46,20 +46,20 @@
     </mime-info>
   '';
 
-  # 3) Make rdp-open the default handler for RDP files
+  # Make rdp-open the default handler for RDP files
   xdg.mimeApps.enable = true;
   xdg.mimeApps.defaultApplications = {
     "application/x-rdp" = [ "rdp-open.desktop" ];
     "application/rdp"   = [ "rdp-open.desktop" ];
   };
 
-  # 4) Rebuild the MIME + desktop caches on activation
+  # Rebuild the MIME + desktop caches on activation
   home.activation.refreshXdgDBs = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     ${pkgs.shared-mime-info}/bin/update-mime-database "$HOME/.local/share/mime" || true
     ${pkgs.desktop-file-utils}/bin/update-desktop-database "$HOME/.local/share/applications" || true
   '';
 
-  # 5) Hard-create the desktop file so KDE can launch it
+  # Hard-create the desktop file
   home.file.".local/share/applications/rdp-open.desktop".text = ''
     [Desktop Entry]
     Type=Application

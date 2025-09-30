@@ -11,13 +11,18 @@
     };
   };
 
-  services.desktopManager.plasma6.enable = true;
-  services.displayManager.sddm.enable = true;
+  # COSMIC
+  services.desktopManager.cosmic.enable = true;
+  services.desktopManager.cosmic.xwayland.enable = true;
+  services.displayManager.cosmic-greeter.enable = true;
+  xdg.portal.enable = true;
+  xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-cosmic ];
+
 
   services.flatpak.enable = true;
   programs.xwayland.enable = true;
 
-  # Modern graphics toggle (replaces old hardware.opengl.enable)
+  # Graphics toggle
   hardware.graphics.enable = true;
   hardware.graphics.extraPackages = with pkgs; [
     vulkan-loader        
