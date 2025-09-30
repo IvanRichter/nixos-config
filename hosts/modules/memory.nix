@@ -16,17 +16,18 @@ let
       -p MemoryLow=2G \
       -p CPUWeight=90 \
       -p IOWeight=90 \
-      google-chrome-stable \
+      ${pkgs.google-chrome}/bin/google-chrome-stable \
         --ozone-platform=x11 \
         --use-angle=vulkan \
         --enable-vulkan \
         --ignore-gpu-blocklist \
         --enable-gpu-rasterization \
         --enable-zero-copy \
-        --enable-features=VaapiVideoDecoder,VaapiOnNvidiaGPUs,WebGPU,UnsafeWebGPU,Vulkan,VulkanFromANGLE,DefaultANGLEVulkan,UseSkiaRenderer
+        --enable-features=UseOzonePlatform,WaylandWindowDecorations,VaapiVideoDecoder,VaapiOnNvidiaGPUs,WebGPU,UnsafeWebGPU,Vulkan,VulkanFromANGLE,DefaultANGLEVulkan,UseSkiaRenderer \
         "$@"
   '';
 
+  # Replace the stock launcher by using the same desktop-id ("google-chrome.desktop")
   chromeProtectedDesktop = pkgs.makeDesktopItem {
     name = "google-chrome-protected";
     desktopName = "Google Chrome";
@@ -56,6 +57,6 @@ in
     chromeProtectedDesktop
   ];
 
-  # Raw alias if you really want to bypass the wrapper
+  # Raw alias
   environment.shellAliases.chrome-raw = "${pkgs.google-chrome}/bin/google-chrome";
 }

@@ -1,5 +1,5 @@
 {
-  description = "Minimal Plasma 6 NixOS with Wayland and NVIDIA";
+  description = "COSMIC DE + NVIDIA";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
