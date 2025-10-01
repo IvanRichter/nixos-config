@@ -33,6 +33,7 @@ with pkgs; [
   libva-utils 
   mesa-demos
   dataform
+  lazysql
 
   # IDEs
   vscode
