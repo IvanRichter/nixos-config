@@ -1,9 +1,13 @@
-{ config, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 
+let
+  isX86 = pkgs.stdenv.hostPlatform.system == "x86_64-linux";
+  isAarch = pkgs.stdenv.hostPlatform.system == "aarch64-linux";
+in 
 {
   services.xserver = {
-    enable = true;
-    videoDrivers = [ "nvidia" ];
+    enable = isX86;
+    videoDrivers = lib.optionals isX86 [ "nvidia" ];
     xkb = {
       layout = "us,cz";
       variant = ",qwerty";
@@ -30,12 +34,14 @@
   ];
 
   # Fix Wayland things
-  environment.sessionVariables = {
+  environment.sessionVariables =
+ {
     NIXOS_OZONE_WL = "1";
 
     ELECTRON_OZONE_PLATFORM_HINT = "wayland";
     MOZ_ENABLE_WAYLAND = "1";
-
+}
+  // lib.optionalAttrs isX86 {
     # VAAPI on NVIDIA needs this
     LIBVA_DRIVER_NAME = "nvidia";
     LIBVA_DRIVERS_PATH = "/run/opengl-driver/lib/dri";
