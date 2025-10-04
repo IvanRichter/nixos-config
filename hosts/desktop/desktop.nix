@@ -42,4 +42,11 @@
   environment.etc."pkcs11/modules/opensc-pkcs11".text = ''
     module: ${pkgs.opensc}/lib/opensc-pkcs11.so
   '';
+
+  systemd.services."home-manager-ivan" = {
+    after  = [ "network-online.target" ];
+    wants  = [ "network-online.target" ];
+    # HM module sets 5m, force value
+    serviceConfig.TimeoutStartSec = lib.mkForce "10min";
+  };
 }
