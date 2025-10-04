@@ -4,4 +4,4 @@ let
 in
 with pkgs;
 []
-++  (if isX86 then slack else [])
+++  (if isX86 then [slack] else [])

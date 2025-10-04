@@ -10,6 +10,10 @@
   # Make sure XDG dirs are managed so HM writes to ~/.local/share/applications
   xdg.enable = true;
 
+  imports = [
+    ./ivan/vscode.nix
+  ];
+
   # Ensure tools to refresh caches are present
   home.packages = [
     pkgs.freerdp
