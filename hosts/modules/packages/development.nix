@@ -35,9 +35,6 @@ with pkgs; [
   dataform
   lazysql
 
-  # IDEs
-  vscode
-
   # Terminal
   wezterm
 ]
