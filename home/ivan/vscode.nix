@@ -3,7 +3,8 @@
 let
   codeBin = "${config.programs.vscode.package}/bin/code";
 
-  exts = [
+  # Wishlist
+  want = [
     "adrianwilczynski.alpine-js-intellisense"
     "ashishalex.dataform-lsp-vscode"
     "astro-build.astro-vscode"
@@ -21,7 +22,6 @@ let
     "mechatroner.rainbow-csv"
     "ms-azuretools.vscode-containers"
     "ms-azuretools.vscode-docker"
-    "ms-python.debugpy"
     "ms-python.python"
     "ms-python.vscode-pylance"
     "ms-python.vscode-python-envs"
@@ -43,59 +43,106 @@ let
     "zhuangtongfa.material-theme"
     "zignd.html-css-class-completion"
   ];
-in
-{
+
+  # Extensions in nixpkgs
+  declaredIds = [
+    "astro-build.astro-vscode"        
+    "bbenoist.nix"                    
+    "bradlc.vscode-tailwindcss"       
+    "esbenp.prettier-vscode"          
+    "hashicorp.terraform"             
+    "mechatroner.rainbow-csv"         
+    "tamasfe.even-better-toml"        
+    "timonwong.shellcheck"            
+    "usernamehw.errorlens"            
+    "vscode-icons-team.vscode-icons"  
+    "vue.volar"                       
+    "ms-python.python"                
+    "ms-python.vscode-pylance"        
+    "golang.go"                       
+    "pkief.material-icon-theme"       
+  ];
+
+  # The actual derivations for those
+  declaredPkgs = with pkgs.vscode-extensions; [
+    astro-build.astro-vscode
+    bbenoist.nix
+    bradlc.vscode-tailwindcss
+    esbenp.prettier-vscode
+    hashicorp.terraform
+    mechatroner.rainbow-csv
+    tamasfe.even-better-toml
+    timonwong.shellcheck
+    usernamehw.errorlens
+    vscode-icons-team.vscode-icons
+    vue.volar
+    ms-python.python
+    ms-python.vscode-pylance
+    golang.go
+    pkief.material-icon-theme
+  ];
+
+  # Everything else gets installed once via the Code CLI
+  missingIds = lib.subtractLists declaredIds want;
+
+in {
   programs.vscode = {
     enable  = true;
     package = pkgs.vscode;
 
-    # New API: put settings under a profile
-    profiles.default.userSettings = {
-      "telemetry.telemetryLevel" = "off";
-      "security.workspace.trust.untrustedFiles" = "open";
+    # Let the fallback CLI write to the extensions dir
+    mutableExtensionsDir = true;
 
-      "terminal.integrated.fontFamily" = "MesloLGS Nerd Font";
-      "terminal.integrated.defaultProfile.linux" = "fish";
-      "terminal.integrated.gpuAcceleration" = "on";
-      "terminal.integrated.cursorBlinking" = true;
-      "terminal.integrated.shellIntegration.enabled" = false;
-      "terminal.integrated.enableImages" = false;
-      "terminal.integrated.smoothScrolling" = false;
-      "terminal.integrated.fastScrollSensitivity" = 5;
-      "terminal.integrated.profiles.linux" = {
-        fish = { path = "/run/current-system/sw/bin/fish"; };
+    profiles.default = {
+      extensions = declaredPkgs;
+
+      userSettings = {
+        "telemetry.telemetryLevel" = "off";
+        "security.workspace.trust.untrustedFiles" = "open";
+        "terminal.integrated.fontFamily" = "MesloLGS Nerd Font";
+        "terminal.integrated.defaultProfile.linux" = "fish";
+        "terminal.integrated.gpuAcceleration" = "on";
+        "terminal.integrated.cursorBlinking" = true;
+        "terminal.integrated.shellIntegration.enabled" = false;
+        "terminal.integrated.enableImages" = false;
+        "terminal.integrated.smoothScrolling" = false;
+        "terminal.integrated.fastScrollSensitivity" = 5;
+        "terminal.integrated.profiles.linux" = {
+          fish = { path = "/run/current-system/sw/bin/fish"; };
+        };
+
+        "sqlfluff.dialect" = "bigquery";
+        "workbench.iconTheme" = "material-icon-theme";
+        "workbench.sideBar.location" = "right";
+        "vsicons.dontShowNewVersionMessage" = true;
+
+        "files.associations" = {
+          "cloudbuild.yaml" = "yaml";
+          "*.bash" = "shellscript";
+          "*.sh" = "shellscript";
+        };
+
+        "github.copilot.nextEditSuggestions.enabled" = true;
+
+        "editor.defaultFormatter" = "esbenp.prettier-vscode";
+        "editor.formatOnSave" = true;
+        "editor.fontFamily" =
+          "'JetBrainsMono Nerd Font', 'MesloLGS Nerd Font', 'Droid Sans Mono', 'monospace'";
+        "workbench.colorTheme" = "One Dark Pro Night Flat";
+
+        "extensions.autoUpdate" = false;
+        "extensions.autoCheckUpdates" = false;
+
+        "vscode-dataform-tools.currencyFoDryRunCost" = "EUR";
       };
-
-      "sqlfluff.dialect" = "bigquery";
-      "workbench.iconTheme" = "material-icon-theme";
-      "workbench.sideBar.location" = "right";
-      "vsicons.dontShowNewVersionMessage" = true;
-
-      "files.associations" = {
-        "cloudbuild.yaml" = "yaml";
-        "*.bash" = "shellscript";
-        "*.sh" = "shellscript";
-      };
-
-      "github.copilot.nextEditSuggestions.enabled" = true;
-
-      "editor.defaultFormatter" = "esbenp.prettier-vscode";
-      "editor.formatOnSave" = true;
-      "editor.fontFamily" =
-        "'JetBrainsMono Nerd Font', 'MesloLGS Nerd Font', 'Droid Sans Mono', 'monospace'";
-      "workbench.colorTheme" = "One Dark Pro Night Flat";
-
-      "extensions.autoUpdate" = true;
-      "extensions.autoCheckUpdates" = true;
-
-      "vscode-dataform-tools.currencyFoDryRunCost" = "EUR";
     };
   };
 
-  # Always install/update your list to latest on each HM switch
-  home.activation.vscodeLatestExtensions = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+  # One-shot install for marketplace-only stuff
+  home.activation.vscodeFallbackExtensions = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     set -eu
-    for ext in ${lib.concatStringsSep " " (map lib.escapeShellArg exts)}; do
+    for ext in ${lib.concatStringsSep " " (map lib.escapeShellArg missingIds)}; do
+      echo "Installing non-nixpkgs extension: $ext"
       ${codeBin} --install-extension "$ext" --force || true
     done
   '';
