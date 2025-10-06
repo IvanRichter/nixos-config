@@ -36,6 +36,11 @@
     # HM module sets 5m, force value
     serviceConfig.TimeoutStartSec = lib.mkForce "10min";
   };
+  
+  # Firmware
+  hardware.asahi = {
+    enable = true;
+  };
 
   # Keyboard: Ctrl, Fn, Super, Alt
 
