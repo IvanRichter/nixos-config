@@ -11,7 +11,6 @@ in
     xkb = {
       layout = "us,cz";
       variant = ",qwerty";
-      options = "grp:alt_shift_toggle";
     };
   };
 
