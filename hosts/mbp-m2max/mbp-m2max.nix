@@ -64,4 +64,41 @@
     [main]
     rightmeta = delete
   '';
+
+  # Make s2idle as safe as it can be on Asahi
+
+  # Force s2idle explicitly
+  boot.kernelParams = [
+    "mem_sleep_default=s2idle"
+  ];
+
+  # Lid close uses suspend (s2idle)
+  services.logind.settings.Login = {
+    HandleLidSwitch = "suspend";
+    # respect app inhibitors
+    LidSwitchIgnoreInhibited = "no";         
+  };
+
+  # Pre/post sleep guardrails:
+  #  - pre: sync writes, drop caches, remount / read-only
+  #  - post: remount / read-write
+  # This prevents unclean unmount on resume
+  environment.etc."systemd/system-sleep/10-safe-suspend".text = ''
+    #!/bin/sh
+    set -eu
+    case "$1" in
+      pre)
+        sync
+        echo 3 > /proc/sys/vm/drop_caches 2>/dev/null || true
+        mount -o remount,ro / 2>/dev/null || true
+        ;;
+      post)
+        mount -o remount,rw / 2>/dev/null || true
+        ;;
+    esac
+  '';
+  environment.etc."systemd/system-sleep/10-safe-suspend".mode = "0755";
+
+  # Run fsck in initrd if journal looks dirty
+  boot.initrd.checkJournalingFS = true;
 }
