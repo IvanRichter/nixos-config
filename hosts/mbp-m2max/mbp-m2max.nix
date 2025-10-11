@@ -3,6 +3,8 @@
   imports = [
     ./hardware-configuration.nix
     ../modules/gui.nix
+    ../modules/cosmic.nix
+    ../modules/graphics.nix
     ../modules/packages.nix
     ../modules/docker.nix
     ../modules/fonts.nix
