@@ -9,6 +9,8 @@
     ../modules/user.nix
     ../modules/fonts.nix
     ../modules/graphics.nix
+    ../modules/nvidia.nix
+    ../modules/cosmic.nix
     ../modules/gui.nix
     ../modules/memory.nix
     ../modules/networking.nix
