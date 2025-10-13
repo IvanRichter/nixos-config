@@ -75,10 +75,17 @@
   ];
 
   # Lid close uses suspend (s2idle)
-  services.logind.settings.Login = {
-    HandleLidSwitch = "suspend";
-    # respect app inhibitors
-    LidSwitchIgnoreInhibited = "no";         
+  services.logind.settings = {
+    Login = {
+      # close lid = suspend
+      HandleLidSwitch = "suspend";
+      HandleLidSwitchExternalPower = "suspend";
+      HandleLidSwitchDocked = "suspend";
+
+      # never idle-suspend, respect app inhibitors
+      IdleAction = "ignore";
+      LidSwitchIgnoreInhibited = "no";
+    };
   };
 
   # Pre/post sleep guardrails:
