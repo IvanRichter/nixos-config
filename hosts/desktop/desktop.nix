@@ -4,6 +4,7 @@
   imports = [
     ./hardware-configuration.nix
     ./razer.nix
+    ./vivaldi.nix
 
     ../modules/nix.nix
     ../modules/user.nix
