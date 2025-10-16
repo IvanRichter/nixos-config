@@ -12,6 +12,7 @@
 
   imports = [
     ./ivan/vscode.nix
+    ./ivan/vivaldi.nix
   ];
 
   # Ensure tools to refresh caches are present
