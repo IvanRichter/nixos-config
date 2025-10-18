@@ -7,5 +7,6 @@
     dejavu_fonts
     corefonts
     nerd-fonts.meslo-lg
+    roboto
   ];
 }
