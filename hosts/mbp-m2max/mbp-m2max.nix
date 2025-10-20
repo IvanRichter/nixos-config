@@ -13,48 +13,55 @@
     ../modules/user.nix
   ];
 
+  # Platform & licensing
   nixpkgs.hostPlatform = "aarch64-linux";
   nixpkgs.config.allowUnfree = true;
 
+  # Bootloader
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
+  # System identity
   system.stateVersion = "25.11";
   networking.hostName = "mbp-nixos";
   i18n.defaultLocale = "en_US.UTF-8";
   time.timeZone = "Europe/Prague";
   networking.networkmanager.enable = true;
 
+  # SSH
   services.openssh.enable = true;
 
-  # Laptop sanity
-  zramSwap.enable = true;
+  # Memory / swap
+  zramSwap = {
+    enable = true;
+    memoryPercent = 50;
+    algorithm = "zstd";
+    priority = 100;
+  };
+  boot.kernel.sysctl = {
+    "vm.swappiness" = 80;
+    "vm.vfs_cache_pressure" = 50;
+  };
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
   systemd.services."home-manager-ivan" = {
     after  = [ "network-online.target" ];
     wants  = [ "network-online.target" ];
-    # HM module sets 5m, force value
     serviceConfig.TimeoutStartSec = lib.mkForce "10min";
   };
-  
+
   # Firmware
-  hardware.asahi = {
-    enable = true;
-  };
+  hardware.asahi.enable = true;
 
-  # Keyboard: Ctrl, Fn, Super, Alt
-
-  # Kernel modules
+  # Keyboard / input
   boot.kernelModules = [ "hid_apple" "uinput" ];
 
-  # Fn <-> Left Ctrl, Option <-> Command, make F1–F12 real keys
+  # Fn <-> Ctrl, Opt <-> Cmd, F1–F12 as real keys
   boot.extraModprobeConfig = ''
     options hid_apple swap_fn_leftctrl=1 swap_opt_cmd=1 fnmode=2
   '';
 
-  # uinput for keyd
   hardware.uinput.enable = true;
 
   # Right Cmd -> Delete
@@ -67,42 +74,57 @@
     rightmeta = delete
   '';
 
-  # Make s2idle as safe as it can be on Asahi
-
-  # Force s2idle explicitly
+  # -- Suspend / power --
+  # Force s2idle + tweak PCI/USB behavior
   boot.kernelParams = [
     "mem_sleep_default=s2idle"
+    "usbcore.autosuspend=1"
+    "pci=pcie_bus_perf"
   ];
 
-  # Lid close uses suspend (s2idle)
+  # Align systemd sleep with kernel
+  systemd.sleep.extraConfig = ''
+    SuspendState=mem
+    SuspendMode=s2idle
+  '';
+
+  # Lid behavior
   services.logind.settings = {
     Login = {
-      # close lid = suspend
       HandleLidSwitch = "suspend";
       HandleLidSwitchExternalPower = "suspend";
       HandleLidSwitchDocked = "suspend";
-
-      # never idle-suspend, respect app inhibitors
       IdleAction = "ignore";
-      LidSwitchIgnoreInhibited = "no";
+      LidSwitchIgnoreInhibited = false;
+      KillUserProcesses = true;
     };
   };
 
-  # Pre/post sleep guardrails:
-  #  - pre: sync writes, drop caches, remount / read-only
-  #  - post: remount / read-write
-  # This prevents unclean unmount on resume
+  # Disable useless wait
+  systemd.services."NetworkManager-wait-online".enable = false;
+
+  # Power profiles
+  services.power-profiles-daemon.enable = true;
+
+  # Disable OOM killer
+  systemd.oomd.enable = false;
+
+  # Disable USB/BT wakeups
+  services.udev.extraRules = ''
+    SUBSYSTEM=="usb", TEST=="power/wakeup", ATTR{power/wakeup}="disabled"
+    SUBSYSTEM=="bluetooth", TEST=="power/wakeup", ATTR{power/wakeup}="disabled"
+  '';
+
+  # -- Sleep hook --
   environment.etc."systemd/system-sleep/10-safe-suspend".text = ''
     #!/bin/sh
     set -eu
     case "$1" in
       pre)
         sync
-        echo 3 > /proc/sys/vm/drop_caches 2>/dev/null || true
-        mount -o remount,ro / 2>/dev/null || true
         ;;
       post)
-        mount -o remount,rw / 2>/dev/null || true
+        :
         ;;
     esac
   '';
