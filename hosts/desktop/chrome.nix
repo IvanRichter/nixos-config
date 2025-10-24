@@ -27,10 +27,10 @@ let
         "$@"
   '';
 
-  # Replace the stock launcher by using the same desktop-id ("google-chrome.desktop")
+  
   chromeProtectedDesktop = pkgs.makeDesktopItem {
     name = "google-chrome-protected";
-    desktopName = "Google Chrome";
+    desktopName = "Google Chrome (WebGPU)";
     genericName = "Web Browser";
     exec = "chrome-protected %U";
     icon = "google-chrome";
