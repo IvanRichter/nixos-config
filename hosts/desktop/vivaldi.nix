@@ -29,17 +29,9 @@ let
         "$@"
   '';
 
-  # Nuke the upstream .desktop
-  vivaldiNoDesktop = pkgs.vivaldi.overrideAttrs (old: {
-    postInstall = (old.postInstall or "") + ''
-      rm -f "$out/share/applications/vivaldi-stable.desktop"
-    '';
-  });
-
-  # Replace the stock launcher by using the same desktop-id
   vivaldiProtectedDesktop = pkgs.makeDesktopItem {
-    name = "vivaldi-stable";  
-    desktopName = "Vivaldi";
+    name = "vivaldi-protected";
+    desktopName = "Vivaldi (WebGPU)";
     genericName = "Web Browser";
     exec = "vivaldi-protected %U";
     icon = "vivaldi";
@@ -48,7 +40,6 @@ let
 in
 {
   environment.systemPackages = [
-    vivaldiNoDesktop
     vivaldiProtected
     vivaldiProtectedDesktop
   ];
