@@ -5,6 +5,8 @@
     ./hardware-configuration.nix
     ./razer.nix
     ./vivaldi.nix
+    ./memory.nix
+    ./chrome.nix
 
     ../modules/nix.nix
     ../modules/user.nix
@@ -13,7 +15,6 @@
     ../modules/nvidia.nix
     ../modules/cosmic.nix
     ../modules/gui.nix
-    ../modules/memory.nix
     ../modules/networking.nix
     ../modules/docker.nix
     ../modules/rdp.nix
