@@ -42,13 +42,14 @@ in
 
   zramSwap = {
     enable = true;
-    memoryPercent = 100;
+    memoryPercent = 50;
     priority = 100;
-    algorithm = "zstd";
+    algorithm = "lz4";
   };
 
   boot.kernel.sysctl = {
-    "vm.swappiness" = 140;
+    "vm.swappiness" = 180;
+    "vm.page-cluster" = 0; 
     "vm.vfs_cache_pressure" = 50;
   };
 
