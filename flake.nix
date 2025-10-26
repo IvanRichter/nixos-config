@@ -11,15 +11,32 @@
 
     # Asahi/Apple Silicon support
     apple-silicon.url = "github:nix-community/nixos-apple-silicon";
+
+    # nix-index prebuilt database + comma runner
+    nix-index-database.url = "github:nix-community/nix-index-database";
+    nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, home-manager, flake-utils, apple-silicon, ... }: {
+  # Bind inputs
+  outputs = { self, nixpkgs, home-manager, flake-utils, apple-silicon, ... } @ inputs: {
     nixosConfigurations = {
       desktop = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
           ./hosts/desktop/desktop.nix
 
+          # nix-index database module
+          inputs."nix-index-database".nixosModules.nix-index
+
+          # nix-index + comma integration
+          {
+            programs.nix-index.enable = true;
+            programs.nix-index.enableFishIntegration = true;
+            programs.command-not-found.enable = false;
+            programs.nix-index-database.comma.enable = true;
+          }
+
+          # Home Manager
           home-manager.nixosModules.home-manager
           {
             home-manager.useGlobalPkgs = true;
@@ -33,7 +50,6 @@
         };
       };
 
-      
       mbp-m2max = nixpkgs.lib.nixosSystem {
         system = "aarch64-linux";
         modules = [
@@ -43,6 +59,18 @@
           # Host module
           ./hosts/mbp-m2max/mbp-m2max.nix
 
+          # nix-index database module
+          inputs."nix-index-database".nixosModules.nix-index
+
+          # nix-index + comma integration
+          {
+            programs.nix-index.enable = true;
+            programs.nix-index.enableFishIntegration = true;
+            programs.command-not-found.enable = false;
+            programs.nix-index-database.comma.enable = true;
+          }
+
+          # Home Manager
           home-manager.nixosModules.home-manager
           {
             home-manager.useGlobalPkgs = true;
