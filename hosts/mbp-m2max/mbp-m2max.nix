@@ -74,12 +74,14 @@
     rightmeta = delete
   '';
 
-  # -- Suspend / power --
+  # -- Power management & display tweaks --
   # Force s2idle + tweak PCI/USB behavior
+  # Enable full native panel (disable fake black bar over notch)
   boot.kernelParams = [
     "mem_sleep_default=s2idle"
     "usbcore.autosuspend=1"
     "pci=pcie_bus_perf"
+    "apple_dcp.show_notch=1"
   ];
 
   # Align systemd sleep with kernel
