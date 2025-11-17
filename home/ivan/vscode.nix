@@ -8,7 +8,7 @@ let
     "adrianwilczynski.alpine-js-intellisense"
     "ashishalex.dataform-lsp-vscode"
     "astro-build.astro-vscode"
-    "bbenoist.nix"
+    "jeff-hykin.better-nix-syntax"
     "bradlc.vscode-tailwindcss"
     "docker.docker"
     "esbenp.prettier-vscode"
@@ -47,7 +47,7 @@ let
   # Extensions in nixpkgs
   declaredIds = [
     "astro-build.astro-vscode"        
-    "bbenoist.nix"                    
+    "jeff-hykin.better-nix-syntax"
     "bradlc.vscode-tailwindcss"       
     "esbenp.prettier-vscode"          
     "hashicorp.terraform"             
@@ -66,7 +66,7 @@ let
   # The actual derivations for those
   declaredPkgs = with pkgs.vscode-extensions; [
     astro-build.astro-vscode
-    bbenoist.nix
+    jeff-hykin.better-nix-syntax
     bradlc.vscode-tailwindcss
     esbenp.prettier-vscode
     hashicorp.terraform
