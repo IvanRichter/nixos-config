@@ -1,8 +1,6 @@
-{ config, pkgs, starshipToml, ... }:
+{ config, pkgs, ... }:
 
 {
-  environment.etc."starship.toml".source = starshipToml;
-
   users.users.ivan = {
     isNormalUser = true;
     shell = pkgs.fish;
@@ -11,7 +9,6 @@
     packages = with pkgs; [
       syncthing
       fish
-      starship
     ];
   };
 

@@ -10,11 +10,9 @@
   xdg.enable = true;
 
   imports = [
+    ./ivan/stylix.nix
     ./ivan/vscode.nix
     ./ivan/vivaldi.nix
     ./ivan/rdp.nix
   ];
-
-  # WezTerm
-  home.file.".config/wezterm/wezterm.lua".source = ../dotfiles/wezterm.lua;
 }

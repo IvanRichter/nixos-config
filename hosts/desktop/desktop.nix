@@ -13,6 +13,7 @@
     ../modules/fonts.nix
     ../modules/graphics.nix
     ../modules/nvidia.nix
+    ../modules/stylix.nix
     ../modules/cosmic.nix
     ../modules/gui.nix
     ../modules/networking.nix

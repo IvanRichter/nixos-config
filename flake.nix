@@ -15,15 +15,19 @@
     # nix-index prebuilt database + comma runner
     nix-index-database.url = "github:nix-community/nix-index-database";
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
+
+    stylix.url = "github:danth/stylix";
+    stylix.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   # Bind inputs
-  outputs = { self, nixpkgs, home-manager, flake-utils, apple-silicon, ... } @ inputs: {
+  outputs = { self, nixpkgs, home-manager, flake-utils, apple-silicon, stylix, ... } @ inputs: {
     nixosConfigurations = {
       desktop = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
           ./hosts/desktop/desktop.nix
+          stylix.nixosModules.stylix
 
           # nix-index database module
           inputs."nix-index-database".nixosModules.nix-index
@@ -45,9 +49,6 @@
             home-manager.users.ivan = import ./home/ivan.nix;
           }
         ];
-        specialArgs = {
-          starshipToml = ./dotfiles/starship.toml;
-        };
       };
 
       mbp-m2max = nixpkgs.lib.nixosSystem {
@@ -55,6 +56,7 @@
         modules = [
           # Wire up Asahi
           apple-silicon.nixosModules.apple-silicon-support
+          stylix.nixosModules.stylix
 
           # Host module
           ./hosts/mbp-m2max/mbp-m2max.nix
@@ -79,9 +81,6 @@
             home-manager.users.ivan = import ./home/ivan.nix;
           }
         ];
-        specialArgs = {
-          starshipToml = ./dotfiles/starship.toml;
-        };
       };
     };
   };
