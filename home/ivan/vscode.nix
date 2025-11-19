@@ -26,9 +26,7 @@ let
     "ms-python.vscode-pylance"
     "ms-python.vscode-python-envs"
     "ms-vscode-remote.remote-containers"
-    "ms-vscode-remote.remote-wsl"
     "openai.chatgpt"
-    "pkief.material-icon-theme"
     "polymeilex.wgsl"
     "randomfractalsinc.vscode-data-preview"
     "risingstack.astro-alpinejs-syntax-highlight"
@@ -37,10 +35,9 @@ let
     "timonwong.shellcheck"
     "unifiedjs.vscode-mdx"
     "usernamehw.errorlens"
-    "vscode-icons-team.vscode-icons"
+    "AtomMaterial.a-file-icon-vscode"
     "vue.volar"
     "xabikos.javascriptsnippets"
-    "zhuangtongfa.material-theme"
     "zignd.html-css-class-completion"
   ];
 
@@ -55,12 +52,10 @@ let
     "tamasfe.even-better-toml"        
     "timonwong.shellcheck"            
     "usernamehw.errorlens"            
-    "vscode-icons-team.vscode-icons"  
     "vue.volar"                       
     "ms-python.python"                
     "ms-python.vscode-pylance"        
     "golang.go"                       
-    "pkief.material-icon-theme"       
   ];
 
   # The actual derivations for those
@@ -74,12 +69,10 @@ let
     tamasfe.even-better-toml
     timonwong.shellcheck
     usernamehw.errorlens
-    vscode-icons-team.vscode-icons
     vue.volar
     ms-python.python
     ms-python.vscode-pylance
     golang.go
-    pkief.material-icon-theme
   ];
 
   # Everything else gets installed once via the Code CLI
@@ -112,7 +105,7 @@ in {
         };
 
         "sqlfluff.dialect" = "bigquery";
-        "workbench.iconTheme" = "material-icon-theme";
+        "workbench.iconTheme" = "a-file-icon-vscode";
         "workbench.sideBar.location" = "right";
         "vsicons.dontShowNewVersionMessage" = true;
 
