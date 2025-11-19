@@ -22,7 +22,7 @@
       defaultFonts = {
         sansSerif = [ "Roboto" "Noto Sans" "DejaVu Sans" ];
         serif     = [ "Noto Serif" "DejaVu Serif" ];
-        monospace = [ "JetBrains Mono" "DejaVu Sans Mono" ];
+        monospace = [ "MesloLGS Nerd Font Mono" "DejaVu Sans Mono" ];
         emoji     = [ "Noto Color Emoji" ];
       };
 
