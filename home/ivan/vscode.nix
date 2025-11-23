@@ -28,6 +28,7 @@ let
     "ms-vscode-remote.remote-containers"
     "openai.chatgpt"
     "polymeilex.wgsl"
+    "macabeus.vscode-fluent"
     "randomfractalsinc.vscode-data-preview"
     "risingstack.astro-alpinejs-syntax-highlight"
     "ritwickdey.liveserver"
