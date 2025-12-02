@@ -34,6 +34,8 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
+  services.system76-scheduler.enable = true;
+
   # ---------------------------
   # Web eID
   # ---------------------------
