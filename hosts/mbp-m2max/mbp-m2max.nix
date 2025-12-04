@@ -87,6 +87,7 @@
     "pci=pcie_bus_perf"
     "apple_dcp.show_notch=1"
   ];
+  services.system76-scheduler.enable = true;
 
   # Align systemd sleep with kernel
   systemd.sleep.extraConfig = ''
