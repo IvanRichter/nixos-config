@@ -12,8 +12,8 @@ in
 
 with pkgs; [
   # Programming languages & runtimes
-  nodejs_24
-  corepack_24
+  nodejs_25
+  corepack
   rustup
   python3
 
