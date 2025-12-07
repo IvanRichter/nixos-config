@@ -34,6 +34,7 @@ with pkgs; [
   mesa-demos
   dataform
   lazysql
+  gh
 
   # Terminal
   wezterm
