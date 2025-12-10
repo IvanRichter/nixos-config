@@ -14,6 +14,10 @@
     ../modules/stylix.nix
   ];
 
+  environment.systemPackages = with pkgs; [
+    triforce-lv2
+  ];
+
   # Platform & licensing
   nixpkgs.hostPlatform = "aarch64-linux";
   nixpkgs.config.allowUnfree = true;
