@@ -9,10 +9,18 @@
 
   # COSMIC apps and extensions
   environment.systemPackages = with pkgs; [
-    cosmic-player
     cosmic-reader
-    cosmic-ext-calculator
     cosmic-ext-tweaks
+  ];
+
+  # Remove unneeded packages
+  environment.cosmic.excludePackages = with pkgs; [
+    cosmic-store
+    cosmic-term
+    adwaita-icon-theme
+    pop-icon-theme
+    pulseaudio
+    playerctl
   ];
 
   # Clipboard manager needs zwlr_data_control_manager_v1
