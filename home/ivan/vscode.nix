@@ -20,6 +20,7 @@ let
     "ms-azuretools.vscode-containers"
     "ms-azuretools.vscode-docker"
     "ms-python.python"
+    "ms-toolsai.jupyter"
     "ms-python.vscode-pylance"
     "ms-vscode-remote.remote-containers"
     "ritwickdey.liveserver"
@@ -28,11 +29,13 @@ let
     "unifiedjs.vscode-mdx"
     "usernamehw.errorlens"
     "vue.volar"
+    "zhuangtongfa.material-theme"
 
     # Marketplace-only
     "adrianwilczynski.alpine-js-intellisense"
     "ashishalex.dataform-lsp-vscode"
     "AtomMaterial.a-file-icon-vscode"
+    "googlecloudtools.cloudcode"
     "ggsimm.wgsl-literal"
     "macabeus.vscode-fluent"
     "ms-python.vscode-python-envs"
@@ -61,11 +64,13 @@ let
     "tamasfe.even-better-toml"         
     "timonwong.shellcheck"             
     "unifiedjs.vscode-mdx"             
-    "usernamehw.errorlens"             
+    "usernamehw.errorlens"
     "vue.volar"                        
     "ms-python.python"                 
+    "ms-toolsai.jupyter"               
     "ms-python.vscode-pylance"         
     "golang.go"                        
+    "zhuangtongfa.material-theme"
   ];
 
   # The actual derivations for those
@@ -90,8 +95,10 @@ let
     usernamehw.errorlens
     vue.volar
     ms-python.python
+    ms-toolsai.jupyter
     ms-python.vscode-pylance
     golang.go
+    zhuangtongfa.material-theme
   ];
 
   # Everything else gets installed once via the Code CLI
@@ -135,6 +142,7 @@ in {
         };
 
         "github.copilot.nextEditSuggestions.enabled" = true;
+        "cloudcode.project" = "happy-end-data-warehouse";
 
         "editor.defaultFormatter" = "esbenp.prettier-vscode";
         "editor.formatOnSave" = true;
