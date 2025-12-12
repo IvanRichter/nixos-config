@@ -14,6 +14,7 @@ with pkgs; [
   macchina
   usbutils
   wl-clipboard
+  xclip
   eza
   bat
   ripgrep
