@@ -12,7 +12,7 @@ in {
     };
   };
 
-  services.flatpak.enable = true;
+  services.flatpak.enable = false;
   xdg.portal.enable = true;
   programs.xwayland.enable = true;
 
