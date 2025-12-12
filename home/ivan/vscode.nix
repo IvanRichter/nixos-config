@@ -5,58 +5,67 @@ let
 
   # Wishlist
   want = [
-    "adrianwilczynski.alpine-js-intellisense"
-    "ashishalex.dataform-lsp-vscode"
+    # Provided by nixpkgs
     "astro-build.astro-vscode"
-    "jeff-hykin.better-nix-syntax"
     "bradlc.vscode-tailwindcss"
     "docker.docker"
     "esbenp.prettier-vscode"
-    "ggsimm.wgsl-literal"
     "github.copilot"
     "github.copilot-chat"
-    "glenn2223.live-sass"
     "golang.go"
     "hashicorp.terraform"
+    "jeff-hykin.better-nix-syntax"
     "mads-hartmann.bash-ide-vscode"
     "mechatroner.rainbow-csv"
     "ms-azuretools.vscode-containers"
     "ms-azuretools.vscode-docker"
     "ms-python.python"
     "ms-python.vscode-pylance"
-    "ms-python.vscode-python-envs"
     "ms-vscode-remote.remote-containers"
-    "openai.chatgpt"
-    "polymeilex.wgsl"
-    "macabeus.vscode-fluent"
-    "randomfractalsinc.vscode-data-preview"
-    "risingstack.astro-alpinejs-syntax-highlight"
     "ritwickdey.liveserver"
     "tamasfe.even-better-toml"
     "timonwong.shellcheck"
     "unifiedjs.vscode-mdx"
     "usernamehw.errorlens"
-    "AtomMaterial.a-file-icon-vscode"
     "vue.volar"
-    "xabikos.javascriptsnippets"
-    "zignd.html-css-class-completion"
+
+    # Marketplace-only
+    "adrianwilczynski.alpine-js-intellisense"
+    "ashishalex.dataform-lsp-vscode"
+    "AtomMaterial.a-file-icon-vscode"
+    "ggsimm.wgsl-literal"
+    "macabeus.vscode-fluent"
+    "ms-python.vscode-python-envs"
+    "openai.chatgpt"
+    "polymeilex.wgsl"
+    "randomfractalsinc.vscode-data-preview"
+    "risingstack.astro-alpinejs-syntax-highlight"
   ];
 
   # Extensions in nixpkgs
   declaredIds = [
-    "astro-build.astro-vscode"        
+    "astro-build.astro-vscode"         
     "jeff-hykin.better-nix-syntax"
-    "bradlc.vscode-tailwindcss"       
-    "esbenp.prettier-vscode"          
-    "hashicorp.terraform"             
-    "mechatroner.rainbow-csv"         
-    "tamasfe.even-better-toml"        
-    "timonwong.shellcheck"            
-    "usernamehw.errorlens"            
-    "vue.volar"                       
-    "ms-python.python"                
-    "ms-python.vscode-pylance"        
-    "golang.go"                       
+    "bradlc.vscode-tailwindcss"        
+    "docker.docker"                    
+    "esbenp.prettier-vscode"           
+    "github.copilot"                   
+    "github.copilot-chat"              
+    "hashicorp.terraform"              
+    "mads-hartmann.bash-ide-vscode"    
+    "ms-azuretools.vscode-containers"  
+    "ms-azuretools.vscode-docker"      
+    "mechatroner.rainbow-csv"          
+    "ms-vscode-remote.remote-containers"
+    "ritwickdey.liveserver"            
+    "tamasfe.even-better-toml"         
+    "timonwong.shellcheck"             
+    "unifiedjs.vscode-mdx"             
+    "usernamehw.errorlens"             
+    "vue.volar"                        
+    "ms-python.python"                 
+    "ms-python.vscode-pylance"         
+    "golang.go"                        
   ];
 
   # The actual derivations for those
@@ -64,11 +73,20 @@ let
     astro-build.astro-vscode
     jeff-hykin.better-nix-syntax
     bradlc.vscode-tailwindcss
+    docker.docker
     esbenp.prettier-vscode
+    github.copilot
+    github.copilot-chat
     hashicorp.terraform
+    mads-hartmann.bash-ide-vscode
+    ms-azuretools.vscode-containers
+    ms-azuretools.vscode-docker
     mechatroner.rainbow-csv
+    ms-vscode-remote.remote-containers
+    ritwickdey.liveserver
     tamasfe.even-better-toml
     timonwong.shellcheck
+    unifiedjs.vscode-mdx
     usernamehw.errorlens
     vue.volar
     ms-python.python
@@ -124,20 +142,27 @@ in {
           "'JetBrainsMono Nerd Font', 'MesloLGS Nerd Font', 'Droid Sans Mono', 'monospace'";
         "workbench.colorTheme" = "One Dark Pro Night Flat";
 
-        "extensions.autoUpdate" = false;
-        "extensions.autoCheckUpdates" = false;
+        "extensions.autoUpdate" = true;
+        "extensions.autoCheckUpdates" = true;
 
         "vscode-dataform-tools.currencyFoDryRunCost" = "EUR";
       };
     };
   };
 
-  # One-shot install for marketplace-only stuff
+  # Install marketplace-only extensions if missing
   home.activation.vscodeFallbackExtensions = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     set -eu
+
+    INSTALLED="$(${codeBin} --list-extensions || true)"
+
     for ext in ${lib.concatStringsSep " " (map lib.escapeShellArg missingIds)}; do
-      echo "Installing non-nixpkgs extension: $ext"
-      ${codeBin} --install-extension "$ext" --force || true
+      if ! echo "$INSTALLED" | grep -qx "$ext"; then
+        echo "Installing VS Code marketplace extension: $ext"
+        ${codeBin} --install-extension "$ext"
+      else
+        echo "VS Code extension already installed: $ext"
+      fi
     done
   '';
 }
