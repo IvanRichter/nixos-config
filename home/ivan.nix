@@ -14,5 +14,6 @@
     ./ivan/vscode.nix
     ./ivan/vivaldi.nix
     ./ivan/rdp.nix
+    ./ivan/lazysql.nix
   ];
 }
