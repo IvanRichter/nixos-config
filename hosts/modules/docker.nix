@@ -9,6 +9,11 @@ in
     daemon.settings.features.buildkit = true;
   };
 
+  systemd.services.docker = {
+    wants = [ ];
+    after = [ "multi-user.target" ];
+  };
+
   # Register QEMU binfmt so amd64 containers/binaries run on ARM
   boot.binfmt = lib.mkIf isAarch64 {
     emulatedSystems = [ "x86_64-linux" ];

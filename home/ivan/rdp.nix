@@ -130,12 +130,6 @@ in
     "application/rdp"   = [ "rdp-open.desktop" ];
   };
 
-  # Rebuild the MIME + desktop caches on activation
-  home.activation.refreshXdgDBs = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    ${pkgs.shared-mime-info}/bin/update-mime-database "$HOME/.local/share/mime" || true
-    ${pkgs.desktop-file-utils}/bin/update-desktop-database "$HOME/.local/share/applications" || true
-  '';
-
   # Hard-create the desktop file
   home.file.".local/share/applications/rdp-open.desktop".text = ''
     [Desktop Entry]
