@@ -36,6 +36,11 @@
 
   services.system76-scheduler.enable = true;
 
+  services.fstrim.enable = true;
+  services.fstrim.interval = "weekly";
+  systemd.services.fstrim.wantedBy = lib.mkForce [ ];
+  systemd.timers.fstrim.timerConfig.Persistent = false;
+
   # ---------------------------
   # Web eID
   # ---------------------------

@@ -111,14 +111,20 @@
     };
   };
 
-  # Disable useless wait
+  # Disable unnecessary NetworkManager units
   systemd.services."NetworkManager-wait-online".enable = false;
+  systemd.services.NetworkManager-dispatcher.enable = false;
 
   # Power profiles
   services.power-profiles-daemon.enable = true;
 
   # Disable OOM killer
   systemd.oomd.enable = false;
+
+  services.fstrim.enable = true;
+  services.fstrim.interval = "weekly";
+  systemd.services.fstrim.wantedBy = lib.mkForce [ ];
+  systemd.timers.fstrim.timerConfig.Persistent = false;
 
   # Disable USB/BT wakeups
   services.udev.extraRules = ''
