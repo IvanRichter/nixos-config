@@ -5,6 +5,7 @@ in
 {
   virtualisation.docker = {
     enable = true;
+    enableOnBoot = false;
     # Make BuildKit the default
     daemon.settings.features.buildkit = true;
   };
