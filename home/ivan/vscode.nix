@@ -143,6 +143,7 @@ in {
 
         "github.copilot.nextEditSuggestions.enabled" = true;
         "cloudcode.project" = "happy-end-data-warehouse";
+        "cloudcode.beta.bigqueryRegion" = "eu";
 
         "editor.defaultFormatter" = "esbenp.prettier-vscode";
         "editor.formatOnSave" = true;
