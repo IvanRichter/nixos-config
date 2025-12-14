@@ -15,7 +15,11 @@ with pkgs; [
   nodejs_25
   corepack
   rustup
-  python3
+  (python3.withPackages (pythonPackages: [
+    pythonPackages.ipykernel
+    pythonPackages.jupyter
+    pythonPackages.bigquery-magics
+  ]))
 
   # Build tools & compilers
   gcc
