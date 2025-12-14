@@ -21,67 +21,72 @@
   };
 
   # Bind inputs
-  outputs = { self, nixpkgs, home-manager, flake-utils, apple-silicon, stylix, ... } @ inputs: {
-    nixosConfigurations = {
-      desktop = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
-        modules = [
-          ./hosts/desktop/desktop.nix
-          stylix.nixosModules.stylix
+  outputs = { self, nixpkgs, home-manager, flake-utils, apple-silicon, stylix, ... } @ inputs:
+    let
+      overlays = import ./overlays;
+    in {
+      nixosConfigurations = {
+        desktop = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          modules = [
+            { nixpkgs.overlays = overlays; }
+            ./hosts/desktop/desktop.nix
+            stylix.nixosModules.stylix
 
-          # nix-index database module
-          inputs."nix-index-database".nixosModules.nix-index
+            # nix-index database module
+            inputs."nix-index-database".nixosModules.nix-index
 
-          # nix-index + comma integration
-          {
-            programs.nix-index.enable = true;
-            programs.nix-index.enableFishIntegration = true;
-            programs.command-not-found.enable = false;
-            programs.nix-index-database.comma.enable = true;
-          }
+            # nix-index + comma integration
+            {
+              programs.nix-index.enable = true;
+              programs.nix-index.enableFishIntegration = true;
+              programs.command-not-found.enable = false;
+              programs.nix-index-database.comma.enable = true;
+            }
 
-          # Home Manager
-          home-manager.nixosModules.home-manager
-          {
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
-            home-manager.backupFileExtension = "bak";
-            home-manager.users.ivan = import ./home/ivan.nix;
-          }
-        ];
-      };
+            # Home Manager
+            home-manager.nixosModules.home-manager
+            {
+              home-manager.useGlobalPkgs = true;
+              home-manager.useUserPackages = true;
+              home-manager.backupFileExtension = "bak";
+              home-manager.users.ivan = import ./home/ivan.nix;
+            }
+          ];
+        };
 
-      mbp-m2max = nixpkgs.lib.nixosSystem {
-        system = "aarch64-linux";
-        modules = [
-          # Wire up Asahi
-          apple-silicon.nixosModules.apple-silicon-support
-          stylix.nixosModules.stylix
+        mbp-m2max = nixpkgs.lib.nixosSystem {
+          system = "aarch64-linux";
+          modules = [
+            { nixpkgs.overlays = overlays; }
+            # Wire up Asahi
+            apple-silicon.nixosModules.apple-silicon-support
+            stylix.nixosModules.stylix
 
-          # Host module
-          ./hosts/mbp-m2max/mbp-m2max.nix
+            # Host module
+            ./hosts/mbp-m2max/mbp-m2max.nix
 
-          # nix-index database module
-          inputs."nix-index-database".nixosModules.nix-index
+            # nix-index database module
+            inputs."nix-index-database".nixosModules.nix-index
 
-          # nix-index + comma integration
-          {
-            programs.nix-index.enable = true;
-            programs.nix-index.enableFishIntegration = true;
-            programs.command-not-found.enable = false;
-            programs.nix-index-database.comma.enable = true;
-          }
+            # nix-index + comma integration
+            {
+              programs.nix-index.enable = true;
+              programs.nix-index.enableFishIntegration = true;
+              programs.command-not-found.enable = false;
+              programs.nix-index-database.comma.enable = true;
+            }
 
-          # Home Manager
-          home-manager.nixosModules.home-manager
-          {
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
-            home-manager.backupFileExtension = "bak";
-            home-manager.users.ivan = import ./home/ivan.nix;
-          }
-        ];
+            # Home Manager
+            home-manager.nixosModules.home-manager
+            {
+              home-manager.useGlobalPkgs = true;
+              home-manager.useUserPackages = true;
+              home-manager.backupFileExtension = "bak";
+              home-manager.users.ivan = import ./home/ivan.nix;
+            }
+          ];
+        };
       };
     };
-  };
 }
