@@ -1,9 +1,11 @@
-{ config, pkgs, ... }: {
+{ config, pkgs, lib, ... }: {
   networking = {
-    hostName = "nixos";
     networkmanager.enable = true;
+    dhcpcd.enable = false;
   };
 
-  systemd.services."NetworkManager-wait-online".enable = false;
-  systemd.services.NetworkManager-dispatcher.enable = false;
+  systemd.network.enable = true;
+
+  systemd.services.systemd-networkd-wait-online.enable = lib.mkForce false;
+  systemd.services.NetworkManager-wait-online.enable = lib.mkForce false;
 }
