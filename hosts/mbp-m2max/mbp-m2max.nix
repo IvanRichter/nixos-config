@@ -8,6 +8,7 @@
     ../modules/packages.nix
     ../modules/docker.nix
     ../modules/fonts.nix
+    ../modules/networking.nix
     ../modules/nix.nix
     ../modules/rdp.nix
     ../modules/user.nix
@@ -34,7 +35,6 @@
   networking.hostName = "mbp-nixos";
   i18n.defaultLocale = "en_US.UTF-8";
   time.timeZone = "Europe/Prague";
-  networking.networkmanager.enable = true;
 
   # SSH
   services.openssh.enable = true;
@@ -110,10 +110,6 @@
       KillUserProcesses = true;
     };
   };
-
-  # Disable unnecessary NetworkManager units
-  systemd.services."NetworkManager-wait-online".enable = false;
-  systemd.services.NetworkManager-dispatcher.enable = false;
 
   # Power profiles
   services.power-profiles-daemon.enable = true;
