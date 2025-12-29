@@ -7,6 +7,7 @@
     ./vivaldi.nix
     ./memory.nix
     ./chrome.nix
+    ./corsair.nix
 
     ../modules/nix.nix
     ../modules/user.nix
