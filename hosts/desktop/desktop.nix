@@ -34,7 +34,14 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
+  # Desktop tuning
   services.system76-scheduler.enable = true;
+  powerManagement.cpuFreqGovernor = "performance";
+  boot.kernelParams = [
+    "amd_pstate=active"
+    "amd_iommu=on"
+    "iommu=pt"
+    ];
 
   services.fstrim.enable = true;
   services.fstrim.interval = "weekly";
