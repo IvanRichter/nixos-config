@@ -20,6 +20,7 @@
   # Kernel switches for DRM + nicer suspend
   boot.kernelParams = [
     "nvidia_drm.modeset=1"
+    "nvidia.NVreg_EnableVRR=0"
     "mem_sleep_default=deep"
   ];
 
