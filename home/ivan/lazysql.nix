@@ -13,7 +13,7 @@ let
     placeholder="${placeholder}"
 
     secret="$(${pkgs.google-cloud-sdk}/bin/gcloud secrets versions access latest \
-      --secret=gibbor-db-test-an-reader-password \
+      --secret=gibbor-test-db-an-reader-password \
       --project=he-platform-prd \
       | tr -d '\n')"
 
