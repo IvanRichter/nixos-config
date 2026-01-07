@@ -28,7 +28,7 @@
       grep = "rg --no-heading --color=auto";
       find = "fd";
       top  = "btm";
-      dig  = "dog";
+      dig  = "doggo";
       cd   = "z";
     };
   };
