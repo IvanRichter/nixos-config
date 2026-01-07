@@ -20,7 +20,7 @@ with pkgs; [
   ripgrep
   fd
   bottom
-  dogdns
+  doggo
   zoxide
   evtest
 ]
