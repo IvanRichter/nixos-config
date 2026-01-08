@@ -26,6 +26,11 @@
     let
       overlays = import ./overlays;
     in {
+      formatter = {
+        x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.nixfmt;
+        aarch64-linux = nixpkgs.legacyPackages.aarch64-linux.nixfmt;
+      };
+
       nixosConfigurations = {
         desktop = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
