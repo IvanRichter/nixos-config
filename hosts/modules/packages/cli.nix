@@ -1,27 +1,49 @@
 { pkgs }:
 with pkgs; [
+  # Network / HTTP
   wget
   curl
+  xh
+
+  # Version control
   git
+
+  # Editors
   nano
+
+  # Archives
   unzip
   zip
+
+  # File navigation
   broot
   tree
+  eza
+  zoxide
+  fd
+
+  # File/system utilities
   lsof
   file
-  jaq
-  nix-output-monitor
-  macchina
   usbutils
-  wl-clipboard-rs
-  xclip
-  eza
+  evtest
   bat
   ripgrep
-  fd
+
+  # JSON processing
+  jaq
+
+  # Nix tooling
+  nix-output-monitor
+
+  # System info
+  macchina
   bottom
+
+  # Clipboard
+  wl-clipboard-rs
+  xclip
+
+  # DNS
   doggo
-  zoxide
-  evtest
 ]
