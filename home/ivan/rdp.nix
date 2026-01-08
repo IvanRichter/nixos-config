@@ -103,8 +103,14 @@ in
     exec = "${rdpOpen}/bin/rdp-open %u";
     icon = "computer";
     type = "Application";
-    categories = [ "Network" "RemoteAccess" ];
-    mimeType = [ "application/x-rdp" "application/rdp" ];
+    categories = [
+      "Network"
+      "RemoteAccess"
+    ];
+    mimeType = [
+      "application/x-rdp"
+      "application/rdp"
+    ];
     terminal = false;
   };
 
@@ -127,7 +133,7 @@ in
   xdg.mimeApps.enable = true;
   xdg.mimeApps.defaultApplications = {
     "application/x-rdp" = [ "rdp-open.desktop" ];
-    "application/rdp"   = [ "rdp-open.desktop" ];
+    "application/rdp" = [ "rdp-open.desktop" ];
   };
 
   # Hard-create the desktop file

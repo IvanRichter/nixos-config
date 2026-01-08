@@ -1,4 +1,9 @@
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
 {
   # Kernel + udev support for Razer
@@ -22,5 +27,5 @@
     polychromatic
   ];
 
-  hardware.openrazer.users = ["ivan"];
+  hardware.openrazer.users = [ "ivan" ];
 }

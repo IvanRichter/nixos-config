@@ -1,4 +1,9 @@
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 {
   imports = [
     ./hardware-configuration.nix
@@ -51,11 +56,14 @@
     "vm.vfs_cache_pressure" = 50;
   };
 
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix.settings.experimental-features = [
+    "nix-command"
+    "flakes"
+  ];
 
   systemd.services."home-manager-ivan" = {
-    after  = [ "network-online.target" ];
-    wants  = [ "network-online.target" ];
+    after = [ "network-online.target" ];
+    wants = [ "network-online.target" ];
     serviceConfig.TimeoutStartSec = lib.mkForce "10min";
   };
 
@@ -63,7 +71,10 @@
   hardware.asahi.enable = true;
 
   # Keyboard / input
-  boot.kernelModules = [ "hid_apple" "uinput" ];
+  boot.kernelModules = [
+    "hid_apple"
+    "uinput"
+  ];
 
   # Fn <-> Ctrl, Opt <-> Cmd, F1–F12 as real keys
   boot.extraModprobeConfig = ''

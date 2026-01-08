@@ -10,7 +10,8 @@ let
   };
 in
 
-with pkgs; [
+with pkgs;
+[
   # Programming languages & runtimes
   nodejs_25
   corepack
@@ -34,7 +35,7 @@ with pkgs; [
   pulumi-bin
   dbmate
   vulkan-tools
-  libva-utils 
+  libva-utils
   mesa-demos
   dataform
   lazysql

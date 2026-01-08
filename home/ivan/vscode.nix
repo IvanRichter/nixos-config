@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
   codeBin = "${config.programs.vscode.package}/bin/code";
@@ -48,30 +53,30 @@ let
 
   # Extensions in nixpkgs
   declaredIds = [
-    "astro-build.astro-vscode"         
+    "astro-build.astro-vscode"
     "jeff-hykin.better-nix-syntax"
-    "bradlc.vscode-tailwindcss"        
-    "docker.docker"                    
-    "esbenp.prettier-vscode"           
-    "github.copilot"                   
-    "github.copilot-chat"              
-    "hashicorp.terraform"              
+    "bradlc.vscode-tailwindcss"
+    "docker.docker"
+    "esbenp.prettier-vscode"
+    "github.copilot"
+    "github.copilot-chat"
+    "hashicorp.terraform"
     "jnoortheen.nix-ide"
-    "mads-hartmann.bash-ide-vscode"    
-    "ms-azuretools.vscode-containers"  
-    "ms-azuretools.vscode-docker"      
-    "mechatroner.rainbow-csv"          
+    "mads-hartmann.bash-ide-vscode"
+    "ms-azuretools.vscode-containers"
+    "ms-azuretools.vscode-docker"
+    "mechatroner.rainbow-csv"
     "ms-vscode-remote.remote-containers"
-    "ritwickdey.liveserver"            
-    "tamasfe.even-better-toml"         
-    "timonwong.shellcheck"             
-    "unifiedjs.vscode-mdx"             
+    "ritwickdey.liveserver"
+    "tamasfe.even-better-toml"
+    "timonwong.shellcheck"
+    "unifiedjs.vscode-mdx"
     "usernamehw.errorlens"
-    "vue.volar"                        
-    "ms-python.python"                 
-    "ms-toolsai.jupyter"               
-    "ms-python.vscode-pylance"         
-    "golang.go"                        
+    "vue.volar"
+    "ms-python.python"
+    "ms-toolsai.jupyter"
+    "ms-python.vscode-pylance"
+    "golang.go"
     "zhuangtongfa.material-theme"
   ];
 
@@ -107,9 +112,10 @@ let
   # Everything else gets installed once via the Code CLI
   missingIds = lib.subtractLists declaredIds want;
 
-in {
+in
+{
   programs.vscode = {
-    enable  = true;
+    enable = true;
     package = pkgs.vscode;
 
     # Let the fallback CLI write to the extensions dir
@@ -130,7 +136,9 @@ in {
         "terminal.integrated.smoothScrolling" = false;
         "terminal.integrated.fastScrollSensitivity" = 5;
         "terminal.integrated.profiles.linux" = {
-          fish = { path = "/run/current-system/sw/bin/fish"; };
+          fish = {
+            path = "/run/current-system/sw/bin/fish";
+          };
         };
 
         "sqlfluff.dialect" = "bigquery";

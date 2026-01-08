@@ -2,7 +2,8 @@
 
 let
   isX86 = pkgs.stdenv.hostPlatform.system == "x86_64-linux";
-in {
+in
+{
   hardware.graphics = {
     enable = true;
     enable32Bit = isX86;
@@ -12,8 +13,8 @@ in {
   };
 
   environment.systemPackages = with pkgs; [
-    vulkan-tools        
-    libva-utils         
-    vdpauinfo           
+    vulkan-tools
+    libva-utils
+    vdpauinfo
   ];
 }

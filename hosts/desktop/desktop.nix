@@ -1,4 +1,9 @@
-{ config, pkgs, lib, ...  }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
 {
   imports = [
@@ -42,7 +47,7 @@
     "amd_pstate=active"
     "amd_iommu=on"
     "iommu=pt"
-    ];
+  ];
 
   services.fstrim.enable = true;
   services.fstrim.interval = "weekly";
@@ -65,8 +70,8 @@
   '';
 
   systemd.services."home-manager-ivan" = {
-    after  = [ "network-online.target" ];
-    wants  = [ "network-online.target" ];
+    after = [ "network-online.target" ];
+    wants = [ "network-online.target" ];
     # HM module sets 5m, force value
     serviceConfig.TimeoutStartSec = lib.mkForce "10min";
   };

@@ -1,4 +1,5 @@
 { pkgs }:
-with pkgs; [
+with pkgs;
+[
   mission-center
 ]

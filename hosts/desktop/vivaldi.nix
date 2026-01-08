@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
   # Wayland + Vulkan + WebGPU Vivaldi launcher with resource protections
@@ -35,7 +40,10 @@ let
     genericName = "Web Browser";
     exec = "vivaldi-protected %U";
     icon = "vivaldi";
-    categories = [ "Network" "WebBrowser" ];
+    categories = [
+      "Network"
+      "WebBrowser"
+    ];
   };
 in
 {
