@@ -42,7 +42,6 @@ with pkgs; [
 
   # Clipboard
   wl-clipboard-rs
-  xclip
 
   # DNS
   doggo
