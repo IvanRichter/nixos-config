@@ -22,10 +22,20 @@
   };
 
   # Bind inputs
-  outputs = { self, nixpkgs, home-manager, flake-utils, apple-silicon, stylix, ... } @ inputs:
+  outputs =
+    {
+      self,
+      nixpkgs,
+      home-manager,
+      flake-utils,
+      apple-silicon,
+      stylix,
+      ...
+    }@inputs:
     let
       overlays = import ./overlays;
-    in {
+    in
+    {
       formatter = {
         x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.nixfmt;
         aarch64-linux = nixpkgs.legacyPackages.aarch64-linux.nixfmt;

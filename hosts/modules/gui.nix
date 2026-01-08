@@ -1,8 +1,14 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
-  isX86   = pkgs.stdenv.hostPlatform.system == "x86_64-linux";
-in {
+  isX86 = pkgs.stdenv.hostPlatform.system == "x86_64-linux";
+in
+{
   services.xserver = {
     enable = isX86;
     videoDrivers = lib.optionals isX86 [ "nvidia" ];

@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
   # Wayland + Vulkan + WebGPU Chrome launcher with resource protections
@@ -27,14 +32,16 @@ let
         "$@"
   '';
 
-  
   chromeProtectedDesktop = pkgs.makeDesktopItem {
     name = "google-chrome-protected";
     desktopName = "Google Chrome (WebGPU)";
     genericName = "Web Browser";
     exec = "chrome-protected %U";
     icon = "google-chrome";
-    categories = [ "Network" "WebBrowser" ];
+    categories = [
+      "Network"
+      "WebBrowser"
+    ];
   };
 in
 {

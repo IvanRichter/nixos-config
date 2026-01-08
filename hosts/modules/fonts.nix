@@ -1,4 +1,5 @@
-{ pkgs, ... }: {
+{ pkgs, ... }:
+{
   fonts = {
     packages = with pkgs; [
       roboto
@@ -20,10 +21,20 @@
       allowBitmaps = false;
 
       defaultFonts = {
-        sansSerif = [ "Roboto" "Noto Sans" "DejaVu Sans" ];
-        serif     = [ "Noto Serif" "DejaVu Serif" ];
-        monospace = [ "MesloLGS Nerd Font Mono" "DejaVu Sans Mono" ];
-        emoji     = [ "Noto Color Emoji" ];
+        sansSerif = [
+          "Roboto"
+          "Noto Sans"
+          "DejaVu Sans"
+        ];
+        serif = [
+          "Noto Serif"
+          "DejaVu Serif"
+        ];
+        monospace = [
+          "MesloLGS Nerd Font Mono"
+          "DejaVu Sans Mono"
+        ];
+        emoji = [ "Noto Color Emoji" ];
       };
 
       # Route common stacks to Roboto
@@ -52,6 +63,5 @@
   };
 
   # Slightly crisper TrueType metrics
-  environment.sessionVariables.FREETYPE_PROPERTIES = 
-    "truetype:interpreter-version=40 cff:no-stem-darkening=1 autofitter:warping=1";
+  environment.sessionVariables.FREETYPE_PROPERTIES = "truetype:interpreter-version=40 cff:no-stem-darkening=1 autofitter:warping=1";
 }

@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
   isAarch64 = pkgs.stdenv.hostPlatform.system == "aarch64-linux";
 in
