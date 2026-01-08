@@ -13,7 +13,7 @@ with pkgs; [
   nix-output-monitor
   macchina
   usbutils
-  wl-clipboard
+  wl-clipboard-rs
   xclip
   eza
   bat
