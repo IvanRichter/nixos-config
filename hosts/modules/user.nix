@@ -30,6 +30,7 @@
       top  = "btm";
       dig  = "doggo";
       jq = "jaq";
+      du = "dust";
       cd   = "z";
     };
   };
