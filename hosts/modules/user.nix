@@ -29,6 +29,7 @@
       find = "fd";
       top  = "btm";
       dig  = "doggo";
+      jq = "jaq";
       cd   = "z";
     };
   };
