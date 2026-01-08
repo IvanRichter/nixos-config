@@ -6,6 +6,7 @@ with pkgs; [
   nano
   unzip
   zip
+  broot
   tree
   lsof
   file
