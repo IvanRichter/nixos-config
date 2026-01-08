@@ -36,6 +36,7 @@ with pkgs; [
 
   # Nix tooling
   nix-output-monitor
+  nixfmt
 
   # System info
   macchina

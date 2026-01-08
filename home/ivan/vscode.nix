@@ -15,6 +15,7 @@ let
     "golang.go"
     "hashicorp.terraform"
     "jeff-hykin.better-nix-syntax"
+    "jnoortheen.nix-ide"
     "mads-hartmann.bash-ide-vscode"
     "mechatroner.rainbow-csv"
     "ms-azuretools.vscode-containers"
@@ -55,6 +56,7 @@ let
     "github.copilot"                   
     "github.copilot-chat"              
     "hashicorp.terraform"              
+    "jnoortheen.nix-ide"
     "mads-hartmann.bash-ide-vscode"    
     "ms-azuretools.vscode-containers"  
     "ms-azuretools.vscode-docker"      
@@ -83,6 +85,7 @@ let
     github.copilot
     github.copilot-chat
     hashicorp.terraform
+    jnoortheen.nix-ide
     mads-hartmann.bash-ide-vscode
     ms-azuretools.vscode-containers
     ms-azuretools.vscode-docker
@@ -147,6 +150,10 @@ in {
 
         "editor.defaultFormatter" = "esbenp.prettier-vscode";
         "editor.formatOnSave" = true;
+        "[nix]" = {
+          "editor.defaultFormatter" = "jnoortheen.nix-ide";
+        };
+        "nix.formatterPath" = "${pkgs.nixfmt}/bin/nixfmt";
         "editor.fontFamily" =
           "'JetBrainsMono Nerd Font', 'MesloLGS Nerd Font', 'Droid Sans Mono', 'monospace'";
         "workbench.colorTheme" = "One Dark Pro Night Flat";
