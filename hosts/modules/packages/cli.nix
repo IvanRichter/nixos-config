@@ -29,6 +29,7 @@ with pkgs; [
   evtest
   bat
   ripgrep
+  dust
 
   # JSON processing
   jaq
