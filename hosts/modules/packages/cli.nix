@@ -9,7 +9,7 @@ with pkgs; [
   tree
   lsof
   file
-  jq
+  jaq
   nix-output-monitor
   macchina
   usbutils
