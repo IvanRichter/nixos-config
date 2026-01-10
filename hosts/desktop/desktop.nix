@@ -29,7 +29,7 @@
   ];
 
   nixpkgs.config.allowUnfree = true;
-  boot.kernelPackages = pkgs.linuxPackages_latest;
+  boot.kernelPackages = pkgs.linuxPackages_lqx_v4;
 
   system.stateVersion = "25.11";
   networking.hostName = "nixos";
