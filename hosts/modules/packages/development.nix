@@ -40,7 +40,4 @@ with pkgs;
   dataform
   lazysql
   gh
-
-  # Terminal
-  wezterm
 ]
