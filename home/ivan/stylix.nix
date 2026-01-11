@@ -3,12 +3,12 @@
 {
   stylix.targets = {
     starship.enable = true;
-    wezterm.enable = true;
+    rio.enable = false;
     vscode.enable = false;
   };
 
   imports = [
     ./stylix/starship.nix
-    ./stylix/wezterm.nix
+    ./stylix/rio.nix
   ];
 }

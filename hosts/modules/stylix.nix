@@ -48,8 +48,8 @@ in
         name = "Noto Color Emoji";
       };
       sizes = {
-        terminal = 12.5;
-        popups = 12;
+        terminal = 16;
+        popups = 16;
       };
     };
   };
