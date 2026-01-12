@@ -8,6 +8,13 @@ let
       exec npx -y @dataform/cli@latest "$@"
     '';
   };
+  rustToolchain = pkgs.rust-bin.stable.latest.default.override {
+    extensions = [
+      "clippy"
+      "rust-src"
+      "rustfmt"
+    ];
+  };
 in
 
 with pkgs;
@@ -15,7 +22,7 @@ with pkgs;
   # Programming languages & runtimes
   nodejs_25
   corepack
-  rustup
+  rustToolchain
   (python3.withPackages (pythonPackages: [
     pythonPackages.ipykernel
     pythonPackages.jupyter

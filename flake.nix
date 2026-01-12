@@ -19,6 +19,10 @@
     # Stylix
     stylix.url = "github:nix-community/stylix";
     stylix.inputs.nixpkgs.follows = "nixpkgs";
+
+    # Rust toolchains
+    rust-overlay.url = "github:oxalica/rust-overlay";
+    rust-overlay.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   # Bind inputs
@@ -29,11 +33,12 @@
       home-manager,
       flake-utils,
       apple-silicon,
+      rust-overlay,
       stylix,
       ...
     }@inputs:
     let
-      overlays = import ./overlays;
+      overlays = import ./overlays ++ [ rust-overlay.overlays.default ];
     in
     {
       formatter = {
