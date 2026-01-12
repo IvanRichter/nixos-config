@@ -7,6 +7,13 @@
 
 let
   codeBin = "${config.programs.vscode.package}/bin/code";
+  rustToolchain = pkgs.rust-bin.stable.latest.default.override {
+    extensions = [
+      "clippy"
+      "rust-src"
+      "rustfmt"
+    ];
+  };
 
   # Wishlist
   want = [
@@ -30,6 +37,7 @@ let
     "ms-python.vscode-pylance"
     "ms-vscode-remote.remote-containers"
     "ritwickdey.liveserver"
+    "rust-lang.rust-analyzer"
     "tamasfe.even-better-toml"
     "timonwong.shellcheck"
     "unifiedjs.vscode-mdx"
@@ -41,6 +49,7 @@ let
     "adrianwilczynski.alpine-js-intellisense"
     "ashishalex.dataform-lsp-vscode"
     "AtomMaterial.a-file-icon-vscode"
+    "dustypomerleau.rust-syntax"
     "googlecloudtools.cloudcode"
     "ggsimm.wgsl-literal"
     "macabeus.vscode-fluent"
@@ -68,6 +77,7 @@ let
     "mechatroner.rainbow-csv"
     "ms-vscode-remote.remote-containers"
     "ritwickdey.liveserver"
+    "rust-lang.rust-analyzer"
     "tamasfe.even-better-toml"
     "timonwong.shellcheck"
     "unifiedjs.vscode-mdx"
@@ -97,6 +107,7 @@ let
     mechatroner.rainbow-csv
     ms-vscode-remote.remote-containers
     ritwickdey.liveserver
+    rust-lang.rust-analyzer
     tamasfe.even-better-toml
     timonwong.shellcheck
     unifiedjs.vscode-mdx
@@ -161,6 +172,19 @@ in
         "[nix]" = {
           "editor.defaultFormatter" = "jnoortheen.nix-ide";
         };
+        "[rust]" = {
+          "editor.defaultFormatter" = "rust-lang.rust-analyzer";
+          "editor.formatOnSave" = true;
+        };
+        "rust-analyzer.checkOnSave" = false;
+        "rust-analyzer.cargo.buildScripts.enable" = false;
+        "rust-analyzer.cargo.targetDir" = "${config.xdg.cacheHome}/rust-analyzer/target";
+        "rust-analyzer.procMacro.enable" = false;
+        "rust-analyzer.rustfmt.overrideCommand" = [
+          "${rustToolchain}/bin/rustfmt"
+          "--edition"
+          "2024"
+        ];
         "nix.formatterPath" = "${pkgs.nixfmt}/bin/nixfmt";
         "editor.fontFamily" =
           "'JetBrainsMono Nerd Font', 'MesloLGS Nerd Font', 'Droid Sans Mono', 'monospace'";
