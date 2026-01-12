@@ -15,83 +15,8 @@ let
     ];
   };
 
-  # Wishlist
-  want = [
-    # Provided by nixpkgs
-    "astro-build.astro-vscode"
-    "bradlc.vscode-tailwindcss"
-    "docker.docker"
-    "esbenp.prettier-vscode"
-    "github.copilot"
-    "github.copilot-chat"
-    "golang.go"
-    "hashicorp.terraform"
-    "jeff-hykin.better-nix-syntax"
-    "jnoortheen.nix-ide"
-    "mads-hartmann.bash-ide-vscode"
-    "mechatroner.rainbow-csv"
-    "ms-azuretools.vscode-containers"
-    "ms-azuretools.vscode-docker"
-    "ms-python.python"
-    "ms-toolsai.jupyter"
-    "ms-python.vscode-pylance"
-    "ms-vscode-remote.remote-containers"
-    "ritwickdey.liveserver"
-    "rust-lang.rust-analyzer"
-    "tamasfe.even-better-toml"
-    "timonwong.shellcheck"
-    "unifiedjs.vscode-mdx"
-    "usernamehw.errorlens"
-    "vue.volar"
-    "zhuangtongfa.material-theme"
-
-    # Marketplace-only
-    "adrianwilczynski.alpine-js-intellisense"
-    "ashishalex.dataform-lsp-vscode"
-    "AtomMaterial.a-file-icon-vscode"
-    "dustypomerleau.rust-syntax"
-    "googlecloudtools.cloudcode"
-    "ggsimm.wgsl-literal"
-    "macabeus.vscode-fluent"
-    "ms-python.vscode-python-envs"
-    "openai.chatgpt"
-    "polymeilex.wgsl"
-    "randomfractalsinc.vscode-data-preview"
-    "risingstack.astro-alpinejs-syntax-highlight"
-  ];
-
   # Extensions in nixpkgs
-  declaredIds = [
-    "astro-build.astro-vscode"
-    "jeff-hykin.better-nix-syntax"
-    "bradlc.vscode-tailwindcss"
-    "docker.docker"
-    "esbenp.prettier-vscode"
-    "github.copilot"
-    "github.copilot-chat"
-    "hashicorp.terraform"
-    "jnoortheen.nix-ide"
-    "mads-hartmann.bash-ide-vscode"
-    "ms-azuretools.vscode-containers"
-    "ms-azuretools.vscode-docker"
-    "mechatroner.rainbow-csv"
-    "ms-vscode-remote.remote-containers"
-    "ritwickdey.liveserver"
-    "rust-lang.rust-analyzer"
-    "tamasfe.even-better-toml"
-    "timonwong.shellcheck"
-    "unifiedjs.vscode-mdx"
-    "usernamehw.errorlens"
-    "vue.volar"
-    "ms-python.python"
-    "ms-toolsai.jupyter"
-    "ms-python.vscode-pylance"
-    "golang.go"
-    "zhuangtongfa.material-theme"
-  ];
-
-  # The actual derivations for those
-  declaredPkgs = with pkgs.vscode-extensions; [
+  nixpkgsExtensions = with pkgs.vscode-extensions; [
     astro-build.astro-vscode
     jeff-hykin.better-nix-syntax
     bradlc.vscode-tailwindcss
@@ -120,8 +45,21 @@ let
     zhuangtongfa.material-theme
   ];
 
-  # Everything else gets installed once via the Code CLI
-  missingIds = lib.subtractLists declaredIds want;
+  # Marketplace-only extensions
+  marketplaceExtensions = [
+    "adrianwilczynski.alpine-js-intellisense"
+    "ashishalex.dataform-lsp-vscode"
+    "AtomMaterial.a-file-icon-vscode"
+    "dustypomerleau.rust-syntax"
+    "googlecloudtools.cloudcode"
+    "ggsimm.wgsl-literal"
+    "macabeus.vscode-fluent"
+    "ms-python.vscode-python-envs"
+    "openai.chatgpt"
+    "polymeilex.wgsl"
+    "randomfractalsinc.vscode-data-preview"
+    "risingstack.astro-alpinejs-syntax-highlight"
+  ];
 
 in
 {
@@ -133,7 +71,7 @@ in
     mutableExtensionsDir = true;
 
     profiles.default = {
-      extensions = declaredPkgs;
+      extensions = nixpkgsExtensions;
 
       userSettings = {
         "telemetry.telemetryLevel" = "off";
@@ -204,7 +142,7 @@ in
 
     INSTALLED="$(${codeBin} --list-extensions || true)"
 
-    for ext in ${lib.concatStringsSep " " (map lib.escapeShellArg missingIds)}; do
+    for ext in ${lib.concatStringsSep " " (map lib.escapeShellArg marketplaceExtensions)}; do
       if ! echo "$INSTALLED" | grep -qx "$ext"; then
         echo "Installing VS Code marketplace extension: $ext"
         ${codeBin} --install-extension "$ext"
