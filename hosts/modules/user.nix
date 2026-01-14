@@ -48,4 +48,11 @@
     dataDir = "/home/ivan";
     configDir = "/home/ivan/.config/syncthing";
   };
+
+  security.sudo-rs = {
+    enable = true;
+    extraConfig = ''
+      Defaults pwfeedback
+    '';
+  };
 }
