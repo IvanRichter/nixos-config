@@ -3,7 +3,7 @@
 {
   stylix.targets = {
     starship.enable = true;
-    rio.enable = false;
+    rio.enable = true;
     vscode.enable = false;
   };
 

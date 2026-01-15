@@ -25,6 +25,9 @@
       starship init fish | source
       zoxide init fish --cmd cd | source
 
+      function fish_greeting
+          macchina
+      end
     '';
     shellAliases = {
       pbcopy = "wl-copy";

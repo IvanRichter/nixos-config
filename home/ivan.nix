@@ -15,5 +15,7 @@
     ./ivan/vivaldi.nix
     ./ivan/rdp.nix
     ./ivan/lazysql.nix
+    ./ivan/macchina.nix
+    ./ivan/zellij.nix
   ];
 }

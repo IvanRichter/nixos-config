@@ -1,4 +1,4 @@
-{ config, ... }:
+{ ... }:
 
 {
   programs.rio = {
@@ -8,22 +8,24 @@
         shape = "beam";
       };
       "confirm-before-quit" = false;
-      window.opacity = config.stylix.opacity.terminal;
       window.blur = true;
+      window.decorations = "Disabled";
       fonts = {
-        family = config.stylix.fonts.monospace.name;
-        size = config.stylix.fonts.sizes.terminal;
-        emoji = {
-          family = config.stylix.fonts.emoji.name;
-        };
+        "use-drawable-chars" = true;
       };
-      colors = {
-        selection-background = config.lib.stylix.colors.withHashtag.base03;
-        selection-foreground = config.lib.stylix.colors.withHashtag.base05;
+      navigation = {
+        mode = "Plain";
       };
       renderer = {
         performance = "High";
         backend = "Vulkan";
+      };
+      shell = {
+        program = "zellij";
+        args = [
+          "attach"
+          "-c"
+        ];
       };
     };
   };
