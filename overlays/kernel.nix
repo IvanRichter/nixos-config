@@ -1,12 +1,64 @@
-_final: prev:
+final: prev:
 if (prev ? linuxPackages_lqx) && prev.stdenv.hostPlatform.isx86_64 then
   {
     linuxPackages_lqx_v4 = prev.linuxPackagesFor (
       prev.linuxPackages_lqx.kernel.override {
-        extraConfig = ''
-          # CPU ISA baseline
-          X86_64_VERSION 4
 
+        # Force Clang/LLVM for kernel build
+        stdenv = final.llvmPackages.stdenv;
+
+        # Authoritative Kconfig + force LLVM toolchain in Kbuild
+        argsOverride =
+          let
+            llvm = final.llvmPackages;
+          in
+          {
+            extraMakeFlags =
+              (prev.linuxPackages_lqx.kernel.extraMakeFlags or [ ])
+              ++ [
+                "LLVM=1"
+                "LLVM_IAS=1"
+                "LD=${llvm.lld}/bin/ld.lld"
+                "AR=${llvm.llvm}/bin/llvm-ar"
+                "NM=${llvm.llvm}/bin/llvm-nm"
+                "STRIP=${llvm.llvm}/bin/llvm-strip"
+                "OBJCOPY=${llvm.llvm}/bin/llvm-objcopy"
+                "OBJDUMP=${llvm.llvm}/bin/llvm-objdump"
+                "READELF=${llvm.llvm}/bin/llvm-readelf"
+              ];
+            structuredExtraConfig =
+              (prev.linuxPackages_lqx.kernel.structuredExtraConfig or { })
+              // (with final.lib.kernel; {
+                # CPU ISA baseline
+                X86_64_VERSION_4 = yes;
+                X86_64_VERSION_1 = no;
+                X86_64_VERSION_2 = no;
+                X86_64_VERSION_3 = no;
+
+                # LTO
+                LTO = yes;
+                LTO_CLANG = yes;
+                LTO_CLANG_FULL = yes;
+                LTO_NONE = no;
+                LTO_CLANG_THIN = no;
+
+                # Smaller kernel text
+                KALLSYMS = no;
+
+                # Disable kernel debug noise
+                DEBUG_INFO = final.lib.mkForce no;
+                DEBUG_KERNEL = final.lib.mkForce no;
+                DEBUG_MISC = final.lib.mkForce no;
+                SCHED_DEBUG = final.lib.mkForce no;
+
+                # Scheduling behavior
+                HZ_1000 = yes;
+                PREEMPT_DYNAMIC = yes;
+              });
+          };
+
+        # Pruning
+        extraConfig = ''
           # Obsolete buses
           EISA n
           FIREWIRE n
@@ -95,7 +147,7 @@ if (prev ? linuxPackages_lqx) && prev.stdenv.hostPlatform.isx86_64 then
           M386 n
           M486 n
           M586 n
-          M586TSC n 
+          M586TSC n
           M686 n
 
           # Unused memory
@@ -153,17 +205,8 @@ if (prev ? linuxPackages_lqx) && prev.stdenv.hostPlatform.isx86_64 then
           MD_RAID1 n
           MD_RAID10 n
           MD_RAID456 n
-
-          # Disable kernel debug noise
-          DEBUG_INFO n
-          DEBUG_KERNEL n
-          DEBUG_MISC n
-          SCHED_DEBUG n
-
-          # Scheduling behavior
-          HZ_1000 y
-          PREEMPT_DYNAMIC y
         '';
+
         ignoreConfigErrors = true;
       }
     );
