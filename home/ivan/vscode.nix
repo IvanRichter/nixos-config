@@ -107,6 +107,7 @@ in
 
         "editor.defaultFormatter" = "esbenp.prettier-vscode";
         "editor.formatOnSave" = true;
+        "editor.inlayHints.enabled" = "offUnlessPressed";
         "[nix]" = {
           "editor.defaultFormatter" = "jnoortheen.nix-ide";
         };
