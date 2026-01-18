@@ -21,6 +21,7 @@ let
     jeff-hykin.better-nix-syntax
     bradlc.vscode-tailwindcss
     docker.docker
+    eamodio.gitlens
     esbenp.prettier-vscode
     github.copilot
     github.copilot-chat
@@ -30,9 +31,11 @@ let
     ms-azuretools.vscode-containers
     ms-azuretools.vscode-docker
     mechatroner.rainbow-csv
+    oderwat.indent-rainbow
     ms-vscode-remote.remote-containers
     ritwickdey.liveserver
     rust-lang.rust-analyzer
+    shd101wyy.markdown-preview-enhanced
     tamasfe.even-better-toml
     timonwong.shellcheck
     unifiedjs.vscode-mdx
@@ -93,6 +96,7 @@ in
         "sqlfluff.dialect" = "bigquery";
         "workbench.iconTheme" = "a-file-icon-vscode";
         "workbench.sideBar.location" = "right";
+        "workbench.editor.closeOnFileDelete" = true;
         "vsicons.dontShowNewVersionMessage" = true;
 
         "files.associations" = {
@@ -101,13 +105,38 @@ in
           "*.sh" = "shellscript";
         };
 
+        "search.useIgnoreFiles" = true;
+        "search.useGlobalIgnoreFiles" = true;
+        "search.showLineNumbers" = true;
+        "search.smartCase" = true;
+        "search.exclude" = {
+          "**/.git/objects/**" = true;
+          "**/.git/subtree-cache/**" = true;
+          "**/node_modules/**" = true;
+          "**/target/**" = true;
+          "**/dist/**" = true;
+          "**/.direnv/**" = true;
+        };
+        "files.watcherExclude" = {
+          "**/.git/objects/**" = true;
+          "**/.git/subtree-cache/**" = true;
+          "**/node_modules/**" = true;
+          "**/target/**" = true;
+          "**/dist/**" = true;
+          "**/.direnv/**" = true;
+        };
+
         "github.copilot.nextEditSuggestions.enabled" = true;
         "cloudcode.project" = "happy-end-data-warehouse";
         "cloudcode.beta.bigqueryRegion" = "eu";
 
         "editor.defaultFormatter" = "esbenp.prettier-vscode";
         "editor.formatOnSave" = true;
+        "editor.cursorBlinking" = "phase";
+        "editor.cursorSmoothCaretAnimation" = "on";
         "editor.inlayHints.enabled" = "offUnlessPressed";
+        "indentRainbow.indicatorStyle" = "light";
+        "typescript.updateImportsOnFileMove.enabled" = "always";
         "[nix]" = {
           "editor.defaultFormatter" = "jnoortheen.nix-ide";
         };
@@ -131,6 +160,8 @@ in
 
         "extensions.autoUpdate" = true;
         "extensions.autoCheckUpdates" = true;
+
+        "geminicodeassist.enableTelemetry" = false;
 
         "vscode-dataform-tools.currencyFoDryRunCost" = "EUR";
       };
