@@ -47,4 +47,5 @@ with pkgs;
   dataform
   lazysql
   gh
+  sqlfluff
 ]
