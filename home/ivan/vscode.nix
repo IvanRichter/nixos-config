@@ -62,6 +62,7 @@ let
     "polymeilex.wgsl"
     "randomfractalsinc.vscode-data-preview"
     "risingstack.astro-alpinejs-syntax-highlight"
+    "sqlfluff.vscode-sqlfluff"
   ];
 
 in
@@ -93,7 +94,8 @@ in
           };
         };
 
-        "sqlfluff.dialect" = "bigquery";
+        "vscode-dataform-tools.formattingCli" = "sqlfluff";
+        "vscode-dataform-tools.sqlfluffConfigPath" = "./.sqlfluff";
         "workbench.iconTheme" = "a-file-icon-vscode";
         "workbench.sideBar.location" = "right";
         "workbench.editor.closeOnFileDelete" = true;
@@ -140,6 +142,14 @@ in
         "[nix]" = {
           "editor.defaultFormatter" = "jnoortheen.nix-ide";
         };
+        "[sql]" = {
+          "editor.defaultFormatter" = "sqlfluff.vscode-sqlfluff";
+          "editor.formatOnSave" = true;
+        };
+        "[sqlx]" = {
+          "editor.defaultFormatter" = "ashishalex.dataform-lsp-vscode";
+          "editor.formatOnSave" = true;
+        };
         "[rust]" = {
           "editor.defaultFormatter" = "rust-lang.rust-analyzer";
           "editor.formatOnSave" = true;
@@ -163,6 +173,8 @@ in
 
         "geminicodeassist.enableTelemetry" = false;
 
+        "vscode-dataform-tools.gcpProjectId" = "he-dlh-prd";
+        "vscode-dataform-tools.gcpLocation" = "europe-west1";
         "vscode-dataform-tools.currencyFoDryRunCost" = "EUR";
       };
     };
