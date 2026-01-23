@@ -11,6 +11,9 @@
   environment.systemPackages = with pkgs; [
     cosmic-reader
     cosmic-ext-tweaks
+    cosmic-ext-applet-weather
+    cosmic-ext-applet-caffeine
+    cosmic-ext-applet-sysinfo
   ];
 
   # Remove unneeded packages
