@@ -35,17 +35,24 @@ with pkgs;
   pkg-config
   openssl
 
-  # Dev tools
+  # Cloud & infra
   google-cloud-sdk
   google-cloud-sql-proxy
   terraform
   pulumi-bin
+  gh
+
+  # Databases & SQL
   dbmate
+  lazysql
+  sqlfluff
+  dataform
+
+  # Graphics & GPU
   vulkan-tools
   libva-utils
   mesa-demos
-  dataform
-  lazysql
-  gh
-  sqlfluff
+
+  # Utilities
+  bruno
 ]
