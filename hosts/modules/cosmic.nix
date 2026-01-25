@@ -20,6 +20,7 @@
   environment.cosmic.excludePackages = with pkgs; [
     cosmic-store
     cosmic-term
+    cosmic-player
     adwaita-icon-theme
     pop-icon-theme
     pulseaudio
