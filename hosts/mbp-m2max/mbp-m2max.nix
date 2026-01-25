@@ -11,6 +11,7 @@
     ../modules/cosmic.nix
     ../modules/graphics.nix
     ../modules/packages.nix
+    ../modules/uutils.nix
     ../modules/docker.nix
     ../modules/fonts.nix
     ../modules/networking.nix

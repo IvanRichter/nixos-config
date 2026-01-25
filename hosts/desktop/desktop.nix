@@ -27,6 +27,7 @@
     ../modules/docker.nix
     ../modules/rdp.nix
     ../modules/packages.nix
+    ../modules/uutils.nix
   ];
 
   nixpkgs.config.allowUnfree = true;
