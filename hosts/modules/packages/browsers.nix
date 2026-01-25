@@ -10,4 +10,5 @@ with pkgs;
     proprietaryCodecs = true;
     enableWidevine = true;
   })
+  servo
 ]
