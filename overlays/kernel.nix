@@ -13,19 +13,17 @@ if (prev ? linuxPackages_lqx) && prev.stdenv.hostPlatform.isx86_64 then
             llvm = final.llvmPackages;
           in
           {
-            extraMakeFlags =
-              (prev.linuxPackages_lqx.kernel.extraMakeFlags or [ ])
-              ++ [
-                "LLVM=1"
-                "LLVM_IAS=1"
-                "LD=${llvm.lld}/bin/ld.lld"
-                "AR=${llvm.llvm}/bin/llvm-ar"
-                "NM=${llvm.llvm}/bin/llvm-nm"
-                "STRIP=${llvm.llvm}/bin/llvm-strip"
-                "OBJCOPY=${llvm.llvm}/bin/llvm-objcopy"
-                "OBJDUMP=${llvm.llvm}/bin/llvm-objdump"
-                "READELF=${llvm.llvm}/bin/llvm-readelf"
-              ];
+            extraMakeFlags = (prev.linuxPackages_lqx.kernel.extraMakeFlags or [ ]) ++ [
+              "LLVM=1"
+              "LLVM_IAS=1"
+              "LD=${llvm.lld}/bin/ld.lld"
+              "AR=${llvm.llvm}/bin/llvm-ar"
+              "NM=${llvm.llvm}/bin/llvm-nm"
+              "STRIP=${llvm.llvm}/bin/llvm-strip"
+              "OBJCOPY=${llvm.llvm}/bin/llvm-objcopy"
+              "OBJDUMP=${llvm.llvm}/bin/llvm-objdump"
+              "READELF=${llvm.llvm}/bin/llvm-readelf"
+            ];
             structuredExtraConfig =
               (prev.linuxPackages_lqx.kernel.structuredExtraConfig or { })
               // (with final.lib.kernel; {
@@ -70,6 +68,19 @@ if (prev ? linuxPackages_lqx) && prev.stdenv.hostPlatform.isx86_64 then
           PCI_LEGACY n
           PCMCIA n
 
+          # Unused sensors
+          IIO n
+          INDUSTRIAL_IO n
+          SENSORS_CORETEMP n
+
+          # Obsolete crypto
+          CRYPTO_ARC4 n
+          CRYPTO_BLOWFISH n
+          CRYPTO_CAMELLIA m
+          CRYPTO_SEED n
+          CRYPTO_SERPENT m
+          CRYPTO_TWOFISH n
+
           # Obsolete devices
           FLOPPY n
           IEEE1284 n
@@ -82,7 +93,13 @@ if (prev ? linuxPackages_lqx) && prev.stdenv.hostPlatform.isx86_64 then
           BLK_DEV_FD n
           IDE n
 
-          # Obsolete / special-purpose filesystems
+          # Unused media
+          MEDIA_ANALOG_TV_SUPPORT n
+          MEDIA_CEC_SUPPORT n
+          MEDIA_DIGITAL_TV_SUPPORT n
+          MEDIA_RADIO_SUPPORT n
+
+          # Obsolete/special-purpose filesystems
           9P_FS n
           ADFS_FS n
           AFFS_FS n
@@ -91,8 +108,8 @@ if (prev ? linuxPackages_lqx) && prev.stdenv.hostPlatform.isx86_64 then
           CEPH_FS n
           CIFS n
           GFS2_FS n
-          HFSPLUS_FS n
           HFS_FS n
+          HFSPLUS_FS n
           MINIX_FS n
           NFS_FS n
           NFS_V2 n
@@ -114,18 +131,22 @@ if (prev ? linuxPackages_lqx) && prev.stdenv.hostPlatform.isx86_64 then
           JFS_FS n
           XFS_FS n
 
-          # Obsolete networking
+          # Obsolete/unused networking
+          6LOWPAN n
           ARCNET n
           ATM n
+          CAN n
+          CAN_BCM n
+          CAN_RAW n
           DECNET n
           FDDI n
           HIPPI n
+          IEEE802154 n
+          INFINIBAND n
+          IRDA n
           LAPB n
           TOKENRING n
           X25 n
-
-          # Unused networking
-          INFINIBAND n
 
           # Unused GPU
           DRM_AMDGPU n
@@ -166,7 +187,10 @@ if (prev ? linuxPackages_lqx) && prev.stdenv.hostPlatform.isx86_64 then
           INPUT_TOUCHSCREEN n
 
           # X870E Taichi Wi-Fi
-          IWLWIFI m
+          MT76 m
+          MT76_CONNAC_LIB m
+          MT7925E m
+          MT792X_LIB m
           WLAN y
 
           # Unused Wi-Fi
@@ -174,11 +198,16 @@ if (prev ? linuxPackages_lqx) && prev.stdenv.hostPlatform.isx86_64 then
           ATH9K n
           ATH_COMMON n
           BRCMFMAC n
+          IWLWIFI n
           RTLWIFI n
 
-          # USB Gadget mode
+          # Unused USB
           USB_CONFIGFS n
           USB_GADGET n
+          USB_PRINTER n
+          USB_SERIAL n
+          USB_SERIAL_FTDI_SIO n
+          USB_SERIAL_PL2303 n
 
           # Unused hardware monitoring
           HWMON_VID n
@@ -199,8 +228,10 @@ if (prev ? linuxPackages_lqx) && prev.stdenv.hostPlatform.isx86_64 then
           DM_MULTIPATH n
           DM_RAID n
 
-          # Unused RAID
+          # Unused block/RAID
+          BLK_DEV_BSG n
           BLK_DEV_MD n
+          BLK_DEV_ZONED n
           MD_RAID0 n
           MD_RAID1 n
           MD_RAID10 n
