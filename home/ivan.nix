@@ -13,6 +13,7 @@
     ./ivan/stylix.nix
     ./ivan/vscode.nix
     ./ivan/vivaldi.nix
+    ./ivan/vlc.nix
     ./ivan/rdp.nix
     ./ivan/lazysql.nix
     ./ivan/macchina.nix

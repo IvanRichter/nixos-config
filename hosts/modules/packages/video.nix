@@ -2,4 +2,5 @@
 with pkgs;
 [
   ffmpeg-full
+  vlc
 ]
