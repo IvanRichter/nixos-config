@@ -13,6 +13,7 @@
     ./memory.nix
     ./chrome.nix
     ./corsair.nix
+    ./eid.nix
 
     ../modules/nix.nix
     ../modules/user.nix
@@ -53,21 +54,6 @@
   services.fstrim.interval = "weekly";
   systemd.services.fstrim.wantedBy = lib.mkForce [ ];
   systemd.timers.fstrim.timerConfig.Persistent = false;
-
-  # ---------------------------
-  # Web eID
-  # ---------------------------
-  services.pcscd.enable = true;
-
-  environment.etc."chromium/native-messaging-hosts/eu.webeid.json".source =
-    "${pkgs.web-eid-app}/share/web-eid/eu.webeid.json";
-
-  environment.etc."opt/chrome/native-messaging-hosts/eu.webeid.json".source =
-    "${pkgs.web-eid-app}/share/web-eid/eu.webeid.json";
-
-  environment.etc."pkcs11/modules/opensc-pkcs11".text = ''
-    module: ${pkgs.opensc}/lib/opensc-pkcs11.so
-  '';
 
   systemd.services."home-manager-ivan" = {
     after = [ "network-online.target" ];
