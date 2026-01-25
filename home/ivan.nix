@@ -14,6 +14,7 @@
     ./ivan/vscode.nix
     ./ivan/vivaldi.nix
     ./ivan/vlc.nix
+    ./ivan/office.nix
     ./ivan/rdp.nix
     ./ivan/lazysql.nix
     ./ivan/macchina.nix

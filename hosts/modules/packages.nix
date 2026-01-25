@@ -7,6 +7,7 @@
     ++ (import ./packages/comms.nix { inherit pkgs; })
     ++ (import ./packages/development.nix { inherit pkgs; })
     ++ (import ./packages/eid.nix { inherit pkgs; })
+    ++ (import ./packages/office.nix { inherit pkgs; })
     ++ (import ./packages/video.nix { inherit pkgs; })
     ++ (import ./packages/utils.nix { inherit pkgs; })
     ++ (import ./packages/graphics-apps.nix { inherit pkgs; });
