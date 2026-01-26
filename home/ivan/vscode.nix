@@ -20,6 +20,7 @@ let
     astro-build.astro-vscode
     jeff-hykin.better-nix-syntax
     bradlc.vscode-tailwindcss
+    catppuccin.catppuccin-vsc-icons
     docker.docker
     eamodio.gitlens
     esbenp.prettier-vscode
@@ -41,6 +42,7 @@ let
     unifiedjs.vscode-mdx
     usernamehw.errorlens
     vue.volar
+    wgsl-analyzer.wgsl-analyzer
     ms-python.python
     ms-toolsai.jupyter
     ms-python.vscode-pylance
@@ -52,15 +54,10 @@ let
   marketplaceExtensions = [
     "adrianwilczynski.alpine-js-intellisense"
     "ashishalex.dataform-lsp-vscode"
-    "AtomMaterial.a-file-icon-vscode"
     "dustypomerleau.rust-syntax"
     "googlecloudtools.cloudcode"
-    "ggsimm.wgsl-literal"
     "macabeus.vscode-fluent"
-    "ms-python.vscode-python-envs"
     "openai.chatgpt"
-    "polymeilex.wgsl"
-    "randomfractalsinc.vscode-data-preview"
     "risingstack.astro-alpinejs-syntax-highlight"
     "sqlfluff.vscode-sqlfluff"
   ];
@@ -96,7 +93,7 @@ in
 
         "vscode-dataform-tools.formattingCli" = "sqlfluff";
         "vscode-dataform-tools.sqlfluffConfigPath" = "./.sqlfluff";
-        "workbench.iconTheme" = "a-file-icon-vscode";
+        "workbench.iconTheme" = "catppuccin-macchiato";
         "workbench.sideBar.location" = "right";
         "workbench.editor.closeOnFileDelete" = true;
         "vsicons.dontShowNewVersionMessage" = true;
