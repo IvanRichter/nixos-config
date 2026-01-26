@@ -6,7 +6,7 @@
 
     settings = {
       "$schema" = "https://starship.rs/config-schema.json";
-      # Default $all list with $os moved before $directory to show the icon on the first line.
+      # Default $all list with $os moved before $directory to show the icon on the first line
       format = builtins.concatStringsSep "" [
         "$username"
         "$hostname"
@@ -99,10 +99,10 @@
         "$custom"
         "$sudo"
         "$cmd_duration"
+        "$time"
         "$line_break"
         "$jobs"
         "$battery"
-        "$time"
         "$status"
         "$container"
         "$netns"
@@ -130,8 +130,17 @@
         format = " [$symbol$state( $name)]($style)";
       };
       cmd_duration = {
-        min_time = 1000;
+        min_time = 0;
+        show_milliseconds = true;
         format = " [$duration]($style)";
+      };
+      time = {
+        disabled = false;
+        time_format = "%-I:%M:%S %p";
+        format = " at [$time]($style)";
+      };
+      gcloud = {
+        format = "on [$symbol$domain(\\($project\\))]($style) ";
       };
       character = {
         format = " $symbol ";
