@@ -10,7 +10,7 @@ with pkgs;
   git
 
   # Editors
-  nano
+  micro-full
 
   # Archives
   unzip
