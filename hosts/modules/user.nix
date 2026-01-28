@@ -42,6 +42,7 @@
       jq = "jaq";
       du = "dust";
       cd = "z";
+      nano = "micro";
     };
   };
 
