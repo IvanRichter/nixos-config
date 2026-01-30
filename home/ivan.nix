@@ -11,6 +11,7 @@
 
   imports = [
     ./ivan/stylix.nix
+    ./ivan/cosmic.nix
     ./ivan/vscode.nix
     ./ivan/vivaldi.nix
     ./ivan/vlc.nix
