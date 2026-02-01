@@ -1,4 +1,4 @@
-{ pkgs, lib, ... }:
+{ pkgs, lib, osConfig, ... }:
 
 {
   home.username = "ivan";
@@ -20,5 +20,7 @@
     ./ivan/lazysql.nix
     ./ivan/macchina.nix
     ./ivan/zellij.nix
+  ] ++ lib.optionals (osConfig.networking.hostName == "nixos") [
+    ./ivan/corsair.nix
   ];
 }
