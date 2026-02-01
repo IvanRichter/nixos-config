@@ -26,7 +26,6 @@
       zoxide init fish --cmd cd | source
 
       function fish_greeting
-          macchina
       end
     '';
     shellAliases = {
