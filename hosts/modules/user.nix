@@ -42,6 +42,7 @@
       du = "dust";
       cd = "z";
       nano = "micro";
+      torrent = "xdg-open http://localhost:3030/web/";
     };
   };
 
