@@ -7,8 +7,8 @@ with pkgs;
   (if isX86 then google-chrome else chromium)
   firefox
   (vivaldi.override {
-    proprietaryCodecs = true;
-    enableWidevine = true;
+    proprietaryCodecs = isX86;
+    enableWidevine = isX86;
   })
   servo
 ]
