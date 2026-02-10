@@ -7,9 +7,6 @@ in
   hardware.graphics = {
     enable = true;
     enable32Bit = isX86;
-    extraPackages = with pkgs; [
-      nvidia-vaapi-driver
-    ];
   };
 
   environment.systemPackages = with pkgs; [
