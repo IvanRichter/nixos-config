@@ -14,12 +14,12 @@
     ./chrome.nix
     ./corsair.nix
     ./eid.nix
+    ./nvidia.nix
 
     ../modules/nix.nix
     ../modules/user.nix
     ../modules/fonts.nix
     ../modules/graphics.nix
-    ../modules/nvidia.nix
     ../modules/stylix.nix
     ../modules/cosmic.nix
     ../modules/gui.nix
