@@ -16,13 +16,18 @@
     packages = with pkgs; [
       syncthing
       fish
+      fishPlugins.async-prompt
+      fishPlugins.puffer
     ];
   };
 
   programs.fish = {
     enable = true;
-    interactiveShellInit = ''
+    useBabelfish = true;
+    shellInit = ''
       starship init fish | source
+    '';
+    interactiveShellInit = ''
       zoxide init fish --cmd cd | source
 
       function fish_greeting
