@@ -21,7 +21,7 @@ with pkgs;
 [
   # Programming languages & runtimes
   nodejs_25
-  corepack
+  pnpm
   rustToolchain
   (python3.withPackages (pythonPackages: [
     pythonPackages.ipykernel
