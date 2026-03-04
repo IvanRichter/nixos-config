@@ -1,6 +1,8 @@
 { config, pkgs, ... }:
 
 {
+  documentation.man.enable = false;
+
   imports = [
     ./packages/utils.nix
   ];
