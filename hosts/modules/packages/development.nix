@@ -3,7 +3,7 @@
 let
   dataform = pkgs.writeShellApplication {
     name = "dataform";
-    runtimeInputs = [ pkgs.nodejs_24 ];
+    runtimeInputs = [ pkgs.nodejs_25 ];
     text = ''
       exec npx -y @dataform/cli@latest "$@"
     '';
