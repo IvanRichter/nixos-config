@@ -106,10 +106,12 @@
   services.system76-scheduler.enable = true;
 
   # Align systemd sleep with kernel
-  systemd.sleep.extraConfig = ''
-    SuspendState=mem
-    SuspendMode=s2idle
-  '';
+  systemd.sleep.settings = {
+    Sleep = {
+      SuspendState = "mem";
+      SuspendMode = "s2idle";
+    };
+  };
 
   # Lid behavior
   services.logind.settings = {
