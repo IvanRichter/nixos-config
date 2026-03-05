@@ -6,6 +6,7 @@ with pkgs;
 if isX86 then
   [
     lmstudio
+    openclaw
   ]
 else
   [ ]

@@ -1,5 +1,11 @@
-{ config, pkgs, ... }:
+{ lib, ... }:
 {
+  nixpkgs.config.allowInsecurePredicate =
+    pkg:
+    builtins.elem (lib.getName pkg) [
+      "openclaw"
+    ];
+
   nix.settings.experimental-features = [
     "nix-command"
     "flakes"
