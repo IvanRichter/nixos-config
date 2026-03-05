@@ -23,7 +23,7 @@ with pkgs;
   nodejs_25
   pnpm
   rustToolchain
-  (python3.withPackages (pythonPackages: [
+  (python314.withPackages (pythonPackages: [
     pythonPackages.ipykernel
     pythonPackages.jupyter
     pythonPackages.bigquery-magics
