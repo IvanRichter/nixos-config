@@ -7,14 +7,14 @@ in
     (pythonFinal: pythonPrev: {
       bigquery-magics = pythonFinal.buildPythonPackage rec {
         pname = "bigquery-magics";
-        version = "0.10.3";
+        version = "0.12.1";
         format = "setuptools";
 
         src = fetchFromGitHub {
           owner = "googleapis";
           repo = "python-bigquery-magics";
-          rev = "09b65f9550ad8216ddb27af0fd0d4d0319ed7b2f";
-          hash = "sha256-F8yMAJahehV50MKbijIq3YZBsN6kv7xo0mQsYbg3el8=";
+          rev = "v${version}";
+          hash = "sha256-iGGLivWAQkGIOh7ElCVxq07POwVNOqdqCiP41sSnZuo=";
         };
 
         propagatedBuildInputs = with pythonPrev; [
