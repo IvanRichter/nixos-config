@@ -6,4 +6,5 @@
   (import ./terminal/fish.nix)
   (import ./terminal/starship.nix)
   (import ./terminal/zoxide.nix)
+  (import ./terminal/skim.nix)
 ]
