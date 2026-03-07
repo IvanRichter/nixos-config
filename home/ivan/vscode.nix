@@ -59,6 +59,7 @@ let
     "googlecloudtools.cloudcode"
     "macabeus.vscode-fluent"
     "openai.chatgpt"
+    "rlivings39.fzf-quick-open"
     "risingstack.astro-alpinejs-syntax-highlight"
     "sqlfluff.vscode-sqlfluff"
   ];
@@ -109,6 +110,7 @@ in
         "search.useGlobalIgnoreFiles" = true;
         "search.showLineNumbers" = true;
         "search.smartCase" = true;
+        "fzf-quick-open.fuzzyCmd" = "${pkgs.skim}/bin/sk";
         "search.exclude" = {
           "**/.git/objects/**" = true;
           "**/.git/subtree-cache/**" = true;
