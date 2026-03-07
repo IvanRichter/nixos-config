@@ -22,6 +22,7 @@ with pkgs;
   eza
   zoxide
   fd
+  skim
 
   # File/system utilities
   lsof
