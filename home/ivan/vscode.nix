@@ -32,7 +32,6 @@ let
     ms-azuretools.vscode-containers
     ms-azuretools.vscode-docker
     mechatroner.rainbow-csv
-    oderwat.indent-rainbow
     ms-vscode-remote.remote-containers
     ritwickdey.liveserver
     rust-lang.rust-analyzer
@@ -137,7 +136,6 @@ in
         "editor.cursorBlinking" = "phase";
         "editor.cursorSmoothCaretAnimation" = "on";
         "editor.inlayHints.enabled" = "offUnlessPressed";
-        "indentRainbow.indicatorStyle" = "light";
         "typescript.updateImportsOnFileMove.enabled" = "always";
         "[nix]" = {
           "editor.defaultFormatter" = "jnoortheen.nix-ide";
