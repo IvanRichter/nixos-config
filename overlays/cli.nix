@@ -17,6 +17,7 @@ let
     "jaq"
     "wl-clipboard-rs"
     "eza"
+    "ast-grep"
   ];
 
   cPkgs = [
