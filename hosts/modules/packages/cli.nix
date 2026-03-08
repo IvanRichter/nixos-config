@@ -31,6 +31,7 @@ with pkgs;
   evtest
   bat
   ripgrep
+  sd
   dust
 
   # JSON processing
