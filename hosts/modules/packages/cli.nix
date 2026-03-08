@@ -8,6 +8,7 @@ with pkgs;
 
   # Version control
   git
+  delta
 
   # Editors
   micro-full

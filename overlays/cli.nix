@@ -18,6 +18,7 @@ let
     "wl-clipboard-rs"
     "eza"
     "ast-grep"
+    "delta"
   ];
 
   cPkgs = [
