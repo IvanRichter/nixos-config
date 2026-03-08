@@ -23,6 +23,10 @@
     # Rust toolchains
     rust-overlay.url = "github:oxalica/rust-overlay";
     rust-overlay.inputs.nixpkgs.follows = "nixpkgs";
+
+    # Wild linker
+    wild.url = "github:davidlattimore/wild";
+    wild.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   # Bind inputs
@@ -35,10 +39,16 @@
       apple-silicon,
       rust-overlay,
       stylix,
+      wild,
       ...
     }@inputs:
     let
-      overlays = import ./overlays ++ [ rust-overlay.overlays.default ];
+      desktopOverlays = [
+        wild.overlays.default
+      ]
+      ++ import ./overlays
+      ++ [ rust-overlay.overlays.default ];
+      mbpOverlays = import ./overlays ++ [ rust-overlay.overlays.default ];
     in
     {
       formatter = {
@@ -50,7 +60,7 @@
         desktop = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
           modules = [
-            { nixpkgs.overlays = overlays; }
+            { nixpkgs.overlays = desktopOverlays; }
             ./hosts/desktop/desktop.nix
             stylix.nixosModules.stylix
 
@@ -79,7 +89,7 @@
         mbp-m2max = nixpkgs.lib.nixosSystem {
           system = "aarch64-linux";
           modules = [
-            { nixpkgs.overlays = overlays; }
+            { nixpkgs.overlays = mbpOverlays; }
             # Wire up Asahi
             apple-silicon.nixosModules.apple-silicon-support
             stylix.nixosModules.stylix
