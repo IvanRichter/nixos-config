@@ -19,6 +19,7 @@ let
     "eza"
     "ast-grep"
     "delta"
+    "bat"
   ];
 
   cPkgs = [
