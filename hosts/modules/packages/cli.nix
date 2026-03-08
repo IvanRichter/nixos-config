@@ -33,6 +33,7 @@ with pkgs;
   ripgrep
   sd
   dust
+  ast-grep
 
   # JSON processing
   jaq
