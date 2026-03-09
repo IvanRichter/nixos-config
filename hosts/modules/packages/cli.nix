@@ -39,6 +39,9 @@ with pkgs;
   # JSON processing
   jaq
 
+  # YAML processing
+  yq-go
+
   # Nix tooling
   nix-output-monitor
   nixfmt
