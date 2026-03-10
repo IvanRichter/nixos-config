@@ -41,6 +41,7 @@ with pkgs;
   terraform
   pulumi-bin
   gh
+  gws
 
   # Databases & SQL
   dbmate
