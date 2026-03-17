@@ -101,6 +101,7 @@ in
 
         "files.associations" = {
           "cloudbuild.yaml" = "yaml";
+          "*.css" = "tailwindcss";
           "*.bash" = "shellscript";
           "*.sh" = "shellscript";
         };
@@ -135,8 +136,11 @@ in
         "editor.formatOnSave" = true;
         "editor.cursorBlinking" = "phase";
         "editor.cursorSmoothCaretAnimation" = "on";
+        "editor.quickSuggestions" = {
+          "strings" = "on";
+        };
         "editor.inlayHints.enabled" = "offUnlessPressed";
-        "typescript.updateImportsOnFileMove.enabled" = "always";
+        "js/ts.updateImportsOnFileMove.enabled" = "always";
         "[nix]" = {
           "editor.defaultFormatter" = "jnoortheen.nix-ide";
         };
@@ -161,7 +165,7 @@ in
           "--edition"
           "2024"
         ];
-        "nix.formatterPath" = "${pkgs.nixfmt}/bin/nixfmt";
+        "nix.formatterPath" = [ "${pkgs.nixfmt}/bin/nixfmt" ];
         "editor.fontFamily" =
           "'JetBrainsMono Nerd Font', 'MesloLGS Nerd Font', 'Droid Sans Mono', 'monospace'";
         "workbench.colorTheme" = "One Dark Pro Night Flat";
