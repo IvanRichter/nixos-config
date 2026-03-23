@@ -54,6 +54,9 @@ with pkgs;
   libva-utils
   mesa-demos
 
+  # Compression
+  brotli
+
   # Utilities
   bruno
 ]
