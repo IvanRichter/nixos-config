@@ -40,8 +40,11 @@ with pkgs;
   google-cloud-sql-proxy
   terraform
   pulumi-bin
-  gh
   gws
+
+  # Git & version control
+  gh
+  git-filter-repo
 
   # Databases & SQL
   dbmate
