@@ -37,7 +37,7 @@
   boot.loader.efi.canTouchEfiVariables = true;
 
   # System identity
-  system.stateVersion = "25.11";
+  system.stateVersion = "26.05";
   networking.hostName = "mbp-nixos";
   i18n.defaultLocale = "en_US.UTF-8";
   time.timeZone = "Europe/Prague";
