@@ -17,6 +17,7 @@
         "$nats"
         "$os"
         "$directory"
+        "$nix_shell"
         "$vcsh"
         "$fossil_branch"
         "$fossil_metrics"
@@ -82,7 +83,6 @@
         "$zig"
         "$buf"
         "$guix_shell"
-        "$nix_shell"
         "$conda"
         "$pixi"
         "$meson"
@@ -126,8 +126,12 @@
         format = " [$all_status$ahead_behind]($style) ";
       };
       nix_shell = {
-        symbol = "nix:";
-        format = " [$symbol$state( $name)]($style)";
+        format = " [🧪 INSIDE NIX $state SHELL 🧪]($style) ";
+        style = "bold green";
+        impure_msg = "DEV";
+        pure_msg = "PURE";
+        unknown_msg = "???";
+        heuristic = false;
       };
       cmd_duration = {
         min_time = 0;

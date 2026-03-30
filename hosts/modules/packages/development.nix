@@ -62,4 +62,5 @@ with pkgs;
 
   # Utilities
   bruno
+  nix-your-shell
 ]
