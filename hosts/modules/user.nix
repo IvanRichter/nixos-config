@@ -30,6 +30,10 @@
     interactiveShellInit = ''
       zoxide init fish --cmd cd | source
 
+      if command -q nix-your-shell
+        nix-your-shell fish | source
+      end
+
       function fish_greeting
       end
     '';
