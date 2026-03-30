@@ -45,6 +45,7 @@ with pkgs;
   # Git & version control
   gh
   git-filter-repo
+  ghgrab
 
   # Databases & SQL
   dbmate
