@@ -30,11 +30,16 @@
   nixpkgs.config.allowUnfree = true;
 
   # Bootloader
-  boot.loader.systemd-boot = {
-    enable = true;
-    configurationLimit = 3;
+  boot.loader = {
+    systemd-boot.enable = false;
+    efi.canTouchEfiVariables = true;
+    limine = {
+      enable = true;
+      efiSupport = true;
+      biosSupport = false;
+      maxGenerations = 3;
+    };
   };
-  boot.loader.efi.canTouchEfiVariables = true;
 
   # System identity
   system.stateVersion = "26.05";
