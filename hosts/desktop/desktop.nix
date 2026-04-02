@@ -39,8 +39,15 @@
   i18n.defaultLocale = "en_US.UTF-8";
   console.keyMap = "us";
 
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
+  boot.loader = {
+    systemd-boot.enable = false;
+    efi.canTouchEfiVariables = true;
+    limine = {
+      enable = true;
+      efiSupport = true;
+      biosSupport = false;
+    };
+  };
 
   # Desktop tuning
   services.system76-scheduler = {
