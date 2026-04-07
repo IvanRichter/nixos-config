@@ -129,7 +129,7 @@ in
         };
 
         "github.copilot.nextEditSuggestions.enabled" = true;
-        "cloudcode.project" = "happy-end-data-warehouse";
+        "google.cloud.project" = "he-dlh-prd";
         "cloudcode.beta.bigqueryRegion" = "eu";
 
         "editor.defaultFormatter" = "esbenp.prettier-vscode";
