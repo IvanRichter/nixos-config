@@ -6,10 +6,6 @@ with pkgs;
   curl
   xh
 
-  # Version control
-  git
-  delta
-
   # Editors
   micro-full
 
@@ -19,6 +15,7 @@ with pkgs;
 
   # File navigation
   broot
+  yazi
   tree
   eza
   zoxide
