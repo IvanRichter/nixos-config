@@ -43,6 +43,8 @@ with pkgs;
   gws
 
   # Git & version control
+  git
+  delta
   gh
   git-filter-repo
   ghgrab
