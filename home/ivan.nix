@@ -17,6 +17,7 @@
     ./ivan/vlc.nix
     ./ivan/office.nix
     ./ivan/rdp.nix
+    ./ivan/gcloud.nix
     ./ivan/lazysql.nix
     ./ivan/macchina.nix
     ./ivan/zellij.nix
