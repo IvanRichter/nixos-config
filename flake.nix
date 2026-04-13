@@ -24,9 +24,6 @@
     rust-overlay.url = "github:oxalica/rust-overlay";
     rust-overlay.inputs.nixpkgs.follows = "nixpkgs";
 
-    # Wild linker
-    wild.url = "github:davidlattimore/wild";
-    wild.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   # Bind inputs
@@ -39,15 +36,10 @@
       apple-silicon,
       rust-overlay,
       stylix,
-      wild,
       ...
     }@inputs:
     let
-      desktopOverlays = [
-        wild.overlays.default
-      ]
-      ++ import ./overlays
-      ++ [ rust-overlay.overlays.default ];
+      desktopOverlays = import ./overlays ++ [ rust-overlay.overlays.default ];
       mbpOverlays = import ./overlays ++ [ rust-overlay.overlays.default ];
     in
     {
