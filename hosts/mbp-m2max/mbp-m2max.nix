@@ -11,7 +11,6 @@
     ../modules/cosmic.nix
     ../modules/graphics.nix
     ../modules/packages.nix
-    ../modules/uutils.nix
     ../modules/docker.nix
     ../modules/fonts.nix
     ../modules/networking.nix
@@ -37,7 +36,7 @@
       enable = true;
       efiSupport = true;
       biosSupport = false;
-      maxGenerations = 3;
+      maxGenerations = 15;
     };
   };
 
@@ -75,6 +74,7 @@
 
   # Firmware
   hardware.asahi.enable = true;
+  hardware.asahi.extractPeripheralFirmware = false;
 
   # Keyboard / input
   boot.kernelModules = [
