@@ -60,6 +60,9 @@
     user = "ivan";
     dataDir = "/home/ivan";
     configDir = "/home/ivan/.config/syncthing";
+    openDefaultPorts = true;
+    overrideDevices = false;
+    overrideFolders = false;
   };
 
   security.sudo-rs = {
