@@ -1,4 +1,25 @@
-{ ... }:
+{ lib, osConfig, ... }:
+let
+  isLaptop = osConfig.networking.hostName == "mbp-nixos";
+  rightWingApplets =
+    [
+      "io.github.cosmic_utils.sysinfo-applet"
+    ]
+    ++ lib.optionals isLaptop [
+      "com.system76.CosmicAppletBattery"
+    ]
+    ++ [
+      "com.system76.CosmicAppletTime"
+      "io.github.cosmic_utils.weather-applet"
+      "com.system76.CosmicAppletInputSources"
+      "com.system76.CosmicAppletTiling"
+      "com.system76.CosmicAppletAudio"
+      "com.system76.CosmicAppletNetwork"
+      "com.system76.CosmicAppletBluetooth"
+      "com.system76.CosmicAppletStatusArea"
+      "com.system76.CosmicAppletPower"
+    ];
+in
 {
   xdg.configFile = {
     "cosmic/com.system76.CosmicPanel/v1/entries".text = ''
@@ -16,17 +37,7 @@
           "com.system76.CosmicAppletWorkspaces",
           "net.tropicbliss.CosmicExtAppletCaffeine",
       ], [
-          "io.github.cosmic_utils.sysinfo-applet",
-          "com.system76.CosmicAppletBattery",
-          "com.system76.CosmicAppletTime",
-          "io.github.cosmic_utils.weather-applet",
-          "com.system76.CosmicAppletInputSources",
-          "com.system76.CosmicAppletTiling",
-          "com.system76.CosmicAppletAudio",
-          "com.system76.CosmicAppletNetwork",
-          "com.system76.CosmicAppletBluetooth",
-          "com.system76.CosmicAppletStatusArea",
-          "com.system76.CosmicAppletPower",
+${lib.concatMapStringsSep "\n" (applet: "          \"${applet}\",") rightWingApplets}
       ]))
     '';
 
