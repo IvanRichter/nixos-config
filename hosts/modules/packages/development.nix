@@ -52,6 +52,7 @@ with pkgs;
   # Databases & SQL
   dbmate
   lazysql
+  dbeaver-bin
   sqlfluff
   dataform
 
