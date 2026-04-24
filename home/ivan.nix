@@ -19,6 +19,7 @@
     ./ivan/rdp.nix
     ./ivan/gcloud.nix
     ./ivan/lazysql.nix
+    ./ivan/dbeaver.nix
     ./ivan/macchina.nix
     ./ivan/zellij.nix
   ] ++ lib.optionals (osConfig.networking.hostName == "nixos") [
