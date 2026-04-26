@@ -5,6 +5,7 @@ with pkgs;
   wget
   curl
   xh
+  gip
 
   # Editors
   micro-full
