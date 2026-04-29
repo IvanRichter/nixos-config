@@ -6,6 +6,7 @@ with pkgs;
   curl
   xh
   gip
+  gping
 
   # Editors
   micro-full
