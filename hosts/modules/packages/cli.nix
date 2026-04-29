@@ -33,6 +33,7 @@ with pkgs;
   sd
   dust
   ast-grep
+  tokei
 
   # JSON processing
   jaq
