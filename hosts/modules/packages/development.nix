@@ -3,7 +3,7 @@
 let
   dataform = pkgs.writeShellApplication {
     name = "dataform";
-    runtimeInputs = [ pkgs.nodejs_25 ];
+    runtimeInputs = [ pkgs.nodejs_latest ];
     text = ''
       exec npx -y @dataform/cli@latest "$@"
     '';
@@ -20,7 +20,7 @@ in
 with pkgs;
 [
   # Programming languages & runtimes
-  nodejs_25
+  nodejs_latest
   pnpm
   rustToolchain
   (python314.withPackages (pythonPackages: [
