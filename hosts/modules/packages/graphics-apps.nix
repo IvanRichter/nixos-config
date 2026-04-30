@@ -1,7 +1,7 @@
 { pkgs }:
 with pkgs;
 [
-  gimp3
+  gimp
   fontforge-gtk
   graphite
   glaxnimate
