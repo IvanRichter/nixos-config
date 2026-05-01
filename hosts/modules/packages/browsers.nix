@@ -12,3 +12,6 @@ with pkgs;
   })
   servo
 ]
+++ lib.optionals isX86 [
+  tor-browser
+]
