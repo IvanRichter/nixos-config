@@ -4,13 +4,13 @@
   documentation.man.enable = false;
 
   imports = [
+    ./packages/browsers.nix
     ./packages/utils.nix
     ./packages/games.nix
   ];
 
   environment.systemPackages =
-    (import ./packages/browsers.nix { inherit pkgs; })
-    ++ (import ./packages/ai.nix { inherit pkgs; })
+    (import ./packages/ai.nix { inherit pkgs; })
     ++ (import ./packages/cli.nix { inherit pkgs; })
     ++ (import ./packages/comms.nix { inherit pkgs; })
     ++ (import ./packages/development.nix { inherit pkgs; })
