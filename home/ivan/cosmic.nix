@@ -2,14 +2,10 @@
 let
   isLaptop = osConfig.networking.hostName == "mbp-nixos";
   rightWingApplets =
-    [
-      "io.github.cosmic_utils.sysinfo-applet"
-    ]
-    ++ lib.optionals isLaptop [
+    lib.optionals isLaptop [
       "com.system76.CosmicAppletBattery"
     ]
     ++ [
-      "com.system76.CosmicAppletTime"
       "io.github.cosmic_utils.weather-applet"
       "com.system76.CosmicAppletInputSources"
       "com.system76.CosmicAppletTiling"
@@ -17,6 +13,7 @@ let
       "com.system76.CosmicAppletNetwork"
       "com.system76.CosmicAppletBluetooth"
       "com.system76.CosmicAppletStatusArea"
+      "com.system76.CosmicAppletTime"
       "com.system76.CosmicAppletPower"
     ];
 in
@@ -33,12 +30,13 @@ in
     '';
 
     "cosmic/com.system76.CosmicPanel.Panel/v1/plugins_wings".text = ''
-      Some(([
-          "com.system76.CosmicAppletWorkspaces",
-          "net.tropicbliss.CosmicExtAppletCaffeine",
-      ], [
-${lib.concatMapStringsSep "\n" (applet: "          \"${applet}\",") rightWingApplets}
-      ]))
+            Some(([
+                "com.system76.CosmicAppletWorkspaces",
+                "net.tropicbliss.CosmicExtAppletCaffeine",
+                "io.github.cosmic_utils.sysinfo-applet",
+            ], [
+      ${lib.concatMapStringsSep "\n" (applet: "          \"${applet}\",") rightWingApplets}
+            ]))
     '';
 
     "cosmic/com.system76.CosmicPanel.Dock/v1/plugins_center".text = ''
@@ -50,6 +48,28 @@ ${lib.concatMapStringsSep "\n" (applet: "          \"${applet}\",") rightWingApp
     "cosmic/io.github.cosmic-utils.cosmic-ext-applet-sysinfo/v1/include_swap_in_ram".text = "true";
 
     "cosmic/io.github.cosmic_utils.weather-applet/v1/use_ip_location".text = "true";
+
+    "cosmic/com.system76.CosmicSettings.Shortcuts/v1/custom".text = ''
+      {
+          (
+              modifiers: [
+                  Super,
+                  Shift,
+              ],
+              key: "s",
+          ): System(Screenshot),
+          (
+              modifiers: [
+                  Super,
+              ],
+              key: "n",
+          ): Minimize,
+          (
+              modifiers: [],
+              key: "Print",
+          ): Disable,
+      }
+    '';
 
     "cosmic/com.system76.CosmicTk/v1/interface_font".text = ''
       (
