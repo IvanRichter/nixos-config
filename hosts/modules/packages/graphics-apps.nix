@@ -6,4 +6,5 @@ with pkgs;
   graphite
   glaxnimate
   drawio
+  upscaler
 ]
