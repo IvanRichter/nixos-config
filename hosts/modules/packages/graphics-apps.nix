@@ -5,4 +5,5 @@ with pkgs;
   fontforge-gtk
   graphite
   glaxnimate
+  drawio
 ]
