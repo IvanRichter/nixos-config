@@ -38,6 +38,7 @@ with pkgs;
 
   # JSON processing
   jaq
+  jf
 
   # YAML processing
   yq-go
