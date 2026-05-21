@@ -4,7 +4,9 @@ let
 in
 with pkgs;
 [
+  # AI coding workflow tools
   beads
+  repomix
 
   # Archives, compression, and file movement
   p7zip
@@ -68,7 +70,9 @@ with pkgs;
   redis
   git-lfs
 ]
+
 ++ lib.optionals isX86 [
+  # Local AI
   lmstudio
   openclaw
 ]
