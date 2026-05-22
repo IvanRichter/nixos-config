@@ -23,6 +23,7 @@ with pkgs;
   nodejs_latest
   pnpm
   rustToolchain
+  cargo-outdated
   (python314.withPackages (pythonPackages: [
     pythonPackages.ipykernel
     pythonPackages.jupyter
