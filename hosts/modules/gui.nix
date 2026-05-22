@@ -31,6 +31,7 @@ in
   environment.variables = {
     GDK_SCALE = "1";
     GDK_DPI_SCALE = "1.0";
+    XCURSOR_THEME = "Cosmic";
     XCURSOR_SIZE = "24";
   };
 }

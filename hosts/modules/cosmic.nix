@@ -22,7 +22,6 @@
     cosmic-term
     cosmic-player
     adwaita-icon-theme
-    pop-icon-theme
     pulseaudio
     playerctl
   ];
