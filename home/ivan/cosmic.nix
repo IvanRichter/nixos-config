@@ -1,6 +1,20 @@
-{ lib, osConfig, ... }:
+{
+  lib,
+  osConfig,
+  ...
+}:
 let
   isLaptop = osConfig.networking.hostName == "mbp-nixos";
+  roundCornerRadii = ''
+    (
+        radius_0: (0.0, 0.0, 0.0, 0.0),
+        radius_xs: (4.0, 4.0, 4.0, 4.0),
+        radius_s: (8.0, 8.0, 8.0, 8.0),
+        radius_m: (16.0, 16.0, 16.0, 16.0),
+        radius_l: (32.0, 32.0, 32.0, 32.0),
+        radius_xl: (160.0, 160.0, 160.0, 160.0),
+    )
+  '';
   rightWingApplets =
     lib.optionals isLaptop [
       "com.system76.CosmicAppletBattery"
@@ -89,6 +103,12 @@ in
       )
     '';
 
+    "cosmic/com.system76.CosmicTk/v1/apply_theme_global".text = "false";
+    "cosmic/com.system76.CosmicTk/v1/icon_theme".text = ''"Cosmic"'';
+    "cosmic/com.system76.CosmicTk/v1/interface_density".text = "Standard";
+
+    "cosmic/com.system76.CosmicComp/v1/active_hint".text = "true";
+
     "cosmic/com.system76.CosmicComp/v1/input_default".text = ''
       (
           state: Enabled,
@@ -135,6 +155,21 @@ in
 
     "cosmic/com.system76.CosmicTheme.Mode/v1/auto_switch".text = "false";
     "cosmic/com.system76.CosmicTheme.Mode/v1/is_dark".text = "true";
+
+    "cosmic/com.system76.CosmicTheme.Dark.Builder/v1/corner_radii".text = roundCornerRadii;
+    "cosmic/com.system76.CosmicTheme.Dark.Builder/v1/gaps".text = "(0, 10)";
+    "cosmic/com.system76.CosmicTheme.Dark.Builder/v1/active_hint".text = "1";
+    "cosmic/com.system76.CosmicTheme.Dark/v1/corner_radii".text = roundCornerRadii;
+    "cosmic/com.system76.CosmicTheme.Dark/v1/gaps".text = "(0, 10)";
+    "cosmic/com.system76.CosmicTheme.Dark/v1/active_hint".text = "1";
+
+    "cosmic/com.system76.CosmicTheme.Light.Builder/v1/corner_radii".text = roundCornerRadii;
+    "cosmic/com.system76.CosmicTheme.Light.Builder/v1/gaps".text = "(0, 10)";
+    "cosmic/com.system76.CosmicTheme.Light.Builder/v1/active_hint".text = "1";
+    "cosmic/com.system76.CosmicTheme.Light/v1/corner_radii".text = roundCornerRadii;
+    "cosmic/com.system76.CosmicTheme.Light/v1/gaps".text = "(0, 10)";
+    "cosmic/com.system76.CosmicTheme.Light/v1/active_hint".text = "1";
+
     # #4af4fd
     "cosmic/com.system76.CosmicTheme.Dark.Builder/v1/accent".text = ''
       Some((
