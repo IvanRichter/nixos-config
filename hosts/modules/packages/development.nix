@@ -49,6 +49,7 @@ with pkgs;
   gh
   git-filter-repo
   ghgrab
+  pinact
 
   # Databases & SQL
   dbmate
