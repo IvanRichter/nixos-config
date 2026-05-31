@@ -56,6 +56,7 @@ let
     "bruno-api-client.bruno"
     "dustypomerleau.rust-syntax"
     "googlecloudtools.cloudcode"
+    "googlecloudtools.datacloud"
     "macabeus.vscode-fluent"
     "openai.chatgpt"
     "rlivings39.fzf-quick-open"
@@ -130,7 +131,8 @@ in
 
         "github.copilot.nextEditSuggestions.enabled" = true;
         "google.cloud.project" = "he-dlh-prd";
-        "cloudcode.beta.bigqueryRegion" = "eu";
+        "google.cloud.region" = "europe-west1";
+        "google.datacloud.bigqueryRegion" = "europe-west1";
 
         "editor.defaultFormatter" = "esbenp.prettier-vscode";
         "editor.formatOnSave" = true;
