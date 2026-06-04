@@ -1,9 +1,14 @@
-{ pkgs, lib, osConfig, ... }:
+{
+  pkgs,
+  lib,
+  osConfig,
+  ...
+}:
 
 {
   home.username = "ivan";
   home.homeDirectory = "/home/ivan";
-  home.stateVersion = "26.05";
+  home.stateVersion = "26.11";
 
   programs.home-manager.enable = true;
 
@@ -22,7 +27,8 @@
     ./ivan/dbeaver.nix
     ./ivan/macchina.nix
     ./ivan/zellij.nix
-  ] ++ lib.optionals (osConfig.networking.hostName == "nixos") [
+  ]
+  ++ lib.optionals (osConfig.networking.hostName == "nixos") [
     ./ivan/corsair.nix
   ];
 }

@@ -41,7 +41,7 @@
   };
 
   # System identity
-  system.stateVersion = "26.05";
+  system.stateVersion = "26.11";
   networking.hostName = "mbp-nixos";
   i18n.defaultLocale = "en_US.UTF-8";
   time.timeZone = "Europe/Prague";

@@ -32,7 +32,7 @@
   nixpkgs.config.allowUnfree = true;
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
-  system.stateVersion = "26.05";
+  system.stateVersion = "26.11";
   networking.hostName = "nixos";
   time.timeZone = "Europe/Prague";
   i18n.defaultLocale = "en_US.UTF-8";
