@@ -63,6 +63,7 @@ with pkgs;
   graphviz
   imagemagick
   pandoc
+  poppler-utils
   tree-sitter
 
   # Local services and large-asset helpers
