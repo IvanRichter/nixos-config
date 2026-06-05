@@ -133,6 +133,12 @@ in
         "google.cloud.project" = "he-dlh-prd";
         "google.cloud.region" = "europe-west1";
         "google.datacloud.bigqueryRegion" = "europe-west1";
+        "jupyter.runStartupCommands" = [
+          "import bigframes"
+          "%load_ext bigframes"
+          "bigframes.options.bigquery.project = \"he-dlh-prd\""
+          "bigframes.options.bigquery.application_name = \"datacloud.visual studio code\""
+        ];
 
         "editor.defaultFormatter" = "esbenp.prettier-vscode";
         "editor.formatOnSave" = true;
