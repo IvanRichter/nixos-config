@@ -24,6 +24,7 @@ with pkgs;
   pnpm
   rustToolchain
   cargo-outdated
+  cargo-edit
   (python314.withPackages (pythonPackages: [
     pythonPackages.ipykernel
     pythonPackages.jupyter
