@@ -117,6 +117,7 @@ in
               speed: 0.0,
           )),
           scroll_config: Some((
+              method: None,
               natural_scroll: Some(false),
           )),
       )
