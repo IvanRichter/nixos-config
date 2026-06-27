@@ -7,6 +7,7 @@ with pkgs;
   # AI coding workflow tools
   beads
   repomix
+  rtk
 
   # Archives, compression, and file movement
   p7zip
