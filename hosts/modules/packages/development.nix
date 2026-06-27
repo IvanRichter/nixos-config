@@ -23,6 +23,7 @@ with pkgs;
   nodejs_latest
   pnpm
   rustToolchain
+  cargo-nextest
   cargo-outdated
   cargo-edit
   (python314.withPackages (pythonPackages: [
