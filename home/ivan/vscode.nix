@@ -178,7 +178,7 @@ in
           "'JetBrainsMono Nerd Font', 'MesloLGS Nerd Font', 'Droid Sans Mono', 'monospace'";
         "workbench.colorTheme" = "One Dark Pro Night Flat";
 
-        "extensions.autoUpdate" = true;
+        "extensions.autoUpdate" = "on";
         "extensions.autoCheckUpdates" = true;
 
         "geminicodeassist.enableTelemetry" = false;
