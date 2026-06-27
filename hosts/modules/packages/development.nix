@@ -3,9 +3,9 @@
 let
   dataform = pkgs.writeShellApplication {
     name = "dataform";
-    runtimeInputs = [ pkgs.nodejs_latest ];
+    runtimeInputs = [ pkgs.bun ];
     text = ''
-      exec npx -y @dataform/cli@latest "$@"
+      exec bunx @dataform/cli@latest "$@"
     '';
   };
   rustToolchain = pkgs.rust-bin.stable.latest.default.override {
@@ -22,6 +22,7 @@ with pkgs;
   # Programming languages & runtimes
   nodejs_latest
   pnpm
+  bun
   rustToolchain
   cargo-nextest
   cargo-outdated
