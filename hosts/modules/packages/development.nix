@@ -45,6 +45,7 @@ with pkgs;
   terraform
   pulumi-bin
   gws
+  ansible
 
   # Git & version control
   git
