@@ -35,6 +35,7 @@ let
     ms-vscode-remote.remote-containers
     ritwickdey.liveserver
     rust-lang.rust-analyzer
+    samuelcolvin.jinjahtml
     shd101wyy.markdown-preview-enhanced
     tamasfe.even-better-toml
     timonwong.shellcheck
