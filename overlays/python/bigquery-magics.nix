@@ -7,7 +7,7 @@ in
     (pythonFinal: pythonPrev: {
       bigquery-magics = pythonFinal.buildPythonPackage rec {
         pname = "bigquery-magics";
-        version = "0.14.0";
+        version = "0.15.0";
         format = "setuptools";
         disabled = pythonFinal.pythonOlder "3.10";
 
@@ -15,7 +15,7 @@ in
           owner = "googleapis";
           repo = "google-cloud-python";
           rev = "bigquery-magics-v${version}";
-          hash = "sha256-OjncCE9RQuTO8PZbZNZBMap5Batn8OwNnKp1QYobqAQ=";
+          hash = "sha256-KJviH4dofYSvZu9S7VMBSnGjH66xMUEvhcmZN7GJ4Iw=";
         };
         sourceRoot = "source/packages/bigquery-magics";
 
