@@ -10,8 +10,8 @@ in
     [
       (if isX86 then google-chrome else chromium)
       (vivaldi.override {
-        proprietaryCodecs = isX86;
-        enableWidevine = isX86;
+        proprietaryCodecs = true;
+        enableWidevine = true;
       })
       servo
     ]
