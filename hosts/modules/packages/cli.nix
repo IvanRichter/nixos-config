@@ -15,6 +15,9 @@ with pkgs;
   unzip
   zip
 
+  # Document processing
+  ghostscript
+
   # File navigation
   broot
   yazi
