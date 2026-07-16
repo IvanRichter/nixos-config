@@ -134,6 +134,7 @@ in
         "google.cloud.project" = "he-dlh-prd";
         "google.cloud.region" = "europe-west1";
         "google.datacloud.bigqueryRegion" = "europe-west1";
+        "jupyter.jupyterLaunchTimeout" = 300000;
         "jupyter.runStartupCommands" = [
           "import bigframes"
           "%load_ext bigframes"
