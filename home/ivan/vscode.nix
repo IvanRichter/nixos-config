@@ -39,6 +39,7 @@ let
     shd101wyy.markdown-preview-enhanced
     tamasfe.even-better-toml
     timonwong.shellcheck
+    tomoki1207.pdf
     unifiedjs.vscode-mdx
     usernamehw.errorlens
     vue.volar
