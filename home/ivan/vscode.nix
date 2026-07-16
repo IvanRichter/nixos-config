@@ -52,7 +52,6 @@ let
 
   # Marketplace-only extensions
   marketplaceExtensions = [
-    "adrianwilczynski.alpine-js-intellisense"
     "ashishalex.dataform-lsp-vscode"
     "bruno-api-client.bruno"
     "dustypomerleau.rust-syntax"
