@@ -56,7 +56,6 @@ let
     "ashishalex.dataform-lsp-vscode"
     "bruno-api-client.bruno"
     "dustypomerleau.rust-syntax"
-    "googlecloudtools.cloudcode"
     "googlecloudtools.datacloud"
     "macabeus.vscode-fluent"
     "openai.chatgpt"
@@ -182,8 +181,6 @@ in
 
         "extensions.autoUpdate" = "on";
         "extensions.autoCheckUpdates" = true;
-
-        "geminicodeassist.enableTelemetry" = false;
 
         "vscode-dataform-tools.gcpProjectId" = "he-dlh-prd";
         "vscode-dataform-tools.gcpLocation" = "europe-west1";
