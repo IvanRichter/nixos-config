@@ -54,7 +54,6 @@ let
   marketplaceExtensions = [
     "ashishalex.dataform-lsp-vscode"
     "bruno-api-client.bruno"
-    "dustypomerleau.rust-syntax"
     "googlecloudtools.datacloud"
     "macabeus.vscode-fluent"
     "openai.chatgpt"
