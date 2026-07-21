@@ -49,7 +49,6 @@ with pkgs;
   nixfmt
 
   # System info
-  macchina
   bottom
 
   # Clipboard
