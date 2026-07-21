@@ -115,7 +115,7 @@ in
   };
 
   # *.rdp mime-info
-  home.file.".local/share/mime/packages/rdp.xml".text = ''
+  xdg.dataFile."mime/packages/rdp.xml".text = ''
     <?xml version="1.0" encoding="UTF-8"?>
     <mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
       <mime-type type="application/x-rdp">
@@ -135,16 +135,4 @@ in
     "application/x-rdp" = [ "rdp-open.desktop" ];
     "application/rdp" = [ "rdp-open.desktop" ];
   };
-
-  # Hard-create the desktop file
-  home.file.".local/share/applications/rdp-open.desktop".text = ''
-    [Desktop Entry]
-    Type=Application
-    Name=RDP (FreeRDP)
-    Exec=${rdpOpen}/bin/rdp-open %u
-    Icon=computer
-    Categories=Network;RemoteAccess;
-    MimeType=application/x-rdp;application/rdp;
-    Terminal=false
-  '';
 }

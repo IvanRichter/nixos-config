@@ -25,7 +25,6 @@
     ../modules/gui.nix
     ../modules/networking.nix
     ../modules/docker.nix
-    ../modules/rdp.nix
     ../modules/packages.nix
   ];
 
