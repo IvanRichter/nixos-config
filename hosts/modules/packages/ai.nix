@@ -75,5 +75,4 @@ with pkgs;
 ++ lib.optionals isX86 [
   # Local AI
   lmstudio
-  openclaw
 ]
