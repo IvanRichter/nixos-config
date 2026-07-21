@@ -16,6 +16,10 @@
     nix-index-database.url = "github:nix-community/nix-index-database";
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
 
+    # VS Code Marketplace extensions not packaged in nixpkgs
+    nix-vscode-extensions.url = "github:nix-community/nix-vscode-extensions";
+    nix-vscode-extensions.inputs.nixpkgs.follows = "nixpkgs";
+
     # Stylix
     stylix.url = "github:nix-community/stylix";
     stylix.inputs.nixpkgs.follows = "nixpkgs";
@@ -34,13 +38,20 @@
       home-manager,
       flake-utils,
       apple-silicon,
+      nix-vscode-extensions,
       rust-overlay,
       stylix,
       ...
     }@inputs:
     let
-      desktopOverlays = import ./overlays ++ [ rust-overlay.overlays.default ];
-      mbpOverlays = import ./overlays ++ [ rust-overlay.overlays.default ];
+      desktopOverlays = import ./overlays ++ [
+        rust-overlay.overlays.default
+        nix-vscode-extensions.overlays.default
+      ];
+      mbpOverlays = import ./overlays ++ [
+        rust-overlay.overlays.default
+        nix-vscode-extensions.overlays.default
+      ];
     in
     {
       formatter = {
