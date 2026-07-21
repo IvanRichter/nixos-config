@@ -15,7 +15,6 @@
     ../modules/fonts.nix
     ../modules/networking.nix
     ../modules/nix.nix
-    ../modules/rdp.nix
     ../modules/user.nix
     ../modules/stylix.nix
   ];
