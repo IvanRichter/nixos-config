@@ -22,8 +22,6 @@ with pkgs;
   broot
   yazi
   tree
-  eza
-  zoxide
   fd
   skim
 

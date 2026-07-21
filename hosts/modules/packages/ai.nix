@@ -38,7 +38,6 @@ with pkgs;
   sqlite
   jless
   parallel
-  direnv
   inotify-tools
   tealdeer
   dos2unix
