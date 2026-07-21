@@ -1,12 +1,10 @@
 {
   config,
-  lib,
   pkgs,
   ...
 }:
 
 let
-  codeBin = "${config.programs.vscode.package}/bin/code";
   rustToolchain = pkgs.rust-bin.stable.latest.default.override {
     extensions = [
       "clippy"
@@ -51,14 +49,19 @@ let
     zhuangtongfa.material-theme
   ];
 
-  # Marketplace-only extensions
+  marketplace = pkgs.nix-vscode-extensions.forVSCodeVersion config.programs.vscode.package.version;
+
+  marketplaceRelease = marketplace.vscode-marketplace-release;
+  marketplacePrerelease = marketplace.vscode-marketplace;
+
+  # Marketplace-only extensions missing from nixpkgs
   marketplaceExtensions = [
-    "ashishalex.dataform-lsp-vscode"
-    "googlecloudtools.datacloud"
-    "macabeus.vscode-fluent"
-    "openai.chatgpt"
-    "risingstack.astro-alpinejs-syntax-highlight"
-    "sqlfluff.vscode-sqlfluff"
+    marketplaceRelease.ashishalex.dataform-lsp-vscode
+    marketplaceRelease.googlecloudtools.datacloud
+    marketplaceRelease.macabeus.vscode-fluent
+    marketplacePrerelease.openai.chatgpt
+    marketplaceRelease.risingstack.astro-alpinejs-syntax-highlight
+    marketplaceRelease.sqlfluff.vscode-sqlfluff
   ];
 
 in
@@ -67,11 +70,17 @@ in
     enable = true;
     package = pkgs.vscode;
 
-    # Let the fallback CLI write to the extensions dir
-    mutableExtensionsDir = true;
+    mutableExtensionsDir = false;
+
+    argvSettings = {
+      "enable-crash-reporter" = false;
+      "password-store" = "basic";
+    };
 
     profiles.default = {
-      extensions = nixpkgsExtensions;
+      enableUpdateCheck = false;
+      enableExtensionUpdateCheck = false;
+      extensions = nixpkgsExtensions ++ marketplaceExtensions;
 
       userSettings = {
         "telemetry.telemetryLevel" = "off";
@@ -178,8 +187,7 @@ in
           "'JetBrainsMono Nerd Font', 'MesloLGS Nerd Font', 'Droid Sans Mono', 'monospace'";
         "workbench.colorTheme" = "One Dark Pro Night Flat";
 
-        "extensions.autoUpdate" = "on";
-        "extensions.autoCheckUpdates" = true;
+        "extensions.autoUpdate" = "off";
 
         "vscode-dataform-tools.gcpProjectId" = "he-dlh-prd";
         "vscode-dataform-tools.gcpLocation" = "europe-west1";
@@ -187,20 +195,4 @@ in
       };
     };
   };
-
-  # Install marketplace-only extensions if missing
-  home.activation.vscodeFallbackExtensions = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    set -eu
-
-    INSTALLED="$(${codeBin} --list-extensions || true)"
-
-    for ext in ${lib.concatStringsSep " " (map lib.escapeShellArg marketplaceExtensions)}; do
-      if ! echo "$INSTALLED" | grep -qx "$ext"; then
-        echo "Installing VS Code marketplace extension: $ext"
-        ${codeBin} --install-extension "$ext"
-      else
-        echo "VS Code extension already installed: $ext"
-      fi
-    done
-  '';
 }
