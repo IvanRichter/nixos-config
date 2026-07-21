@@ -74,7 +74,6 @@
 
   # Firmware
   hardware.asahi.enable = true;
-  hardware.asahi.extractPeripheralFirmware = false;
 
   # Keyboard / input
   boot.kernelModules = [
