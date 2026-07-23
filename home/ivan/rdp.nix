@@ -92,8 +92,6 @@ in
 
   home.packages = [
     pkgs.freerdp
-    pkgs.shared-mime-info
-    pkgs.desktop-file-utils
     rdpOpen
   ];
 

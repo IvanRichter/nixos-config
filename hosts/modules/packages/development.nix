@@ -20,7 +20,6 @@ in
 with pkgs;
 [
   # Programming languages & runtimes
-  nodejs_latest
   pnpm
   bun
   rustToolchain
@@ -48,23 +47,16 @@ with pkgs;
   ansible
 
   # Git & version control
-  git
-  delta
-  gh
   git-filter-repo
   ghgrab
   pinact
 
   # Databases & SQL
   dbmate
-  lazysql
-  dbeaver-bin
   sqlfluff
   dataform
 
   # Graphics & GPU
-  vulkan-tools
-  libva-utils
   mesa-demos
 
   # Compression

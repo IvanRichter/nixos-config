@@ -17,9 +17,6 @@
       "render"
       "plugdev"
     ];
-    packages = with pkgs; [
-      syncthing
-    ];
   };
 
   programs.fish = {

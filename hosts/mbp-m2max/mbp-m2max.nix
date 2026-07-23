@@ -20,10 +20,6 @@
     ../modules/stylix.nix
   ];
 
-  environment.systemPackages = with pkgs; [
-    triforce-lv2
-  ];
-
   # Platform & licensing
   nixpkgs.hostPlatform = "aarch64-linux";
   nixpkgs.config.allowUnfree = true;
@@ -60,11 +56,6 @@
     "vm.swappiness" = 80;
     "vm.vfs_cache_pressure" = 50;
   };
-
-  nix.settings.experimental-features = [
-    "nix-command"
-    "flakes"
-  ];
 
   systemd.services."home-manager-ivan" = {
     after = [ "network-online.target" ];

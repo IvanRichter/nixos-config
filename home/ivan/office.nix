@@ -1,5 +1,7 @@
 { pkgs, lib, ... }:
 {
+  programs.onlyoffice.enable = true;
+
   xdg.mimeApps.enable = true;
 
   # Make ONLYOFFICE the default app for .docx, .xlsx, and .pptx

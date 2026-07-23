@@ -4,6 +4,7 @@
   documentation.man.enable = false;
 
   imports = [
+    ./programs.nix
     ./packages/browsers.nix
     ./packages/utils.nix
     ./packages/games.nix
@@ -15,7 +16,6 @@
     ++ (import ./packages/comms.nix { inherit pkgs; })
     ++ (import ./packages/development.nix { inherit pkgs; })
     ++ (import ./packages/eid.nix { inherit pkgs; })
-    ++ (import ./packages/office.nix { inherit pkgs; })
     ++ (import ./packages/video.nix { inherit pkgs; })
     ++ (import ./packages/graphics-apps.nix { inherit pkgs; });
 }

@@ -6,6 +6,11 @@
 }:
 
 let
+  vivaldi = pkgs.vivaldi.override {
+    proprietaryCodecs = true;
+    enableWidevine = true;
+  };
+
   # Wayland + Vulkan + WebGPU Vivaldi launcher with resource protections
   vivaldiProtected = pkgs.writeShellScriptBin "vivaldi-protected" ''
     export NIXOS_OZONE_WL=1
@@ -22,7 +27,7 @@ let
       -p MemoryLow=2G \
       -p CPUWeight=90 \
       -p IOWeight=90 \
-      "${pkgs.vivaldi}/bin/vivaldi" \
+      "${vivaldi}/bin/vivaldi" \
         --ozone-platform=x11 \
         --use-gl=angle \
         --use-angle=vulkan \
@@ -54,5 +59,5 @@ in
   ];
 
   # Raw alias
-  environment.shellAliases.vivaldi-raw = "${pkgs.vivaldi}/bin/vivaldi";
+  environment.shellAliases.vivaldi-raw = "${vivaldi}/bin/vivaldi";
 }

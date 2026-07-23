@@ -31,7 +31,7 @@
     "image/svg+xml" = [ "vivaldi-stable.desktop" ];
   };
 
-  # Apply a COSMIC-matched Vivaldi theme when the profile exists.
+  # Apply a COSMIC-matched Vivaldi theme when the profile exists
   home.activation.vivaldiTheme = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     ${pkgs.python3}/bin/python - <<'PY'
     import json
@@ -91,7 +91,7 @@
       themes["current"] = theme_id
       themes["current_private"] = theme_id
 
-      # Disable schedule override and pin OS schedule to this theme anyway.
+      # Disable schedule override and pin OS schedule to this theme anyway
       schedule["enabled"] = 0
       schedule.setdefault("o_s", {})
       schedule["o_s"]["dark"] = theme_id

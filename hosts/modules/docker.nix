@@ -25,10 +25,5 @@ in
     emulatedSystems = [ "x86_64-linux" ];
   };
 
-  # Tools
-  environment.systemPackages = with pkgs; [
-    docker
-    docker-buildx
-    qemu-user
-  ];
+  environment.systemPackages = [ pkgs.docker-buildx ];
 }

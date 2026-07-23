@@ -70,14 +70,6 @@
             # nix-index database module
             inputs."nix-index-database".nixosModules.nix-index
 
-            # nix-index + comma integration
-            {
-              programs.nix-index.enable = true;
-              programs.nix-index.enableFishIntegration = true;
-              programs.command-not-found.enable = false;
-              programs.nix-index-database.comma.enable = true;
-            }
-
             # Home Manager
             home-manager.nixosModules.home-manager
             {
@@ -103,14 +95,6 @@
 
             # nix-index database module
             inputs."nix-index-database".nixosModules.nix-index
-
-            # nix-index + comma integration
-            {
-              programs.nix-index.enable = true;
-              programs.nix-index.enableFishIntegration = true;
-              programs.command-not-found.enable = false;
-              programs.nix-index-database.comma.enable = true;
-            }
 
             # Home Manager
             home-manager.nixosModules.home-manager
