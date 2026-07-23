@@ -8,7 +8,7 @@ in
   environment.systemPackages =
     with pkgs;
     [
-      (if isX86 then google-chrome else chromium)
+      chromium
       (vivaldi.override {
         proprietaryCodecs = true;
         enableWidevine = true;
@@ -16,6 +16,7 @@ in
       servo
     ]
     ++ lib.optionals isX86 [
+      google-chrome
       tor-browser
     ];
 }
