@@ -14,6 +14,7 @@
     ../modules/docker.nix
     ../modules/fonts.nix
     ../modules/networking.nix
+    ../modules/monitoring.nix
     ../modules/nix.nix
     ../modules/user.nix
     ../modules/stylix.nix
