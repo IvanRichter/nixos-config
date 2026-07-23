@@ -24,6 +24,7 @@
     ../modules/cosmic.nix
     ../modules/gui.nix
     ../modules/networking.nix
+    ../modules/monitoring.nix
     ../modules/docker.nix
     ../modules/packages.nix
   ];
