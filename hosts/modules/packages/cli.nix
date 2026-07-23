@@ -3,7 +3,6 @@ with pkgs;
 [
   # Network / HTTP
   wget
-  curl
   xh
   gip
   gping
@@ -19,18 +18,14 @@ with pkgs;
   ghostscript
 
   # File navigation
-  broot
-  yazi
   tree
   fd
-  skim
 
   # File/system utilities
   lsof
   file
   usbutils
   evtest
-  bat
   ripgrep
   sd
   dust
@@ -49,7 +44,6 @@ with pkgs;
   nixfmt
 
   # System info
-  bottom
 
   # Clipboard
   wl-clipboard-rs

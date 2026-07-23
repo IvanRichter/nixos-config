@@ -1,10 +1,6 @@
 { pkgs, ... }:
 
 {
-  home.packages = [
-    pkgs.ckb-next
-  ];
-
   systemd.user.services.ckb-next = {
     Unit = {
       Description = "Corsair Keyboards and Mice (ckb-next UI)";

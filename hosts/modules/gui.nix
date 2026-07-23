@@ -20,7 +20,6 @@ in
 
   services.flatpak.enable = false;
   xdg.portal.enable = true;
-  programs.xwayland.enable = true;
 
   environment.sessionVariables = {
     NIXOS_OZONE_WL = "1";

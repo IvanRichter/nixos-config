@@ -49,9 +49,10 @@ let
   '';
 in
 {
+  programs.lazysql.enable = true;
+
   home.packages = [
     lazysqlSetup
-    pkgs.lazysql
   ];
 
   xdg.configFile."lazysql/config.toml".source =

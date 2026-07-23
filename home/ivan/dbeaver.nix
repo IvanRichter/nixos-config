@@ -235,9 +235,10 @@ let
   '';
 in
 {
+  programs.dbeaver.enable = true;
+
   home.packages = [
     dbeaverSetup
-    pkgs.mariadb-connector-java
   ];
 
   xdg.dataFile."DBeaverData/workspace6/General/.dbeaver/data-sources-gibbor.json".source =

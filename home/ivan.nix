@@ -18,6 +18,10 @@
     ./ivan/stylix.nix
     ./ivan/fish.nix
     ./ivan/cosmic.nix
+    ./ivan/browsers.nix
+    ./ivan/cli.nix
+    ./ivan/development.nix
+    ./ivan/vesktop.nix
     ./ivan/vscode.nix
     ./ivan/vivaldi.nix
     ./ivan/vlc.nix

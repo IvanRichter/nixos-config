@@ -11,7 +11,6 @@ with pkgs;
 
   # Archives, compression, and file movement
   p7zip
-  rsync
   pv
 
   # Structured data and shell helpers
@@ -44,15 +43,10 @@ with pkgs;
 
   # Network, transport, and low-level debugging
   inetutils
-  iproute2
-  bind
-  openssh
   whois
-  tcpdump
   nmap
   traceroute
   iperf3
-  strace
   ltrace
 
   # Raw byte inspection
@@ -69,7 +63,6 @@ with pkgs;
   # Local services and large-asset helpers
   postgresql
   redis
-  git-lfs
 ]
 
 ++ lib.optionals isX86 [
