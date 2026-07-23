@@ -29,7 +29,6 @@ let
     ms-azuretools.vscode-docker
     mechatroner.rainbow-csv
     ms-vscode-remote.remote-containers
-    ritwickdey.liveserver
     rust-lang.rust-analyzer
     samuelcolvin.jinjahtml
     shd101wyy.markdown-preview-enhanced
