@@ -22,8 +22,6 @@ let
     docker.docker
     eamodio.gitlens
     esbenp.prettier-vscode
-    github.copilot
-    github.copilot-chat
     hashicorp.terraform
     jnoortheen.nix-ide
     mads-hartmann.bash-ide-vscode
@@ -137,7 +135,6 @@ in
           "**/.direnv/**" = true;
         };
 
-        "github.copilot.nextEditSuggestions.enabled" = true;
         "google.cloud.project" = "he-dlh-prd";
         "google.cloud.region" = "europe-west1";
         "google.datacloud.bigqueryRegion" = "europe-west1";
