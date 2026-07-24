@@ -9,9 +9,7 @@
   imports = [
     ./hardware-configuration.nix
     ./razer.nix
-    ./vivaldi.nix
     ./memory.nix
-    ./chrome.nix
     ./corsair.nix
     ./eid.nix
     ./nvidia.nix
