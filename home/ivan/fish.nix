@@ -18,6 +18,11 @@
     functions = {
       fish_greeting = "";
 
+      fish_user_key_bindings = ''
+        bind ctrl-left backward-word
+        bind ctrl-right forward-word
+      '';
+
       gibbor-update = {
         description = "Refresh the local Gibbor source checkout";
         body = ''
