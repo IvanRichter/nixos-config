@@ -29,6 +29,9 @@ in
     enable = true;
     polarity = "dark";
 
+    # Both hosts use COSMIC Greeter
+    targets.regreet.enable = false;
+
     # Use inlined One Dark Pro Night Flat scheme
     base16Scheme = oneDarkProNightFlat;
 
