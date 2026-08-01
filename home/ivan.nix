@@ -30,6 +30,7 @@
     ./ivan/gcloud.nix
     ./ivan/lazysql.nix
     ./ivan/dbeaver.nix
+    ./ivan/tabularis.nix
     ./ivan/macchina.nix
     ./ivan/zellij.nix
   ]
