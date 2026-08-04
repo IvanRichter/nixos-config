@@ -10,6 +10,8 @@
     dhcpcd.enable = false;
   };
 
+  programs.openvpn3.enable = true;
+
   systemd.network.enable = true;
 
   systemd.services.systemd-networkd-wait-online.enable = lib.mkForce false;
