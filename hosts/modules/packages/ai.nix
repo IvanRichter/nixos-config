@@ -9,6 +9,9 @@ with pkgs;
   repomix
   rtk
 
+  # Desktop automation
+  dotool
+
   # Archives, compression, and file movement
   p7zip
   pv
