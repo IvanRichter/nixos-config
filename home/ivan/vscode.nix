@@ -1,10 +1,20 @@
 {
   config,
+  lib,
   pkgs,
   ...
 }:
 
 let
+  codexReasoningEfforts = builtins.toJSON [
+    "low"
+    "medium"
+    "high"
+    "xhigh"
+    "max"
+    "ultra"
+  ];
+
   rustToolchain = pkgs.rust-bin.stable.latest.default.override {
     extensions = [
       "clippy"
@@ -72,6 +82,35 @@ let
 
 in
 {
+  # Preserve Codex preferences stored outside VS Code's declarative settings
+  home.activation.codexExtensionSettings = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    codex_state_db="${config.xdg.configHome}/Code/User/globalStorage/state.vscdb"
+
+    if [ -f "$codex_state_db" ]; then
+      ${pkgs.sqlite}/bin/sqlite3 -cmd ".timeout 5000" "$codex_state_db" <<'SQL'
+    INSERT INTO ItemTable (key, value)
+    VALUES (
+      'openai.chatgpt',
+      json_object(
+        'persisted-atom-state',
+        json_object(
+          'enabled-reasoning-efforts', json('${codexReasoningEfforts}'),
+          'show-context-window-usage', json('true')
+        )
+      )
+    )
+    ON CONFLICT(key) DO UPDATE SET
+      value = json_set(
+        CASE WHEN json_valid(value) THEN value ELSE '{}' END,
+        '$."persisted-atom-state"."enabled-reasoning-efforts"',
+        json('${codexReasoningEfforts}'),
+        '$."persisted-atom-state"."show-context-window-usage"',
+        json('true')
+      );
+    SQL
+    fi
+  '';
+
   programs.vscode = {
     enable = true;
     package = pkgs.vscode;
