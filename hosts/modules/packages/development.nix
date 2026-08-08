@@ -1,13 +1,6 @@
 { pkgs }:
 
 let
-  dataform = pkgs.writeShellApplication {
-    name = "dataform";
-    runtimeInputs = [ pkgs.bun ];
-    text = ''
-      exec bunx @dataform/cli@latest "$@"
-    '';
-  };
   rustToolchain = pkgs.rust-bin.stable.latest.default.override {
     extensions = [
       "clippy"
