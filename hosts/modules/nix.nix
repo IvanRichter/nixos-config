@@ -5,6 +5,8 @@
     "flakes"
   ];
 
+  programs.nh.enable = true;
+
   programs.nix-index.enable = true;
   programs.nix-index.enableFishIntegration = true;
   programs.command-not-found.enable = false;
