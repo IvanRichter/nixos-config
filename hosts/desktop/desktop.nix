@@ -32,6 +32,7 @@
 
   system.stateVersion = "26.11";
   networking.hostName = "nixos";
+  programs.nh.flake = "/home/ivan/nixos-config#desktop";
   time.timeZone = "Europe/Prague";
   i18n.defaultLocale = "en_US.UTF-8";
   console.keyMap = "us";

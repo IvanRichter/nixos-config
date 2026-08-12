@@ -39,6 +39,7 @@
   # System identity
   system.stateVersion = "26.11";
   networking.hostName = "mbp-nixos";
+  programs.nh.flake = "/home/ivan/nixos-config#mbp-m2max";
   i18n.defaultLocale = "en_US.UTF-8";
   time.timeZone = "Europe/Prague";
 
