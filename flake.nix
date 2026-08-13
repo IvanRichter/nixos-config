@@ -4,10 +4,14 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
+    flake-parts.url = "github:hercules-ci/flake-parts";
+    flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
+
+    import-tree.url = "github:denful/import-tree";
+    den.url = "github:denful/den/latest";
+
     home-manager.url = "github:nix-community/home-manager";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
-
-    flake-utils.url = "github:numtide/flake-utils";
 
     # Asahi/Apple Silicon support
     apple-silicon.url = "github:nix-community/nixos-apple-silicon";
@@ -27,86 +31,7 @@
     # Rust toolchains
     rust-overlay.url = "github:oxalica/rust-overlay";
     rust-overlay.inputs.nixpkgs.follows = "nixpkgs";
-
   };
 
-  # Bind inputs
-  outputs =
-    {
-      self,
-      nixpkgs,
-      home-manager,
-      flake-utils,
-      apple-silicon,
-      nix-vscode-extensions,
-      rust-overlay,
-      stylix,
-      ...
-    }@inputs:
-    let
-      desktopOverlays = import ./overlays ++ [
-        rust-overlay.overlays.default
-        nix-vscode-extensions.overlays.default
-      ];
-      mbpOverlays = import ./overlays ++ [
-        rust-overlay.overlays.default
-        nix-vscode-extensions.overlays.default
-      ];
-    in
-    {
-      formatter = {
-        x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.nixfmt;
-        aarch64-linux = nixpkgs.legacyPackages.aarch64-linux.nixfmt;
-      };
-
-      nixosConfigurations = {
-        desktop = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          modules = [
-            { nixpkgs.overlays = desktopOverlays; }
-            ./hosts/desktop/desktop.nix
-            stylix.nixosModules.stylix
-
-            # nix-index database module
-            inputs."nix-index-database".nixosModules.nix-index
-
-            # Home Manager
-            home-manager.nixosModules.home-manager
-            {
-              home-manager.useGlobalPkgs = true;
-              home-manager.useUserPackages = true;
-              home-manager.backupFileExtension = "bak";
-              home-manager.overwriteBackup = true;
-              home-manager.users.ivan = import ./home/ivan.nix;
-            }
-          ];
-        };
-
-        mbp-m2max = nixpkgs.lib.nixosSystem {
-          system = "aarch64-linux";
-          modules = [
-            { nixpkgs.overlays = mbpOverlays; }
-            # Wire up Asahi
-            apple-silicon.nixosModules.apple-silicon-support
-            stylix.nixosModules.stylix
-
-            # Host module
-            ./hosts/mbp-m2max/mbp-m2max.nix
-
-            # nix-index database module
-            inputs."nix-index-database".nixosModules.nix-index
-
-            # Home Manager
-            home-manager.nixosModules.home-manager
-            {
-              home-manager.useGlobalPkgs = true;
-              home-manager.useUserPackages = true;
-              home-manager.backupFileExtension = "bak";
-              home-manager.overwriteBackup = true;
-              home-manager.users.ivan = import ./home/ivan.nix;
-            }
-          ];
-        };
-      };
-    };
+  outputs = inputs: inputs.flake-parts.lib.mkFlake { inherit inputs; } (inputs.import-tree ./modules);
 }
