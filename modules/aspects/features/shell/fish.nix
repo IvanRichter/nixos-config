@@ -27,6 +27,26 @@
             bind ctrl-right forward-word
           '';
 
+          clippy-pedantic = {
+            description = "Run workspace-wide pedantic Clippy in a temporary target directory";
+            body = ''
+              set -l tmp (mktemp -d); or return 1
+
+              env CARGO_TARGET_DIR="$tmp/target" \
+                cargo clippy \
+                  --workspace \
+                  --all-targets \
+                  --all-features \
+                  --locked \
+                  -- \
+                  -W clippy::pedantic
+              set -l code $status
+
+              rm -r -- "$tmp"
+              return $code
+            '';
+          };
+
           gibbor-update = {
             description = "Refresh the local Gibbor source checkout";
             body = ''
