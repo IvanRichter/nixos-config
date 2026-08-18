@@ -43,6 +43,7 @@
         ms-azuretools.vscode-docker
         mechatroner.rainbow-csv
         ms-vscode-remote.remote-containers
+        oxc.oxc-vscode
         rust-lang.rust-analyzer
         samuelcolvin.jinjahtml
         shd101wyy.markdown-preview-enhanced
@@ -197,8 +198,9 @@
               "bigframes.options.bigquery.application_name = \"datacloud.visual studio code\""
             ];
 
-            "editor.defaultFormatter" = "esbenp.prettier-vscode";
+            "editor.defaultFormatter" = "oxc.oxc-vscode";
             "editor.formatOnSave" = true;
+            "editor.formatOnSaveMode" = "file";
             "editor.cursorBlinking" = "phase";
             "editor.cursorSmoothCaretAnimation" = "on";
             "editor.quickSuggestions" = {
@@ -206,6 +208,10 @@
             };
             "editor.inlayHints.enabled" = "offUnlessPressed";
             "js/ts.updateImportsOnFileMove.enabled" = "always";
+            "oxc.enable.oxfmt" = true;
+            "oxc.enable.oxlint" = false;
+            "oxc.path.oxfmt" = "${pkgs.oxfmt}/bin/oxfmt";
+            "oxc.requireConfig" = false;
             "[nix]" = {
               "editor.defaultFormatter" = "jnoortheen.nix-ide";
             };
