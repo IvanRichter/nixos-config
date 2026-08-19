@@ -81,7 +81,6 @@
         marketplaceRelease.googlecloudtools.datacloud
         marketplaceRelease.macabeus.vscode-fluent
         marketplacePrerelease.openai.chatgpt
-        marketplaceRelease.risingstack.astro-alpinejs-syntax-highlight
         marketplaceRelease.sqlfluff.vscode-sqlfluff
       ];
 
