@@ -37,6 +37,8 @@
         };
       };
 
+      services.fwupd.enable = true;
+
       # Desktop tuning
       services.system76-scheduler = {
         enable = true;

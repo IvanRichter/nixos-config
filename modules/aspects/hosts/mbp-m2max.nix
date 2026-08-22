@@ -61,6 +61,7 @@
 
       # Firmware
       hardware.asahi.enable = true;
+      services.fwupd.enable = true;
 
       # Keyboard / input
       boot.kernelModules = [
