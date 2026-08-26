@@ -15,6 +15,7 @@
       docker
       programs
       browsers
+      iloader
       utils
       games
       ai
