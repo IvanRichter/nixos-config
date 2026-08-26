@@ -24,10 +24,9 @@
           cargo-nextest
           cargo-outdated
           cargo-edit
-          (python314.withPackages (pythonPackages: [
+          (python3.withPackages (pythonPackages: [
             pythonPackages.ipykernel
-            pythonPackages.jupyter
-            pythonPackages.bigquery-magics
+            pythonPackages.bigframes
           ]))
 
           # Build tools & compilers
