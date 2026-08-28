@@ -19,6 +19,7 @@
       utils
       games
       ai
+      codex
       cli
       comms
       development
