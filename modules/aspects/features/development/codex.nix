@@ -1,4 +1,4 @@
-{ den, ... }:
+{ den, inputs, ... }:
 
 let
   systemSettings = {
@@ -29,6 +29,9 @@ in
           systemSettings;
     };
 
-    homeManager.programs.codex.enable = true;
+    homeManager.programs.codex = {
+      enable = true;
+      skills.humanizer = inputs.humanizer.outPath;
+    };
   };
 }

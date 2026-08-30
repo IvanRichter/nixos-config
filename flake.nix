@@ -13,6 +13,11 @@
     home-manager.url = "github:nix-community/home-manager";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
+    humanizer = {
+      url = "github:blader/humanizer";
+      flake = false;
+    };
+
     # Asahi/Apple Silicon support
     apple-silicon.url = "github:nix-community/nixos-apple-silicon";
 
