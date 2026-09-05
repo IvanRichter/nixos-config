@@ -20,6 +20,7 @@
           # Programming languages & runtimes
           pnpm
           bun
+          pkl
           rustToolchain
           cargo-nextest
           cargo-outdated
@@ -46,6 +47,7 @@
           # Git & version control
           git-filter-repo
           ghgrab
+          hk
           pinact
 
           # Databases & SQL
