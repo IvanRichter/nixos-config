@@ -44,6 +44,7 @@
         mechatroner.rainbow-csv
         ms-vscode-remote.remote-containers
         oxc.oxc-vscode
+        pkl.pkl-vscode
         rust-lang.rust-analyzer
         samuelcolvin.jinjahtml
         shd101wyy.markdown-preview-enhanced
@@ -213,6 +214,10 @@
             "oxc.requireConfig" = false;
             "[nix]" = {
               "editor.defaultFormatter" = "jnoortheen.nix-ide";
+            };
+            "[pkl]" = {
+              "editor.defaultFormatter" = "Pkl.pkl-vscode";
+              "editor.formatOnSave" = true;
             };
             "[sql]" = {
               "editor.defaultFormatter" = "sqlfluff.vscode-sqlfluff";
