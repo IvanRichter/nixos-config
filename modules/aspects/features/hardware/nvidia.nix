@@ -2,12 +2,12 @@
 
 {
   den.aspects.nvidia.nixos =
-    { config, ... }:
+    { ... }:
 
     {
       # Userspace and open kernel module
       hardware.nvidia = {
-        package = config.boot.kernelPackages.nvidiaPackages.bleeding_edge;
+        branch = "bleeding_edge";
         modesetting.enable = true;
         open = true;
         powerManagement.enable = true;
