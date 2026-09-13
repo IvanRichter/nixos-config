@@ -15,6 +15,7 @@
           cosmic-ext-applet-weather
           cosmic-ext-applet-caffeine
           cosmic-ext-applet-sysinfo
+          cosmic-ext-applet-workspace-icons
         ];
 
         # Remove unneeded packages
@@ -78,7 +79,7 @@
 
           "cosmic/com.system76.CosmicPanel.Panel/v1/plugins_wings".text = ''
                   Some(([
-                      "com.system76.CosmicAppletWorkspaces",
+                      "io.github.crocodile.cosmic-ext-applet-workspace-icons",
                       "net.tropicbliss.CosmicExtAppletCaffeine",
                       "io.github.cosmic_utils.sysinfo-applet",
                   ], [
@@ -91,6 +92,18 @@
           '';
 
           "cosmic/com.system76.CosmicPanel.Dock/v1/plugins_wings".text = "None";
+
+          "cosmic/io.github.crocodile.cosmic-ext-applet-workspace-icons/v3/dim_minimized_window_icons".text =
+            "true";
+          "cosmic/io.github.crocodile.cosmic-ext-applet-workspace-icons/v3/highlight_maximized_window_icons".text =
+            "true";
+          "cosmic/io.github.crocodile.cosmic-ext-applet-workspace-icons/v3/show_one_icon_per_application".text =
+            "false";
+          "cosmic/io.github.crocodile.cosmic-ext-applet-workspace-icons/v3/max_visible_icons".text = "5";
+          "cosmic/io.github.crocodile.cosmic-ext-applet-workspace-icons/v3/pill_style".text = "Filled";
+          "cosmic/io.github.crocodile.cosmic-ext-applet-workspace-icons/v3/pill_spacing_percent".text = "0";
+          "cosmic/io.github.crocodile.cosmic-ext-applet-workspace-icons/v3/inactive_pill_contrast_percent".text =
+            "0";
 
           "cosmic/io.github.cosmic-utils.cosmic-ext-applet-sysinfo/v1/include_swap_in_ram".text = "true";
 
