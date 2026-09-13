@@ -12,6 +12,7 @@
               "rust-src"
               "rustfmt"
             ];
+            targets = [ "wasm32-unknown-unknown" ];
           };
         in
 
@@ -35,6 +36,10 @@
           gnumake
           pkg-config
           openssl
+
+          # Dioxus & WebAssembly
+          dioxus-cli
+          trunk
 
           # Cloud & infra
           google-cloud-sdk
