@@ -41,17 +41,13 @@
 
       # Desktop tuning
       services.system76-scheduler = {
-        enable = true;
         useStockConfig = false;
 
         settings = {
           # CFS latency tuning
           cfsProfiles = {
-            enable = true;
-
             default = {
               latency = 4;
-              nr-latency = 8;
               wakeup-granularity = 0.5;
               bandwidth-size = 3;
               preempt = "full";
@@ -62,25 +58,16 @@
               nr-latency = 6;
               wakeup-granularity = 0.25;
               bandwidth-size = 2;
-              preempt = "full";
             };
           };
 
           # Per-process scheduler control
           processScheduler = {
-            enable = true;
-            useExecsnoop = true;
             refreshInterval = 30;
 
             # Foreground always wins
             foregroundBoost = {
-              enable = true;
-
-              foreground = {
-                nice = -2;
-                ioClass = "best-effort";
-                ioPrio = 0;
-              };
+              foreground.nice = -2;
 
               background = {
                 nice = 8;
@@ -90,15 +77,10 @@
             };
 
             # Audio must never glitch
-            pipewireBoost = {
-              enable = true;
-              profile = {
-                nice = -10;
-                class = "rr";
-                prio = 20;
-                ioClass = "best-effort";
-                ioPrio = 0;
-              };
+            pipewireBoost.profile = {
+              nice = -10;
+              class = "rr";
+              prio = 20;
             };
           };
         };
