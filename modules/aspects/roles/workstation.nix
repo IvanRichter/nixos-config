@@ -11,7 +11,6 @@
       cosmic
       gui
       networking
-      monitoring
       docker
       programs
       browsers
