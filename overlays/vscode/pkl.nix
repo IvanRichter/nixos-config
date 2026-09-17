@@ -3,7 +3,7 @@ final: prev: {
     pkl = (prev.vscode-extensions.pkl or { }) // {
       pkl-vscode =
         let
-          version = "0.23.0";
+          version = "0.23.1";
           javaPath = "${final.temurin-jre-bin-25}/bin/java";
           pklPath = "${final.pkl}/bin/pkl";
         in
@@ -12,7 +12,7 @@ final: prev: {
           inherit version;
           src = final.fetchurl {
             url = "https://github.com/apple/pkl-vscode/releases/download/${version}/pkl-vscode-${version}.vsix";
-            hash = "sha256-HIPSiXWw0Ggv28hgvw+EGjcUfvH4/UVKZurI+33vWs8=";
+            hash = "sha256-HxPEbWHb4L9hhSG2ecPSQKv8Cq0XOAEOzybXFKHMmT8=";
           };
           vscodeExtPublisher = "Pkl";
           vscodeExtName = "pkl-vscode";
