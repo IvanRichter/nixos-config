@@ -116,14 +116,14 @@ in
 
       bigframes = pythonFinal.buildPythonPackage rec {
         pname = "bigframes";
-        version = "2.48.0";
+        version = "2.49.0";
         pyproject = true;
 
         src = fetchFromGitHub {
           owner = "google";
           repo = "bigframes";
-          rev = "7dd5232fae70802b335c6841066c3529f8a72e6e";
-          hash = "sha256-Efi+qx4XrfwuSngcLBe7Bm9N7ansuRwWhXgop8dguf8=";
+          rev = "a41c12ec0c1bef58eae21658f04dccbedd516aca";
+          hash = "sha256-Sr4vhcKtGc6JfqzlKOl2SJ6vonGdrGOzh8pHFQPS3Ys=";
         };
 
         build-system = [ pythonFinal.setuptools ];
