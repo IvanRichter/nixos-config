@@ -62,13 +62,12 @@
         zhuangtongfa.material-theme
       ];
 
-      marketplace = pkgs.nix-vscode-extensions.forVSCodeVersion config.programs.vscode.package.version;
-
-      marketplaceRelease = marketplace.vscode-marketplace-release;
-      marketplacePrerelease = marketplace.vscode-marketplace;
+      marketplace =
+        (pkgs.nix-vscode-extensions.forVSCodeVersion config.programs.vscode.package.version)
+        .vscode-marketplace-release;
 
       # Dataform Tools needs a preseeded version marker to avoid writing to its immutable install
-      dataformTools = marketplaceRelease.ashishalex.dataform-lsp-vscode.overrideAttrs (old: {
+      dataformTools = marketplace.ashishalex.dataform-lsp-vscode.overrideAttrs (old: {
         postInstall = (old.postInstall or "") + ''
           extensionDir="$out/share/vscode/extensions/ashishalex.dataform-lsp-vscode"
           ${pkgs.jq}/bin/jq '{ lastVersion: .version }' \
@@ -79,10 +78,10 @@
       # Marketplace-only extensions missing from nixpkgs
       marketplaceExtensions = [
         dataformTools
-        marketplaceRelease.googlecloudtools.datacloud
-        marketplaceRelease.macabeus.vscode-fluent
-        marketplacePrerelease.openai.chatgpt
-        marketplaceRelease.sqlfluff.vscode-sqlfluff
+        marketplace.googlecloudtools.datacloud
+        marketplace.macabeus.vscode-fluent
+        marketplace.openai.chatgpt
+        marketplace.sqlfluff.vscode-sqlfluff
       ];
 
     in
