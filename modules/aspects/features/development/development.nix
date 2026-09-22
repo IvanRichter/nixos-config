@@ -46,7 +46,6 @@
           google-cloud-sql-proxy
           terraform
           pulumi-bin
-          gws
           ansible
 
           # Git & version control
