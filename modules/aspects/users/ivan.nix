@@ -14,6 +14,7 @@
       den.aspects.office
       den.aspects.rdp
       den.aspects.gcloud
+      den.aspects.gws
       den.aspects.lazysql
       den.aspects.dbeaver
       den.aspects.tabularis
