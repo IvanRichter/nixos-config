@@ -81,6 +81,7 @@
         marketplace.googlecloudtools.datacloud
         marketplace.macabeus.vscode-fluent
         marketplace.openai.chatgpt
+        marketplace.openai.codex-audio
         marketplace.sqlfluff.vscode-sqlfluff
       ];
 
