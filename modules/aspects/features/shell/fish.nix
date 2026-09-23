@@ -47,6 +47,46 @@
             '';
           };
 
+          clippy-nursery = {
+            description = "Run workspace-wide nursery Clippy in a temporary target directory";
+            body = ''
+              set -l tmp (mktemp -d); or return 1
+
+              env CARGO_TARGET_DIR="$tmp/target" \
+                cargo clippy \
+                  --workspace \
+                  --all-targets \
+                  --all-features \
+                  --locked \
+                  -- \
+                  -W clippy::nursery
+              set -l code $status
+
+              rm -r -- "$tmp"
+              return $code
+            '';
+          };
+
+          clippy-restriction = {
+            description = "Run workspace-wide restriction Clippy in a temporary target directory";
+            body = ''
+              set -l tmp (mktemp -d); or return 1
+
+              env CARGO_TARGET_DIR="$tmp/target" \
+                cargo clippy \
+                  --workspace \
+                  --all-targets \
+                  --all-features \
+                  --locked \
+                  -- \
+                  -W clippy::restriction
+              set -l code $status
+
+              rm -r -- "$tmp"
+              return $code
+            '';
+          };
+
           gibbor-update = {
             description = "Refresh the local Gibbor source checkout";
             body = ''
