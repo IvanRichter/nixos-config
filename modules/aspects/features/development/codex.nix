@@ -29,9 +29,25 @@ in
           systemSettings;
     };
 
-    homeManager.programs.codex = {
-      enable = true;
-      skills.humanizer = inputs.humanizer.outPath;
-    };
+    homeManager =
+      { pkgs, ... }:
+      let
+        humanizer =
+          pkgs.runCommand "humanizer-skills"
+            {
+              pname = "humanizer";
+              nativeBuildInputs = [ pkgs.installAgentSkills ];
+            }
+            ''
+              cp -R "${inputs.humanizer}" humanizer
+              installSkill humanizer
+            '';
+      in
+      {
+        programs.codex = {
+          enable = true;
+          skills.humanizer = "${humanizer}/share/skills/humanizer/humanizer";
+        };
+      };
   };
 }
