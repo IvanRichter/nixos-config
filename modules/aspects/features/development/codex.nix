@@ -2,8 +2,6 @@
 
 let
   systemSettings = {
-    model_context_window = 1000000;
-    model_auto_compact_token_limit = 900000;
     model_reasoning_effort = "max";
     personality = "pragmatic";
     service_tier = "default";
