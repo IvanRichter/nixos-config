@@ -6,6 +6,7 @@
     razer
     memory
     corsair
+    crypto
     desktop-eid
     nvidia
   ];
