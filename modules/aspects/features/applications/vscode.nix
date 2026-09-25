@@ -27,6 +27,26 @@
         ];
       };
 
+      rustFormatter = pkgs.writeShellScript "rustfmt-with-project-rules" ''
+        set -euo pipefail
+        project_root="$(${pkgs.git}/bin/git rev-parse --show-toplevel 2>/dev/null || true)"
+        if [[ -n "$project_root" && -f "$project_root/treefmt.toml" && -f "$project_root/flake.nix" ]]; then
+          # rust-analyzer runs the formatter from the source file's directory
+          format_path="$(${pkgs.git}/bin/git rev-parse --show-prefix)stdin.rs"
+          cd "$project_root"
+          exec ${pkgs.nix}/bin/nix fmt --no-update-lock-file -- --quiet --stdin "$format_path"
+        fi
+        latest_edition="$(
+          ${rustToolchain}/bin/rustfmt --help=config | ${pkgs.gawk}/bin/awk -F '[][]' '
+            /^[[:space:]]*edition / {
+              count = split($2, editions, /\|/)
+              print editions[count]
+            }
+          '
+        )"
+        exec ${rustToolchain}/bin/rustfmt --edition "$latest_edition"
+      '';
+
       # Extensions in nixpkgs
       nixpkgsExtensions = with pkgs.vscode-extensions; [
         astro-build.astro-vscode
@@ -235,11 +255,7 @@
             "rust-analyzer.cargo.buildScripts.enable" = false;
             "rust-analyzer.cargo.targetDir" = "${config.xdg.cacheHome}/rust-analyzer/target";
             "rust-analyzer.procMacro.enable" = false;
-            "rust-analyzer.rustfmt.overrideCommand" = [
-              "${rustToolchain}/bin/rustfmt"
-              "--edition"
-              "2024"
-            ];
+            "rust-analyzer.rustfmt.overrideCommand" = [ "${rustFormatter}" ];
             "nix.formatterPath" = [ "${pkgs.nixfmt}/bin/nixfmt" ];
             "editor.fontFamily" =
               "'JetBrainsMono Nerd Font', 'MesloLGS Nerd Font', 'Droid Sans Mono', 'monospace'";
