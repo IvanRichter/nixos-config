@@ -18,6 +18,11 @@
       flake = false;
     };
 
+    agent-skills = {
+      url = "github:addyosmani/agent-skills";
+      flake = false;
+    };
+
     # Asahi/Apple Silicon support
     apple-silicon.url = "github:nix-community/nixos-apple-silicon";
 
