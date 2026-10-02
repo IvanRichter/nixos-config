@@ -10,6 +10,64 @@
     }:
     let
       configFile = "/var/lib/xmrig-cpu/config.json";
+      zanoConfigFile = "/var/lib/zano-gpu/config.json";
+      zanoTemplate = builtins.toJSON {
+        pool = "stratum+ssl://de.zano.herominers.com:1110";
+        wallet = "RECEIVING_ZANO_ADDRESS";
+        worker = "desktop-gpu";
+        gpu = 0;
+      };
+      zanoCheck = pkgs.writeShellApplication {
+        name = "zano-gpu-check";
+        runtimeInputs = [ pkgs.jaq ];
+        text = ''
+          if (( $# > 1 )); then echo "Usage: zano-gpu-check [candidate.json]" >&2; exit 2; fi
+          config_file=''${1:-${zanoConfigFile}}
+          # Check private JSON without starting the miner
+          if [[ ! -f $config_file || -L $config_file ]] || ! jaq --slurp --exit-status '
+            def filled:
+              type == "string" and length > 0 and
+              (test("(?i)[[:space:][:cntrl:]]|receiving|placeholder|your_|wallet_address|pool:port") | not);
+            length == 1 and (.[0] |
+              type == "object" and
+              (keys | sort) == ["gpu", "pool", "wallet", "worker"] and
+              (.pool | filled and test("^stratum\\+(tcp|ssl)://[a-zA-Z0-9.-]+:[0-9]+$")) and
+              (.wallet | filled and (startswith("-") | not)) and
+              (.worker | type == "string" and test("^[a-zA-Z0-9_-]+$")) and
+              (.gpu | type == "number" and . >= 0 and . == floor))
+          ' "$config_file" >/dev/null 2>&1; then
+            echo "Invalid ZANO config. Run mine-setup zano and set wallet in ${zanoConfigFile}." >&2
+            echo "Set pool, wallet, worker and gpu; empty or placeholder values are not allowed." >&2
+            exit 1
+          fi
+        '';
+      };
+      zanoRun = pkgs.writeShellApplication {
+        name = "zano-gpu-run";
+        runtimeInputs = [ pkgs.jaq ];
+        text = ''
+          ${lib.getExe zanoCheck}
+          mapfile -t settings < <(jaq --raw-output '.pool, .wallet, .worker, .gpu' ${zanoConfigFile})
+          if (( ''${#settings[@]} != 4 )); then exit 1; fi
+          pool=''${settings[0]} wallet=''${settings[1]} worker=''${settings[2]} gpu=''${settings[3]}
+          # Rigel requires --list-devices without other flags
+          devices=$(${lib.getExe pkgs.rigel} --list-devices)
+          selected="\+ GPU #$gpu: RTX 4060 Ti [0-9]+G"
+          if [[ ! $devices =~ $selected ]]; then
+            echo "GPU #$gpu is not an RTX 4060 Ti." >&2
+            exit 1
+          fi
+          echo "ZANO: progpowz on NVIDIA RTX 4060 Ti, GPU #$gpu; thermal pause/resume 80C/65C"
+          # The wallet stays private on disk but is visible in process arguments
+          args=(
+            --algorithm progpowz --url "$pool" --username "$wallet" --password x --worker "$worker"
+            --devices "$gpu" --no-colour --no-tui --stats-interval 30
+            --temp-limit 'tc[65-80]' --no-watchdog
+          )
+          # HTTP and file logging are opt-in
+          exec ${lib.getExe pkgs.rigel} "''${args[@]}"
+        '';
+      };
       checkConfig = pkgs.writeShellApplication {
         name = "xmrig-cpu-check";
         runtimeInputs = [
@@ -227,23 +285,33 @@
           pkgs.util-linux
         ];
         text = ''
-          if (( $# > 1 )); then echo "Usage: mine-setup [--help]" >&2; exit 2; fi
+          if (( $# > 1 )); then echo "Usage: mine-setup [zano|--help]" >&2; exit 2; fi
           case "''${1:-}" in
             --help|-h)
-              echo "Usage: mine-setup"
+              echo "Usage: mine-setup [zano]"
               echo "Edit a private copy in Micro and install it after a non-mining check."
               exit 0
               ;;
-            "") ;;
-            *) echo "Usage: mine-setup [--help]" >&2; exit 2 ;;
+            ""|zano) ;;
+            *) echo "Usage: mine-setup [zano|--help]" >&2; exit 2 ;;
           esac
           if [[ ! -t 0 || ! -t 1 ]]; then
             echo "Run mine-setup in an interactive terminal." >&2
             exit 1
           fi
 
+          kind=''${1:-xmr}
+          service_user=xmrig-cpu
+          config_file=${configFile}
+          check=${lib.getExe checkConfig}
+          if [[ $kind == zano ]]; then
+            service_user=zano-gpu
+            config_file=${zanoConfigFile}
+            check=${lib.getExe zanoCheck}
+          fi
+          state_dir=''${config_file%/*}
           account=$(id -un)
-          if [[ $account != xmrig-cpu ]]; then
+          if [[ $account != "$service_user" ]]; then
             runtime_dir=''${XDG_RUNTIME_DIR:-/run/user/$UID}
             if [[ ! -d $runtime_dir || ! -O $runtime_dir ]]; then
               echo "Run mine-setup from desktop login." >&2
@@ -253,36 +321,38 @@
             exec 9>"$runtime_dir/xmrig-cpu.lock"
             flock --exclusive 9
           fi
-          for mode in normal hard; do
-            case "$(systemctl show "xmrig-cpu-$mode.service" --property=ActiveState --value)" in
+          for unit in xmrig-cpu-normal.service xmrig-cpu-hard.service zano-gpu.service; do
+            case "$(systemctl show "$unit" --property=ActiveState --value)" in
               inactive|failed) ;;
               *) echo "Run mine stop before editing the configuration." >&2; exit 1 ;;
             esac
           done
-          if [[ $account != xmrig-cpu ]]; then
-            # Keep the lock in the caller while sudo closes inherited descriptors
-            /run/wrappers/bin/sudo -u xmrig-cpu -- "$0" 9>&-
+          if [[ $account != "$service_user" ]]; then
+            # Hold the lock while sudo closes inherited descriptors
+            /run/wrappers/bin/sudo -u "$service_user" -- "$0" "$@" 9>&-
             exit
           fi
 
-          if [[ ! -d /var/lib/xmrig-cpu || ! -w /var/lib/xmrig-cpu ]]; then
-            echo "Rebuild the desktop configuration to prepare /var/lib/xmrig-cpu." >&2
+          if [[ ! -d $state_dir || ! -w $state_dir ]]; then
+            echo "Rebuild the desktop configuration to prepare $state_dir." >&2
             exit 1
           fi
-          if [[ -L ${configFile} || ( -e ${configFile} && ! -f ${configFile} ) ]]; then
-            echo "Expected a regular file at ${configFile}." >&2
+          if [[ -L "$config_file" || ( -e "$config_file" && ! -f "$config_file" ) ]]; then
+            echo "Expected a regular file at $config_file." >&2
             exit 1
           fi
           umask 077
-          chmod 0700 /var/lib/xmrig-cpu
-          edit_dir=$(mktemp -d /var/lib/xmrig-cpu/.edit.XXXXXX)
+          chmod 0700 "$state_dir"
+          edit_dir=$(mktemp -d "$state_dir/.edit.XXXXXX")
           trap 'rm -rf -- "$edit_dir"' EXIT
           trap 'exit 130' INT
           trap 'exit 143' TERM
           trap 'exit 129' HUP
           candidate="$edit_dir/config.json"
-          if [[ -e ${configFile} ]]; then
-            cp -- ${configFile} "$candidate"
+          if [[ -e "$config_file" ]]; then
+            cp -- "$config_file" "$candidate"
+          elif [[ $kind == zano ]]; then
+            printf '%s\n' '${zanoTemplate}' >"$candidate"
           else
             cat >"$candidate" <<'JSON'
           {
@@ -326,12 +396,17 @@
           JSON
           fi
           chmod 0600 "$candidate"
-          echo "Set pools[0].user to the Monero receiving address."
+          if [[ $kind == zano ]]; then
+            echo "Edit wallet in ${zanoConfigFile}: use the Cake ZANO receiving address."
+          else
+            echo "Set pools[0].user in ${configFile} to the Monero receiving address."
+          fi
           ${lib.getExe pkgs.micro} "$candidate"
-          ${lib.getExe checkConfig} "$candidate"
+          "$check" "$candidate"
+          if [[ ! -f $candidate || -L $candidate ]]; then exit 1; fi
           chmod 0600 "$candidate"
-          mv -T -- "$candidate" ${configFile}
-          echo "Configuration checked. Run mine to start mining."
+          mv -T -- "$candidate" "$config_file"
+          echo "Configuration saved. Use mine for CPU mining or mine hard for both."
         '';
       };
       mine = pkgs.writeShellApplication {
@@ -342,193 +417,158 @@
           pkgs.util-linux
         ];
         text = ''
-          # shellcheck shell=bash
-
           requested_mode=normal
-          config_file=/var/lib/xmrig-cpu/config.json
-          owned=""
-          owned_unit=""
           owned_session=""
-          follower=""
+          logical=""
+          record_unit=xmrig-cpu-normal.service
+          record_cpu=-
+          record_gpu=-
           locked=0
           interrupted=0
+          declare -A states invocations results followers followed
+          units=(xmrig-cpu-normal.service xmrig-cpu-hard.service zano-gpu.service)
 
           usage() {
             cat <<'HELP'
           Usage: mine [hard|slow|stop|logs|--help]
-            mine       Normal mode: up to 16 workers on 8 cores, 4 initialization threads.
-            hard       All available CPUs.
-            slow       Switch running mining back to normal mode.
-            stop       Stop either mode.
-            logs       Observe output. Ctrl+C only closes this observer.
-          Run mine-setup to create or edit the local configuration.
-          Normal mode starts in the background at boot.
-          Normal mode gets promoted to hard after 1 hour idle and goes back to normal on activity.
-          Manually started hard mode stays hard until mine slow or mine stop.
-          INT, TERM and HUP stop an owned session. After SIGKILL, recover with mine stop.
+            mine       Normal CPU mining, GPU off
+            hard       Full CPU and GPU mining
+            slow       Return to normal CPU mining and stop the GPU
+            stop       Stop both miners
+            logs       Follow both miners; Ctrl+C closes the logs
+          Run mine-setup for XMR or mine-setup zano for ZANO, using Micro
+          Normal CPU-only mining starts at boot
+          One hour without input enables hard CPU and GPU mining; activity returns to normal
+          Manually selected hard mode stays hard until mine slow or mine stop
+          Ctrl+C in mine stops mining; use mine stop if its terminal was killed
           HELP
           }
 
           read_state() {
             local properties key value
-            properties=$(systemctl show "$unit" --property=LoadState,ActiveState,SubState,InvocationID,Result,ConditionResult) || return
-            state="" invocation="" result="" condition="" substate="" load=""
+            local -A status=()
+            properties=$(systemctl show "$unit" --property=LoadState,ActiveState,InvocationID,Result) || return
             while IFS='=' read -r key value; do
-              case "$key" in
-                LoadState) load=$value ;;
-                ActiveState) state=$value ;;
-                SubState) substate=$value ;;
-                InvocationID) invocation=$value ;;
-                Result) result=$value ;;
-                ConditionResult) condition=$value ;;
-              esac
+              [[ -z $key ]] || status[$key]=$value
             done <<<"$properties"
-            if [[ $load != loaded || -z $state ]]; then
-              echo "$unit is unavailable. Rebuild the desktop configuration first." >&2
-              return 1
+            states[$unit]=''${status[ActiveState]:-}
+            invocations[$unit]=''${status[InvocationID]:-}
+            results[$unit]=''${status[Result]:-}
+            if [[ ''${status[LoadState]:-} != loaded || -z ''${states[$unit]} ]]; then
+              if [[ $unit == zano-gpu.service ]]; then
+                states[$unit]=unavailable
+              else
+                echo "$unit is unavailable. Rebuild the desktop configuration." >&2
+                return 1
+              fi
             fi
           }
 
           running() {
-            [[ $state == active || $state == activating || $state == reloading || $state == deactivating ]]
+            [[ ''${states[$1]} == @(active|activating|reloading|deactivating) ]]
           }
 
           find_session() {
-            local candidate active="" failed=""
-            for candidate in normal hard; do
-              unit="xmrig-cpu-$candidate.service"
-              read_state
-              if running; then
+            local candidate active=""
+            for candidate in "''${units[@]}"; do
+              unit=$candidate
+              read_state || return
+              if [[ $unit != zano-gpu.service ]] && running "$unit"; then
                 if [[ -n $active ]]; then
-                  echo "Both mining modes are active. Inspect systemctl status 'xmrig-cpu-*.service'." >&2
+                  echo "Both CPU modes are active; inspect systemctl status 'xmrig-cpu-*.service'." >&2
                   return 1
                 fi
                 active=$unit
-              elif [[ $state == failed && -z $failed ]]; then
-                failed=$unit
               fi
             done
-            if [[ -z $active && $command == logs ]]; then
-              active=$failed
-            fi
             unit=''${active:-$requested_unit}
             mode=''${unit#xmrig-cpu-}
             mode=''${mode%.service}
-            read_state
+          }
+
+          any_running() {
+            running "$unit" || running zano-gpu.service
+          }
+
+          report_gpu() {
+            if ! running zano-gpu.service; then
+              if [[ $mode == normal ]] && running "$unit"; then
+                echo "ZANO GPU mining is off in normal mode."
+                return
+              fi
+              echo "ZANO is stopped or unconfigured. Run mine-setup zano to configure it."
+              if [[ $command == logs && -n ''${invocations["zano-gpu.service"]} ]]; then
+                journalctl --quiet --no-pager --output=short -n 30 \
+                  "_SYSTEMD_INVOCATION_ID=''${invocations["zano-gpu.service"]}"
+              fi
+            fi
           }
 
           lock() {
             flock --exclusive 9
             locked=1
           }
-
           unlock() {
             flock --unlock 9
             locked=0
           }
 
           read_session() {
-            session_id="" session_unit="" session_invocation="" session_origin=""
+            session_id="" session_unit="" session_invocation="" session_origin="" session_gpu=""
             local extra=""
             [[ -f $session_file && ! -L $session_file ]] || return 1
-            read -r session_id session_unit session_invocation session_origin extra <"$session_file" || return 1
-            [[ $session_id =~ ^[0-9a-f]{32}$ && $session_invocation =~ ^[0-9a-f]{32}$ && -z $extra ]] || return 1
+            read -r session_id session_unit session_invocation session_origin session_gpu extra <"$session_file" || return 1
+            # Older records track only the CPU
+            session_legacy=0
+            if [[ -z $session_gpu ]]; then
+              session_legacy=1
+              session_gpu=-
+            fi
+            [[ $session_id =~ ^[0-9a-f]{32}$ && -z $extra ]] || return 1
+            [[ $session_invocation == - || $session_invocation =~ ^[0-9a-f]{32}$ ]] || return 1
+            [[ $session_gpu == - || $session_gpu =~ ^[0-9a-f]{32}$ ]] || return 1
             [[ $session_unit == xmrig-cpu-normal.service || $session_unit == xmrig-cpu-hard.service ]] || return 1
             [[ $session_origin == manual || $session_origin == idle ]]
           }
 
           save_session() {
-            local temporary
+            local temporary legacy=0
+            if read_session && [[ $session_id == "$logical" && $session_legacy == 1 && $record_gpu == - ]]; then legacy=1; fi
             temporary=$(mktemp "$runtime_dir/.xmrig-session.XXXXXX")
-            printf '%s %s %s %s\n' "$1" "$unit" "$invocation" "$2" >"$temporary"
+            if ((legacy)); then
+              printf '%s %s %s %s\n' "$logical" "$record_unit" "$record_cpu" "$1" >"$temporary"
+            else
+              printf '%s %s %s %s %s\n' "$logical" "$record_unit" "$record_cpu" "$1" "$record_gpu" >"$temporary"
+            fi
             mv -T -- "$temporary" "$session_file"
           }
 
-          clear_session() {
-            if read_session && [[ $session_unit == "$1" && $session_invocation == "$2" ]]; then
-              rm -f -- "$session_file" "$runtime_dir/xmrig-cpu-idle/promotion"
-            fi
-          }
-
-          run_job() {
-            local job rc=0
-            (
-              trap "" INT TERM HUP
-              exec systemctl --no-ask-password "$1" "$unit"
-            ) 9>&- &
-            job=$!
-            while true; do
-              if wait "$job"; then rc=0; break; else rc=$?; fi
-              if ! kill -0 "$job" 2>/dev/null; then break; fi
-            done
-            return "$rc"
-          }
-
-          stop_service() {
-            local stopped_unit=$unit stopped_invocation=$invocation
-            systemctl --no-ask-password stop "$unit" || return
-            read_state || return
-            if running; then
-              echo "Mining has not stopped ($state/$substate). Inspect mine logs." >&2
-              return 1
-            fi
-            clear_session "$stopped_unit" "$stopped_invocation"
-            echo "Mining stopped."
-          }
-
-          stop_follower() {
-            if [[ -n $follower ]]; then
-              # The journal observer must not delay graceful miner shutdown
-              kill -KILL "$follower" 2>/dev/null || true
-              wait "$follower" 2>/dev/null || true
-              follower=""
+          capture_session() {
+            record_unit=$unit
+            record_cpu=''${invocations[$unit]:--}
+            record_gpu=''${invocations["zano-gpu.service"]:--}
+            running "$unit" || record_cpu=-
+            running zano-gpu.service || record_gpu=-
+            logical=$record_cpu
+            [[ $logical != - ]] || logical=$record_gpu
+            if read_session && { [[ $session_unit == "$unit" && $session_invocation == "$record_cpu" && $record_cpu != - ]] ||
+              [[ $record_cpu == - && $session_gpu == "$record_gpu" && $record_gpu != - ]]; }; then
+              logical=$session_id
             fi
           }
 
           adopt_session() {
-            local previous_unit=$unit
-            if read_session && [[ $session_id == "$1" ]]; then
-              unit=$session_unit
-              read_state || return
-              if [[ $invocation == "$session_invocation" ]]; then
-                mode=''${unit#xmrig-cpu-}
-                mode=''${mode%.service}
-                if [[ -n $owned_session && $session_id == "$owned_session" ]]; then
-                  owned_unit=$unit
-                  owned=$invocation
-                fi
-                return
-              fi
+            if read_session && [[ $session_id == "$logical" ]]; then
+              record_unit=$session_unit
+              record_cpu=$session_invocation
+              record_gpu=$session_gpu
             fi
-            unit=$previous_unit
-            read_state
           }
 
-          cleanup() {
-            local rc=$?
-            trap - EXIT
-            trap "" INT TERM HUP
-            stop_follower
-            if [[ -n $owned ]]; then
-              if ((! locked)); then lock; fi
-              unit=$owned_unit
-              if ! adopt_session "$owned_session"; then rc=1; fi
-              if read_state; then
-                # Check and stop under the same lock used by every mine start/stop
-                if [[ $invocation == "$owned" ]] && running; then
-                  if ! stop_service; then
-                    echo "Could not stop the owned session. Run mine stop." >&2
-                    rc=1
-                  fi
-                else
-                  clear_session "$owned_unit" "$owned"
-                fi
-              else
-                echo "Could not inspect the owned session. Run mine stop." >&2
-                rc=1
-              fi
+          clear_session() {
+            if read_session && [[ $session_id == "$logical" ]]; then
+              rm -f -- "$session_file" "$runtime_dir/xmrig-cpu-idle/promotion"
             fi
-            exit "$rc"
           }
 
           defer_signals() {
@@ -544,108 +584,215 @@
             if ((interrupted)); then exit "$interrupted"; fi
           }
 
-          follow_session() {
-            local session=$1 lines=$2 logical=$1 previous_unit=$unit
-            if read_session && [[ $session_unit == "$unit" && $session_invocation == "$session" ]]; then
-              logical=$session_id
+          run_job() {
+            local job rc=0
+            (
+              trap "" INT TERM HUP
+              exec systemctl --no-ask-password "$1" "$unit"
+            ) 9>&- &
+            job=$!
+            while true; do
+              wait "$job" && return 0
+              rc=$?
+              kill -0 "$job" 2>/dev/null || return "$rc"
+            done
+          }
+
+          stop_service() {
+            read_state || return
+            if ! running "$unit"; then return; fi
+            # Leave replacement invocations alone during owner cleanup
+            if [[ $# == 1 && ''${invocations[$unit]} != "$1" ]]; then return; fi
+            echo "Stopping $unit..."
+            run_job stop || return
+            read_state || return
+            if running "$unit"; then
+              echo "$unit has not stopped. Check mine logs." >&2
+              return 1
             fi
-            echo "Journal output only: use mine commands and owner Ctrl+C, XMRig h/p/r keys are not forwarded."
+          }
+
+          start_gpu() {
+            local previous rc=0
+            unit=zano-gpu.service
+            read_state
+            # Keep an existing worker and its owner
+            if running "$unit"; then return; fi
+            previous=''${invocations[$unit]}
+            echo "Starting ZANO GPU mining..."
+            if [[ ''${states[$unit]} != unavailable ]]; then run_job start || rc=$?; fi
+            read_state
+            if [[ -n ''${invocations[$unit]} && ''${invocations[$unit]} != "$previous" ]]; then
+              record_gpu=''${invocations[$unit]}
+            fi
+            if ((rc)) || [[ ''${states[$unit]} != active ]]; then
+              echo "ZANO could not start. CPU mining will continue. Check mine logs or mine-setup zano." >&2
+            else
+              echo "ZANO mining started."
+            fi
+          }
+
+          stop_gpu() {
+            unit=zano-gpu.service
+            read_state || return
+            if running "$unit"; then
+              if [[ ''${invocations[$unit]} != "$record_gpu" ]]; then
+                echo "The GPU worker changed. Run mine stop before switching to normal mode." >&2
+                return 1
+              fi
+              stop_service || return
+            fi
+            record_gpu=-
+          }
+
+          stop_session() {
+            local candidate expected rc=0
+            for candidate in "$record_unit" zano-gpu.service; do
+              expected=$record_cpu
+              [[ $candidate != zano-gpu.service ]] || expected=$record_gpu
+              [[ $expected != - ]] || continue
+              unit=$candidate
+              stop_service "$expected" || rc=1
+            done
+            if ((rc == 0)); then clear_session; fi
+            return "$rc"
+          }
+
+          stop_follower() {
+            local source=$1 pid=''${followers[$1]:-}
+            if [[ -n $pid ]]; then
+              kill -KILL "$pid" 2>/dev/null || true
+              wait "$pid" 2>/dev/null || true
+              unset 'followers[$source]'
+            fi
+          }
+
+          cleanup() {
+            local rc=$?
+            trap - EXIT
+            trap "" INT TERM HUP
+            stop_follower XMR
+            stop_follower ZANO
+            if [[ -n $owned_session ]]; then
+              echo "Stopping mining..."
+              if ((! locked)); then lock; fi
+              logical=$owned_session
+              adopt_session
+              if ! stop_session; then
+                echo "Could not stop mining. Run mine stop." >&2
+                rc=1
+              fi
+            fi
+            exit "$rc"
+          }
+
+          follow_session() {
+            local initial_lines=$1 source expected candidate alive lines
+            declare -A reported=()
+            echo "Showing logs; miner keyboard shortcuts are unavailable."
             while true; do
               lock
-              adopt_session "$logical"
-              if read_session && [[ $session_id == "$logical" && $session_unit == "$unit" && $session_invocation == "$invocation" ]]; then
-                if [[ $unit != "$previous_unit" || $invocation != "$session" ]]; then
-                  stop_follower
-                  session=$invocation
-                  previous_unit=$unit
-                  lines=all
-                  echo "Mining switched to $mode mode."
+              adopt_session
+              alive=0
+              for source in XMR ZANO; do
+                candidate=$record_unit expected=$record_cpu
+                [[ $source != ZANO ]] || {
+                  candidate=zano-gpu.service
+                  expected=$record_gpu
+                }
+                if [[ $expected == - ]]; then
+                  stop_follower "$source"
+                  continue
                 fi
-              fi
-              unlock
-              if [[ -n $invocation && $invocation != "$session" ]]; then
-                echo "This mining session ended; a replacement session is left untouched."
-                return
-              fi
-              if ! running; then
-                if [[ $state == failed || $result != success ]]; then
-                  echo "Mining failed ($result). Inspect mine logs." >&2
-                  journalctl --quiet --no-pager --output=cat -n 20 "_SYSTEMD_INVOCATION_ID=$session"
+                unit=$candidate
+                read_state
+                if [[ ''${invocations[$unit]} == "$expected" ]] && running "$unit"; then
+                  alive=1
+                elif [[ -z ''${reported[$expected]:-} ]]; then
+                  echo "$source mining stopped (''${results[$unit]})."
+                  reported[$expected]=1
+                fi
+                if [[ ''${followed[$source]:-} != "$expected" ]]; then
+                  lines=$initial_lines
+                  [[ -z ''${followed[$source]:-} ]] || lines=all
+                  stop_follower "$source"
+                  defer_signals
+                  # Follow each invocation once without replaying the other worker
+                  journalctl --quiet --no-pager --output=short --lines="$lines" --follow \
+                    "_SYSTEMD_INVOCATION_ID=$expected" 9>&- &
+                  followers[$source]=$!
+                  followed[$source]=$expected
+                  resume_signals
+                elif ! kill -0 "''${followers[$source]}" 2>/dev/null; then
+                  echo "$source journal follower ended unexpectedly." >&2
                   return 1
                 fi
-                echo "Mining stopped."
-                return
-              fi
-              if [[ -z $invocation ]]; then
+              done
+              unlock
+              if ((! alive)); then
                 echo "This mining session ended."
                 return
-              fi
-              if [[ -z $follower ]]; then
-                # Record the follower before acting on a pending signal
-                defer_signals
-                journalctl --quiet --no-pager --output=cat --lines="$lines" --follow \
-                  "_SYSTEMD_INVOCATION_ID=$session" 9>&- &
-                follower=$!
-                resume_signals
-              elif ! kill -0 "$follower" 2>/dev/null; then
-                echo "The journal follower ended unexpectedly." >&2
-                return 1
               fi
               sleep 1
             done
           }
 
           switch_mode() {
-            local target=$1 origin=$2 token=$invocation rc=0
+            local target=$1 origin=$2 rc=0 legacy=0
             local ticket="$runtime_dir/xmrig-cpu-idle/promotion"
-            if read_session && [[ $session_unit == "$unit" && $session_invocation == "$invocation" ]]; then
-              token=$session_id
+            capture_session
+            # Preserve ownership across mode changes
+            if read_session && [[ $session_id == "$logical" ]]; then
+              record_gpu=$session_gpu
+              legacy=$session_legacy
             fi
             defer_signals
-            run_job stop || return 1
-            read_state
-            if running; then return 1; fi
-            unit="xmrig-cpu-$target.service"
-            run_job start || rc=$?
-            read_state
-            if [[ -n $invocation ]]; then
-              save_session "$token" "$origin"
-            else
-              rm -f -- "$session_file"
+            if [[ $target == normal ]]; then stop_gpu || return 1; fi
+            unit=$record_unit
+            if [[ $unit != "xmrig-cpu-$target.service" ]]; then
+              stop_service || return 1
+              unit="xmrig-cpu-$target.service"
+              run_job start || rc=$?
+              read_state
+              record_unit=$unit record_cpu=''${invocations[$unit]:--}
             fi
-            if [[ $state == active && $origin == idle ]]; then
-              printf '%s %s\n' "$token" "$invocation" >"$ticket"
+            # Start the GPU only after the CPU transition succeeds
+            if ((rc == 0)) && [[ ''${states[$record_unit]} == active && $target == hard ]]; then
+              if ((legacy)); then
+                echo "This older session is CPU-only. Run mine stop then mine hard to enable the GPU."
+              else
+                start_gpu
+              fi
+            fi
+            save_session "$origin"
+            if [[ ''${states[$record_unit]} == active && $origin == idle ]]; then
+              printf '%s %s\n' "$logical" "$record_cpu" >"$ticket"
             else
               rm -f -- "$ticket"
             fi
             resume_signals
-            if ((rc)) || [[ $state != active ]]; then
-              echo "Transition to $target failed; inspect mine logs." >&2
+            if ((rc)) || [[ ''${states[$record_unit]} != active ]]; then
+              echo "Could not switch CPU mining to $target. Check mine logs." >&2
               return 1
             fi
             echo "Mining switched to $target mode."
           }
 
           idle_transition() {
-            local expected_unit expected_invocation target origin ticket ticket_session ticket_invocation
+            local target origin ticket ticket_session ticket_invocation
             ticket=''${MINE_IDLE_TICKET:-$runtime_dir/xmrig-cpu-idle/promotion}
             [[ $ticket == "$runtime_dir/xmrig-cpu-idle/promotion" && -d ''${ticket%/*} ]] || return 0
-            find_session
-            [[ $state == active && -n $invocation ]] || return 0
-            expected_unit=$unit
-            expected_invocation=$invocation
             lock
-            unit=$expected_unit
-            read_state
-            [[ $state == active && $invocation == "$expected_invocation" ]] || return 0
-            if ! read_session || [[ $session_unit != "$unit" || $session_invocation != "$invocation" ]]; then
-              # Boot-started normal mining has no foreground session marker
+            find_session
+            [[ ''${states[$unit]} == active && -n ''${invocations[$unit]} ]] || return 0
+            if ! read_session || [[ $session_unit != "$unit" || $session_invocation != "''${invocations[$unit]}" ]]; then
+              # Boot mining has no session record yet
               [[ $command == idle-hard && $unit == xmrig-cpu-normal.service ]] || return 0
               session_origin=manual
             fi
             if [[ $command == idle-hard ]]; then
               if [[ $unit == xmrig-cpu-hard.service && $session_origin == idle ]]; then
-                printf '%s %s\n' "$session_id" "$invocation" >"$ticket"
+                printf '%s %s\n' "$session_id" "''${invocations[$unit]}" >"$ticket"
                 return 0
               fi
               [[ $unit == xmrig-cpu-normal.service && $session_origin == manual ]] || return 0
@@ -653,49 +800,43 @@
             else
               [[ $unit == xmrig-cpu-hard.service && $session_origin == idle && -f $ticket ]] || return 0
               read -r ticket_session ticket_invocation <"$ticket" || return 0
-              [[ $ticket_session == "$session_id" && $ticket_invocation == "$invocation" ]] || return 0
+              [[ $ticket_session == "$session_id" && $ticket_invocation == "''${invocations[$unit]}" ]] || return 0
               target=normal origin=manual
             fi
             switch_mode "$target" "$origin"
           }
 
           offer_stop() {
-            local prompted=$invocation prompted_unit=$unit answer
-
-            if ((locked)); then
-              unlock
-            fi
-
+            local answer="" prompted_cpu prompted_gpu prompted_unit
+            report_gpu
+            capture_session
+            prompted_cpu=$record_cpu prompted_gpu=$record_gpu prompted_unit=$record_unit
+            unlock
             if [[ ! -t 0 || ! -t 1 ]]; then
-              echo "Mining is already running in $mode mode ($state). Use mine stop to stop it." >&2
+              echo "Mining is already running. Use mine stop to stop it." >&2
               exit 1
             fi
-
-            printf 'Mining is already running in %s mode. Stop it? [y/N] ' "$mode"
-            answer=""
-
-            if ! read -r answer; then
+            printf 'Mining is already running. Stop it? [y/N] '
+            if ! IFS= read -r answer; then
               printf '\n'
               exit 0
             fi
-
             if [[ $answer != [yY] ]]; then
               echo "Mining left running."
               exit 0
             fi
-
             lock
-            unit=$prompted_unit
-            read_state
-
-            if [[ $invocation != "$prompted" ]]; then
-              echo "The session changed; leaving the replacement untouched."
-            elif running; then
-              stop_service
+            find_session
+            capture_session
+            # Don't stop workers started while the prompt was open
+            if [[ $record_cpu != "$prompted_cpu" || $record_gpu != "$prompted_gpu" || $record_unit != "$prompted_unit" ]]; then
+              echo "The session changed. Mining left running."
             else
-              echo "Mining is already stopped ($state)."
+              defer_signals
+              stop_session
+              resume_signals
+              echo "Mining stopped."
             fi
-
             exit 0
           }
 
@@ -705,20 +846,23 @@
           fi
           command=''${1:-start}
           case "$command" in
-            --help | -h)
-              usage
-              exit 0
-              ;;
-            slow | stop | logs | idle-hard | idle-resume) ;;
-            hard) requested_mode=hard; command=start ;;
-            start) if (($#)); then
-              usage >&2
-              exit 2
-            fi ;;
-            *)
-              usage >&2
-              exit 2
-              ;;
+          --help | -h)
+            usage
+            exit 0
+            ;;
+          slow | stop | logs | idle-hard | idle-resume) ;;
+          hard)
+            requested_mode=hard
+            command=start
+            ;;
+          start) if (($#)); then
+            usage >&2
+            exit 2
+          fi ;;
+          *)
+            usage >&2
+            exit 2
+            ;;
           esac
 
           trap cleanup EXIT
@@ -737,89 +881,78 @@
             idle_transition
             exit
           fi
-          find_session
-
-          if [[ $command == logs ]]; then
-            if running && [[ -n $invocation ]]; then
-              follow_session "$invocation" 30
-            else
-              journalctl --quiet --no-pager --output=cat --unit=xmrig-cpu-normal.service --unit=xmrig-cpu-hard.service -n 30
-            fi
-            exit 0
-          fi
-
-          case "$command:$state" in
-            start:active | start:activating | start:reloading) offer_stop ;;
-          esac
           lock
-          find_session
 
           if [[ $command == stop ]]; then
-            if running; then stop_service; else echo "Mining is already stopped ($state)."; fi
-            rm -f -- "$session_file" "$runtime_dir/xmrig-cpu-idle/promotion"
+            # Stop surviving workers even if another unit is unavailable
+            defer_signals
+            stop_rc=0
+            for unit in "''${units[@]}"; do
+              stop_service || stop_rc=1
+            done
+            if ((stop_rc == 0)); then rm -f -- "$session_file" "$runtime_dir/xmrig-cpu-idle/promotion"; fi
+            resume_signals
+            echo "Mining stop completed."
+            exit "$stop_rc"
+          fi
+
+          find_session
+          if [[ $command == logs ]]; then
+            report_gpu
+            if any_running; then
+              capture_session
+              unlock
+              follow_session 30
+            else
+              unlock
+              journalctl --quiet --no-pager --output=short -n 30 \
+                --unit=xmrig-cpu-normal.service --unit=xmrig-cpu-hard.service --unit=zano-gpu.service
+            fi
             exit 0
           fi
 
           if [[ $command == slow ]]; then
-            case "$state" in
-              active)
-                if [[ $mode == normal ]]; then
-                  rm -f -- "$runtime_dir/xmrig-cpu-idle/promotion"
-                  echo "Mining is already in normal mode."
-                else
-                  switch_mode normal manual
-                fi
-                ;;
-              inactive | failed) echo "Mining is stopped. Run mine to start it." ;;
-              *) echo "Mining is $state. Wait for the transition to finish." >&2; exit 1 ;;
-            esac
+            if [[ ''${states[$unit]} == active ]]; then
+              switch_mode normal manual
+            else
+              echo "CPU is stopped or transitioning; GPU is unchanged."
+            fi
             exit 0
           fi
 
-          case "$state" in
-            active | activating | reloading)
-              offer_stop
-              ;;
-            deactivating)
-              echo "Mining is stopping. Wait for shutdown before starting another session."
-              exit 1
-              ;;
-            inactive | failed) ;;
-            *)
-              echo "Cannot start mining in state $state." >&2
-              exit 1
-              ;;
-          esac
+          if any_running; then offer_stop; fi
 
-          previous=$invocation
           defer_signals
-          # Let the bounded systemd start job settle even if terminal is interrupted
+          # Track the GPU before CPU startup can fail
+          if [[ $requested_mode == hard ]]; then
+            start_gpu
+            if [[ $record_gpu != - ]]; then owned_session=$record_gpu; fi
+          else
+            echo "ZANO GPU mining is off in normal mode."
+          fi
+
+          echo "Starting XMR CPU mining ($requested_mode)..."
+          unit=$requested_unit
+          previous=''${invocations[$unit]}
           start_rc=0
           run_job start || start_rc=$?
           read_state
-          if [[ -n $invocation && $invocation != "$previous" ]]; then
-            owned=$invocation
-            owned_unit=$unit
-            owned_session=$invocation
-            save_session "$owned_session" manual
-            rm -f -- "$runtime_dir/xmrig-cpu-idle/promotion"
+          record_unit=$unit
+          if [[ -n ''${invocations[$unit]} && ''${invocations[$unit]} != "$previous" ]]; then
+            record_cpu=''${invocations[$unit]}
+            owned_session=''${owned_session:-$record_cpu}
           fi
+          logical=$owned_session
+          if [[ -n $logical ]]; then save_session manual; fi
+          rm -f -- "$runtime_dir/xmrig-cpu-idle/promotion"
           resume_signals
-
-          if ((start_rc != 0)) || [[ $state != active || -z $owned ]]; then
-            if [[ $condition == no ]]; then
-              echo "Mining did not start. Create $config_file (xmrig-cpu:xmrig-cpu, mode 0600) first." >&2
-            else
-              echo "Mining did not start ($state/$substate, result: $result). Check $config_file and mine logs." >&2
-              if [[ -n $owned ]]; then
-                journalctl --quiet --no-pager --output=cat --lines=all "_SYSTEMD_INVOCATION_ID=$owned"
-              fi
-            fi
+          if ((start_rc)) || [[ ''${states[$unit]} != active || $record_cpu == - ]]; then
+            echo "CPU mining did not start. Check mine logs and /var/lib/xmrig-cpu/config.json." >&2
             exit 1
           fi
           unlock
-          echo "Mining started in $mode mode. Ctrl+C to stop."
-          follow_session "$owned" all
+          echo "XMR started in $requested_mode mode. Ctrl+C stops mining."
+          follow_session all
         '';
       };
 
@@ -834,17 +967,57 @@
             --replace-fail 'if (cmd->resume_pending) {' 'if (false && cmd->resume_pending) {'
         '';
       });
+
+      mkMiningService = lib.recursiveUpdate {
+        wants = [ "network-online.target" ];
+        after = [ "network-online.target" ];
+        restartIfChanged = false;
+        serviceConfig = {
+          Type = "exec";
+          UMask = "0077";
+          Restart = "no";
+          TimeoutStartSec = 30;
+          KillSignal = "SIGTERM";
+          KillMode = "control-group";
+          StandardOutput = "journal";
+          StandardError = "journal";
+          Nice = 19;
+          CPUWeight = 10;
+          NoNewPrivileges = true;
+          PrivateTmp = true;
+          PrivateDevices = false;
+          DevicePolicy = "closed";
+          ProtectHome = true;
+          ProtectSystem = "strict";
+          ProtectKernelTunables = true;
+          ProtectKernelModules = true;
+          ProtectControlGroups = true;
+          RestrictSUIDSGID = true;
+          RestrictRealtime = true;
+          LockPersonality = true;
+          SystemCallArchitectures = "native";
+          # Both miners need JIT-generated code
+          MemoryDenyWriteExecute = false;
+        };
+      };
     in
     {
       environment.systemPackages = [
         mine
         mineSetup
+        pkgs.rigel
       ];
 
       users.groups.xmrig-cpu.gid = 492;
       users.users.xmrig-cpu = {
         isSystemUser = true;
         group = "xmrig-cpu";
+      };
+      users.groups.zano-gpu = { };
+      users.users.zano-gpu = {
+        isSystemUser = true;
+        group = "zano-gpu";
+        home = "/var/lib/zano-gpu";
       };
 
       # Provision before the first start, even when ConditionPathExists skips it
@@ -853,6 +1026,8 @@
 
         # Fixes metadata only if the config already exists
         "z ${configFile} 0600 xmrig-cpu xmrig-cpu -"
+        "d /var/lib/zano-gpu 0700 zano-gpu zano-gpu -"
+        "z ${zanoConfigFile} 0600 zano-gpu zano-gpu -"
       ];
 
       boot.kernel.sysctl = {
@@ -897,21 +1072,66 @@
       };
 
       # Leave the service's Nice=19 intact
-      services.system76-scheduler.exceptions = [ ''"${lib.getExe pkgs.xmrig}"'' ];
+      services.system76-scheduler.exceptions = [
+        ''"${lib.getExe pkgs.xmrig}"''
+        ''"${pkgs.rigel}/libexec/rigel"''
+      ];
 
       security.polkit.extraConfig = ''
         polkit.addRule(function(action, subject) {
           if (subject.user === "ivan" &&
               action.id === "org.freedesktop.systemd1.manage-units" &&
               (action.lookup("unit") === "xmrig-cpu-normal.service" ||
-               action.lookup("unit") === "xmrig-cpu-hard.service") &&
+               action.lookup("unit") === "xmrig-cpu-hard.service" ||
+               action.lookup("unit") === "zano-gpu.service") &&
               (action.lookup("verb") === "start" || action.lookup("verb") === "stop")) {
             return polkit.Result.YES;
           }
         });
       '';
 
-      systemd.services = lib.genAttrs [ "xmrig-cpu-normal" "xmrig-cpu-hard" ] (
+      systemd.services = {
+        zano-gpu = mkMiningService {
+          description = "Zano GPU mining on the NVIDIA RTX 4060 Ti";
+          after = [
+            "network-online.target"
+            "systemd-modules-load.service"
+            "systemd-udev-trigger.service"
+          ];
+          # Don't add a GPU worker to an active session during rebuild
+          unitConfig.X-OnlyManualStart = true;
+          environment = {
+            XDG_CACHE_HOME = "/var/cache/zano-gpu";
+            CUDA_CACHE_PATH = "/var/cache/zano-gpu/nvidia";
+          };
+          serviceConfig = {
+            User = "zano-gpu";
+            Group = "zano-gpu";
+            StateDirectory = "zano-gpu";
+            StateDirectoryMode = "0700";
+            CacheDirectory = "zano-gpu";
+            CacheDirectoryMode = "0700";
+            WorkingDirectory = "/var/lib/zano-gpu";
+            ExecCondition = lib.getExe zanoCheck;
+            ExecStart = lib.getExe zanoRun;
+            # Bound shutdown if the GPU hangs
+            TimeoutStopSec = 5;
+            SyslogIdentifier = "ZANO";
+            CapabilityBoundingSet = "";
+            AmbientCapabilities = "";
+            DeviceAllow = [
+              "/dev/nvidia0 rw"
+              "/dev/nvidiactl rw"
+              "/dev/nvidia-uvm rw"
+              "/dev/nvidia-uvm-tools rw"
+            ];
+            ReadOnlyPaths = [ "-${zanoConfigFile}" ];
+            # Allow outbound connections without listening sockets
+            SocketBindDeny = "any";
+          };
+        };
+      }
+      // lib.genAttrs [ "xmrig-cpu-normal" "xmrig-cpu-hard" ] (
         name:
         let
           mode = lib.removePrefix "xmrig-cpu-" name;
@@ -919,26 +1139,19 @@
           runtimeDir = "/run/${name}";
           effectiveFile = "${runtimeDir}/config.json";
         in
-        {
+        mkMiningService {
           description = "Monero CPU mining (${mode})";
           wantedBy = lib.optional (mode == "normal") "multi-user.target";
           conflicts = [ "xmrig-cpu-${other}.service" ];
 
           # Make systemd finish stopping one mode before starting the other
           before = lib.optional (mode == "normal") "xmrig-cpu-hard.service";
-          wants = [ "network-online.target" ];
-          after = [ "network-online.target" ];
-
-          # Do not restart an active service on rebuild
-          restartIfChanged = false;
           unitConfig = {
             ConditionPathExists = configFile;
           };
           serviceConfig = {
-            Type = "exec";
             User = "xmrig-cpu";
             Group = "xmrig-cpu";
-            UMask = "0077";
             WorkingDirectory = "/var/lib/xmrig-cpu";
             RuntimeDirectory = name;
             RuntimeDirectoryMode = "0700";
@@ -947,29 +1160,16 @@
               "${lib.getExe checkConfig} ${effectiveFile}"
             ];
             ExecStart = "${lib.getExe pkgs.xmrig} --config=${effectiveFile}";
-            Restart = "no";
-            TimeoutStartSec = 30;
             TimeoutStopSec = 30;
-            KillSignal = "SIGTERM";
-            KillMode = "control-group";
-            StandardOutput = "journal";
-            StandardError = "journal";
-            Nice = 19;
-            CPUWeight = 10;
+            SyslogIdentifier = "XMR-${mode}";
             LimitMEMLOCK = "4G";
-            NoNewPrivileges = true;
 
             # Linux msr_open requires RAWIO and device perms
             CapabilityBoundingSet = "CAP_SYS_RAWIO";
             AmbientCapabilities = "CAP_SYS_RAWIO";
-            PrivateTmp = true;
-            PrivateDevices = false;
-            DevicePolicy = "closed";
             DeviceAllow = [ "char-cpu/msr rw" ];
 
             SystemCallFilter = [ "~iopl ioperm" ];
-            ProtectHome = true;
-            ProtectSystem = "strict";
 
             # Keep private files writable
             ReadWritePaths = [
@@ -978,16 +1178,6 @@
             ];
 
             ReadOnlyPaths = [ configFile ];
-            ProtectKernelTunables = true;
-            ProtectKernelModules = true;
-            ProtectControlGroups = true;
-            RestrictSUIDSGID = true;
-            RestrictRealtime = true;
-            LockPersonality = true;
-            SystemCallArchitectures = "native";
-
-            # RandomX JIT needs executable writable memory
-            MemoryDenyWriteExecute = false;
           };
         }
       );
