@@ -185,6 +185,10 @@ _final: prev: {
       }).overrideAttrs
         (old: {
           preferLocalBuild = true;
+          # O3 measured slightly faster than Ofast on the 9950X
+          postPatch = (old.postPatch or "") + ''
+            substituteInPlace cmake/flags.cmake --replace-fail '-Ofast' '-O3'
+          '';
           preConfigure = (old.preConfigure or "") + ''
             pgoProfileDir="$NIX_BUILD_TOP/xmrig-pgo"
             ${uutils}/bin/mkdir -m 0700 "$pgoProfileDir"
@@ -248,7 +252,7 @@ _final: prev: {
             printf 'PGO verified feedback in %s compiler profile dumps\n' "$consumed"
 
             requiredFlags=(
-              -march=znver5 -mtune=znver5 -Ofast -fno-plt -fipa-pta
+              -march=znver5 -mtune=znver5 -O3 -fno-plt -fipa-pta
               "-fprofile-use=$pgoProfileDir"
             )
             for name in flags.make link.txt; do
