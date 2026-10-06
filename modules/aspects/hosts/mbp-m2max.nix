@@ -61,6 +61,17 @@
 
       # Firmware
       hardware.asahi.enable = true;
+
+      # Avoid --impure until firmware can be loaded from the ESP at boot:
+      # https://github.com/nix-community/nixos-apple-silicon/issues/538
+      hardware.asahi.peripheralFirmwareDirectory =
+        (builtins.fetchTree {
+          type = "path";
+          path = "/boot/vendorfw";
+          # Refresh with `nix hash path /boot/vendorfw` after firmware changes
+          narHash = "sha256-ItcB63aNJUQV80uWJSeWBKjOjm+Sey+jgFvNTAmyYyE=";
+        }).outPath;
+
       services.fwupd.enable = true;
 
       # Keyboard / input
