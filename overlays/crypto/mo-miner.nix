@@ -5,103 +5,21 @@ let
   uutils = prev.buildPackages.uutils-coreutils-noprefix;
   diffutils = prev.buildPackages.uutils-diffutils;
 
-  # Use the compiler release tested by MO-Miner without rebuilding LLVM
-  dpcpp = prev.stdenvNoCC.mkDerivation {
-    pname = "mo-miner-dpcpp";
-    version = "2026-07-11";
-    src = prev.fetchurl {
-      url = "https://github.com/intel/llvm/releases/download/nightly-2026-07-11/sycl_linux.tar.gz";
-      hash = "sha256-ey53QSE3ATL5MNtQgZbFxKvcbHdjhnydom9U5RRbiBw=";
-    };
-    sourceRoot = ".";
-    nativeBuildInputs = [
-      prev.autoPatchelfHook
-      prev.autoAddDriverRunpath
-    ];
-    buildInputs = [
-      prev.stdenv.cc.cc.lib
-      prev.zlib
-      prev.hwloc
-    ];
-    # These two libraries come from the running NixOS driver
-    autoPatchelfIgnoreMissingDeps = [
-      "libcuda.so.1"
-      "libnvidia-ml.so.1"
-    ];
-    installPhase = ''
-      runHook preInstall
-      ${uutils}/bin/mkdir -p "$out"
-      ${uutils}/bin/cp -a bin include lib share "$out/"
-      ${uutils}/bin/rm -f "$out/bin/opencl-aot" "$out/lib/"libur_adapter_{opencl,level_zero,level_zero_v2}*
-      runHook postInstall
-    '';
-    passthru = {
-      isClang = true;
-      # Preserve SYCL's standard-library wrapper headers in cc-wrapper
-      isROCm = true;
-      langC = true;
-      langCC = true;
-    };
-    meta = {
-      license = with lib.licenses; [
-        ncsa
-        asl20
-        llvm-exception
-      ];
-      platforms = [ "x86_64-linux" ];
-    };
-  };
-  compiler = prev.wrapCCWith {
-    cc = dpcpp;
-    bintools = prev.llvmPackages_23.bintools;
-  };
-  toolkit = prev.symlinkJoin {
-    name = "mo-miner-cuda";
-    paths = [
-      (lib.getDev cuda.cuda_cudart)
-      (lib.getLib cuda.cuda_cudart)
-      cuda.cuda_nvcc
-    ];
-  };
-  cutlass = prev.fetchFromGitHub {
-    owner = "NVIDIA";
-    repo = "cutlass";
-    tag = "v4.6.1";
-    hash = "sha256-Eru8FdTUwuc4xXD9Pu8r0nRP9eK2MTIHHs9eNEiKQ0g=";
-  };
-  toolchainLicense = prev.fetchurl {
-    url = "https://raw.githubusercontent.com/intel/llvm/190878e023dd0979199786b19604b377229a4996/llvm/LICENSE.TXT";
-    hash = "sha256-jYXBBX10Lll5hcfU5jILAVqROThc/0y64G/8Dr6Jr+4=";
-  };
+  dpcpp = prev.pkgsCuda.intel-llvm;
+  toolkit = dpcpp.unified-runtime.setupVars.CUDA_PATH;
 in
 {
-  mo-miner = (prev.overrideCC prev.stdenv compiler).mkDerivation {
+  mo-miner = dpcpp.stdenv.mkDerivation {
     pname = "mo-miner";
-    version = "0.8.0";
+    version = "0.9.0";
     src = prev.fetchFromGitHub {
       owner = "MoneroOcean";
       repo = "mo-miner";
-      rev = "d758fb9b1155ddfac8114617c504a1f9e61e62b1";
-      hash = "sha256-0DshkZ/BpnzCWM2nNrkahuYexxW1WX76sRcd6W+iMEU=";
+      rev = "a0a4caaca4d363b9ba98c3ebd813c16a17a2f8c1";
+      hash = "sha256-wtLjn1eEputn3ykWaRAqNoOxWmpxWlUmPPC/GEkmQLI=";
     };
-    patches = [
-      # Await V3 proofs and rank penalties in https://github.com/MoneroOcean/mo-miner/pull/5
-      (prev.fetchurl {
-        url = "https://github.com/MoneroOcean/mo-miner/compare/d758fb9b1155ddfac8114617c504a1f9e61e62b1...bb5de56aab9ead93c0489eb0f322a252180eb9fd.diff";
-        hash = "sha256-suJmcgb8T5WYKlxZOtQ3TEaeNQVLEVhN/fvxLMaLxyc=";
-      })
-      # Await multiple shares per job in https://github.com/MoneroOcean/mo-miner/pull/6
-      (prev.fetchurl {
-        url = "https://github.com/MoneroOcean/mo-miner/compare/d758fb9b1155ddfac8114617c504a1f9e61e62b1...369637045c915a884b3647ba96c67091ff28ed98.diff";
-        hash = "sha256-+GP6al1tTq5zUMlrCVqwAZ7gFVuNtMX1ONdppoaKUe8=";
-      })
-      # Await donation recovery in https://github.com/MoneroOcean/mo-miner/pull/7
-      (prev.fetchurl {
-        url = "https://github.com/MoneroOcean/mo-miner/compare/d758fb9b1155ddfac8114617c504a1f9e61e62b1...2a6038f8eb7474b1053cbdd6ec1386337035c39b.diff";
-        hash = "sha256-/rkHP8lToLRXu90nFJHq6kgURsxp8hg1MMu5S76e3i8=";
-      })
-    ];
     nativeBuildInputs = [
+      dpcpp.baseLlvm.bintools
       prev.node-gyp
       prev.python3
       prev.makeWrapper
@@ -111,9 +29,10 @@ in
       prev.nodejs
       cuda.cuda_nvrtc
     ];
-    # CUDA device code cannot call the host libc or clear host registers
+    # CUDA device code can't call the host libc or clear registers
     hardeningDisable = [
       "fortify"
+      "pacret" # ARM-only flag that Intel LLVM's wrapper doesn't filter
       "zerocallusedregs"
     ];
     env = {
@@ -177,9 +96,9 @@ in
         --replace-fail '-mtune=generic -maes' '-mtune=znver5 -maes'
       substituteInPlace scripts/cpu-optflags.sh \
         --replace-fail 'flags="-O3' 'flags="''${MOM_PGO_FLAGS:-} -O3'
-      # Tune SYCL's host code without passing x86 flags to CUDA kernels
+      # Keep CPU tuning and control-flow protection on the host
       substituteInPlace binding.gyp --replace-fail '-fsycl-embed-ir' \
-        '-fsycl-embed-ir -Xarch_host -march=znver5 -Xarch_host -mtune=znver5 <(mom_pgo_host_flags)'
+        '-fsycl-embed-ir -Xarch_device -fcf-protection=none -Xarch_host -march=znver5 -Xarch_host -mtune=znver5 <(mom_pgo_host_flags)'
       # Exercise host proof generation without GPU access or a pool connection
       ${uutils}/bin/cat >> sycl/pearlhash/pearlhash.cpp <<'EOF'
       #ifndef __SYCL_DEVICE_ONLY__
@@ -188,7 +107,9 @@ in
         uint8_t header[76] = {}, key[32];
         derive_key(header, 4096, 256, key);
         for (uint32_t seed : {0U, 1U, 42U}) {
-          const auto proof = build_plain_proof(seed, 65536, 65536, 4096, 256, key, 16, 32);
+          uint32_t adjustment_factor;
+          const auto proof = build_plain_proof(seed, 65536, 65536, 4096, 256, key, 16, 32,
+                                               &adjustment_factor);
           std::puts(proof.c_str());
         }
       }
@@ -205,17 +126,14 @@ in
       substituteInPlace pool/connection.js \
         --replace-fail 'rejectUnauthorized: pool.tls_verify === true' \
           'rejectUnauthorized: pool.tls_verify === true, servername: pool.url'
-      # Preserve the pool's rejection reason until upstream PR 4 is merged
-      substituteInPlace pool.js \
-        --replace-fail 'typeof error.message === "string" ? ": " + error.message' \
-          'typeof (error.message ?? error.msg) === "string" ? ": " + (error.message ?? error.msg)'
       patchShebangs scripts
     '';
     configurePhase = ''
       runHook preConfigure
       export HOME="$TMPDIR" npm_config_nodedir=${prev.nodejs}
       export CXXFLAGS="-fvisibility=hidden --cuda-path=${toolkit}"
-      export LDFLAGS="-fuse-ld=lld --cuda-path=${toolkit}"
+      # Match the target dir of Intel LLVM's bundled profiling runtime
+      export LDFLAGS="--target=x86_64-pc-linux-gnu -fuse-ld=lld --cuda-path=${toolkit}"
       export PATH="${toolkit}/bin:$PATH"
       runHook postConfigure
     '';
@@ -235,11 +153,11 @@ in
       MOM_PGO_TRAIN=1 LLVM_PROFILE_FILE="$pgo_dir/%p.profraw" \
         ${uutils}/bin/timeout --kill-after=10s 300s \
           node -e 'require("./build/Release/mom.node")' > "$pgo_dir/training"
-      # Reference output from upstream's standalone proof generator for these three fixtures
+      # Reference output from upstream's proof generator for these three fixtures
       printf '%s  %s\n' 289a10b7dfcc5783da8afdfbc0856ce8bdb84dd583fa0b66e130abeef6cd3eb1 \
         "$pgo_dir/training" | ${uutils}/bin/sha256sum --check --status
-      ${dpcpp}/bin/llvm-profdata merge "$pgo_dir/"*.profraw -o "$pgo_dir/profile.profdata"
-      ${dpcpp}/bin/llvm-profdata show "$pgo_dir/profile.profdata"
+      ${dpcpp.baseLlvm.llvm}/bin/llvm-profdata merge "$pgo_dir/"*.profraw -o "$pgo_dir/profile.profdata"
+      ${dpcpp.baseLlvm.llvm}/bin/llvm-profdata show "$pgo_dir/profile.profdata"
       node-gyp clean
       build_miner "-fprofile-instr-use=$pgo_dir/profile.profdata" \
         -Werror=profile-instr-out-of-date -Werror=profile-instr-unprofiled
@@ -254,11 +172,10 @@ in
     installPhase = ''
       runHook preInstall
       ${uutils}/bin/mkdir -p "$out/libexec/mo-miner" "$out/share/licenses/mo-miner"
-      ${uutils}/bin/cp *.js package.json GPU-COMPILERS.md "$out/libexec/mo-miner/"
+      ${uutils}/bin/cp *.js package.json GPU-CONFIG.md "$out/libexec/mo-miner/"
       ${uutils}/bin/cp -r helper miner pool "$out/libexec/mo-miner/"
       ${uutils}/bin/cp build/Release/mom.node "$out/libexec/mo-miner/"
       ${uutils}/bin/cp LICENSE "$out/share/licenses/mo-miner/"
-      ${uutils}/bin/cp ${toolchainLicense} "$out/share/licenses/mo-miner/DPCPP-LICENSE.TXT"
       node -e 'const o = require("./opts"); const c = {}; o.set_default_opts(c, o.opt_help); console.log(JSON.stringify(c))' \
         > "$out/libexec/mo-miner/defaults.json"
       makeWrapper ${lib.getExe prev.nodejs} "$out/bin/mo-miner" \
@@ -267,7 +184,7 @@ in
         --set MOM_NATIVE_PATH "$out/libexec/mo-miner/mom.node" \
         --set MOM_SKIP_MSR 1 \
         --set CUDA_PATH ${toolkit} \
-        --set MOM_CUTLASS_INCLUDE_DIR ${cutlass}/include \
+        --set MOM_CUTLASS_INCLUDE_DIR ${cuda.cutlass.src}/include \
         --set MOM_CCCL_INCLUDE_DIR ${lib.getDev cuda.cccl}/include \
         --prefix LD_LIBRARY_PATH : "/run/opengl-driver/lib:${
           lib.makeLibraryPath [

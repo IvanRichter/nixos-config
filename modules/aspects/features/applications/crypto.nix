@@ -74,7 +74,7 @@
             .bench_algo_params = 0 | .pool_time.stats = 30 |
             .pools += [{url: $pool.host, port: ($pool.port | tonumber), is_tls: ($pool.scheme == "ssl"),
               protocol: "pearlhash", tls_verify: true, use_subscribe: true,
-              pearlhash_rank_penalty: true, worker: $c.worker,
+              worker: $c.worker,
               login: ("XMR:" + $c.wallet + "." + $c.worker), pass: "x", is_keepalive: false}] |
             .pool_ids.primary = 1
           ' ${pearlConfigFile} > /run/pearl-gpu/config.json
