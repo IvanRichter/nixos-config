@@ -453,7 +453,7 @@
           Normal CPU-only mining starts at boot
           One hour without input enables hard CPU and GPU mining; activity returns to normal
           Manually selected hard mode stays hard until mine slow or mine stop
-          Ctrl+C in mine stops mining; use mine stop if its terminal was killed
+          Mining runs in the background; use mine logs to view output or mine stop to stop it
           HELP
           }
 
@@ -975,9 +975,10 @@
             echo "CPU mining did not start. Check mine logs and /var/lib/xmrig-cpu/config.json." >&2
             exit 1
           fi
+          # Leave successfully started services running after this command exits
+          owned_session=""
           unlock
-          echo "XMR started in $requested_mode mode. Ctrl+C stops mining."
-          follow_session all
+          echo "XMR started in $requested_mode mode. Use mine logs or mine stop."
         '';
       };
 
