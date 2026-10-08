@@ -16,6 +16,7 @@
           cosmic-ext-applet-caffeine
           cosmic-ext-applet-sysinfo
           cosmic-ext-applet-workspace-icons
+          libheif.out # thumbnails for .heif and .heic in COSMIC Files
         ];
 
         # Remove unneeded packages

@@ -2,6 +2,7 @@
   (import ./browsers/vivaldi.nix)
   (import ./crypto/xmrig.nix)
   (import ./crypto/mo-miner.nix)
+  (import ./cosmic/cosmic-viewer.nix)
   (import ./kernel/asahi.nix)
   (import ./kernel/stock.nix)
   (import ./office/onlyoffice-desktopeditors.nix)
