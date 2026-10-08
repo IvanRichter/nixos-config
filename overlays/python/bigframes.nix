@@ -1,20 +1,23 @@
 final: prev:
 let
-  inherit (final) fetchFromGitHub fetchPypi lib;
+  inherit (final) fetchFromGitHub lib;
 in
 {
   pythonPackagesExtensions = (prev.pythonPackagesExtensions or [ ]) ++ [
     (pythonFinal: _pythonPrev: {
       google-cloud-bigquery-connection = pythonFinal.buildPythonPackage rec {
         pname = "google-cloud-bigquery-connection";
-        version = "1.22.0";
+        version = "1.23.0";
         pyproject = true;
 
-        src = fetchPypi {
-          pname = "google_cloud_bigquery_connection";
-          inherit version;
-          hash = "sha256-E9uutA2xj5N88VIlOkXnonDAkMEr8mx5PEewpog3Rlg=";
+        src = fetchFromGitHub {
+          owner = "googleapis";
+          repo = "google-cloud-python";
+          tag = "${pname}-v${version}";
+          hash = "sha256-b0FYupZU0ZNeIL9xJIqEXgg7ToRCQLjiswJ67YzX7OI=";
         };
+
+        sourceRoot = "${src.name}/packages/${pname}";
 
         build-system = [ pythonFinal.setuptools ];
 
@@ -41,14 +44,17 @@ in
 
       google-cloud-functions = pythonFinal.buildPythonPackage rec {
         pname = "google-cloud-functions";
-        version = "1.24.0";
+        version = "1.25.0";
         pyproject = true;
 
-        src = fetchPypi {
-          pname = "google_cloud_functions";
-          inherit version;
-          hash = "sha256-moOhdT+4i9pMLspBZ6fB4Bb5w2n7FaMwHZw4ln+2osM=";
+        src = fetchFromGitHub {
+          owner = "googleapis";
+          repo = "google-cloud-python";
+          tag = "${pname}-v${version}";
+          hash = "sha256-b0FYupZU0ZNeIL9xJIqEXgg7ToRCQLjiswJ67YzX7OI=";
         };
+
+        sourceRoot = "${src.name}/packages/${pname}";
 
         build-system = [ pythonFinal.setuptools ];
 
@@ -81,11 +87,14 @@ in
         version = "0.35.2";
         pyproject = true;
 
-        src = fetchPypi {
-          pname = "pandas_gbq";
-          inherit version;
-          hash = "sha256-NhPyA+CtnL44cJ/Lm0wsmvH9tGvtMzIZs0pjkUKFCAY=";
+        src = fetchFromGitHub {
+          owner = "googleapis";
+          repo = "google-cloud-python";
+          tag = "${pname}-v${version}";
+          hash = "sha256-0g0uTpt03BrFLJ7vGptrUy3pVx8EAOKYV+uB2bJTJNQ=";
         };
+
+        sourceRoot = "${src.name}/packages/${pname}";
 
         build-system = [ pythonFinal.setuptools ];
 
@@ -109,21 +118,21 @@ in
 
         meta = with lib; {
           description = "Pandas interface for querying and loading data into BigQuery";
-          homepage = "https://github.com/googleapis/python-bigquery-pandas";
+          homepage = "https://github.com/googleapis/google-cloud-python/tree/main/packages/pandas-gbq";
           license = licenses.bsd3;
         };
       };
 
       bigframes = pythonFinal.buildPythonPackage rec {
         pname = "bigframes";
-        version = "2.49.0";
+        version = "2.50.0";
         pyproject = true;
 
         src = fetchFromGitHub {
           owner = "google";
           repo = "bigframes";
-          rev = "a41c12ec0c1bef58eae21658f04dccbedd516aca";
-          hash = "sha256-Sr4vhcKtGc6JfqzlKOl2SJ6vonGdrGOzh8pHFQPS3Ys=";
+          rev = "54b12595258f75de3869442c16c3705737fe7bf0";
+          hash = "sha256-+jPwPptIL0jZ3OASFoPTM1QU+ozDMo1RQg8lwnV66+c=";
         };
 
         build-system = [ pythonFinal.setuptools ];
