@@ -53,6 +53,7 @@
           ghgrab
           hk
           act
+          actionlint
           pinact
 
           # Databases & SQL
