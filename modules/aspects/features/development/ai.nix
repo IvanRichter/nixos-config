@@ -32,7 +32,6 @@
         choose
         ripgrep-all
         fzf
-        shellcheck
         shfmt
         hyperfine
         just

@@ -54,6 +54,7 @@
           hk
           act
           actionlint
+          shellcheck
           pinact
 
           # Databases & SQL
