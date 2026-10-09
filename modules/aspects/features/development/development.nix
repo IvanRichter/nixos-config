@@ -48,10 +48,11 @@
           pulumi-bin
           ansible
 
-          # Git & version control
+          # Git & CI
           git-filter-repo
           ghgrab
           hk
+          act
           pinact
 
           # Databases & SQL
