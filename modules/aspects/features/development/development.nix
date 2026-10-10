@@ -68,6 +68,9 @@
           # Compression
           brotli
 
+          # Encoding & cryptography
+          ciphey
+
           # Utilities
           bruno
         ];
