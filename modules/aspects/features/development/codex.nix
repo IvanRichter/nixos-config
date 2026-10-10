@@ -1,7 +1,7 @@
 { den, inputs, ... }:
 
 let
-  systemSettings = {
+  systemSettings = pkgs: {
     model_reasoning_effort = "max";
     personality = "pragmatic";
     service_tier = "default";
@@ -17,14 +17,21 @@ let
     };
 
     plugins."github@openai-curated".enabled = true;
+
+    mcp_servers.fff = {
+      command = pkgs.lib.getExe pkgs.fff-mcp;
+      args = [ "--no-update-check" ];
+    };
   };
 in
 {
   den.aspects.codex = {
     nixos = { pkgs, ... }: {
-      environment.etc."codex/config.toml".source =
-        (pkgs.formats.toml { }).generate "codex-config.toml"
-          systemSettings;
+      environment.systemPackages = [ pkgs.fff-mcp ];
+
+      environment.etc."codex/config.toml".source = (pkgs.formats.toml { }).generate "codex-config.toml" (
+        systemSettings pkgs
+      );
     };
 
     homeManager =
