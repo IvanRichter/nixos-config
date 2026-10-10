@@ -27,7 +27,10 @@ in
 {
   den.aspects.codex = {
     nixos = { pkgs, ... }: {
-      environment.systemPackages = [ pkgs.fff-mcp ];
+      environment.systemPackages = [
+        pkgs.codex-security
+        pkgs.fff-mcp
+      ];
 
       environment.etc."codex/config.toml".source = (pkgs.formats.toml { }).generate "codex-config.toml" (
         systemSettings pkgs
