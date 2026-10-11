@@ -70,7 +70,12 @@
           jaq --exit-status --slurpfile defaults ${pkgs.mo-miner}/libexec/mo-miner/defaults.json '
             . as $c | ($c.pool | capture("^stratum\\+(?<scheme>tcp|ssl)://(?<host>[a-zA-Z0-9.-]+):(?<port>[0-9]+)$")) as $pool |
             $defaults[0] |
-            .job += {algo: "pearlhash", dev: "gpu1", backend: "native"} |
+            # Measured PearlHash profile for the RTX 4060 Ti 8 GB
+            .job += {
+              algo: "pearlhash",
+              dev: "gpu1*[m=131072;n=65536;k=8192;rank=128]",
+              backend: "native"
+            } |
             .bench_algo_params = 0 | .pool_time.stats = 30 |
             .pools += [{url: $pool.host, port: ($pool.port | tonumber), is_tls: ($pool.scheme == "ssl"),
               protocol: "pearlhash", tls_verify: true, use_subscribe: true,
