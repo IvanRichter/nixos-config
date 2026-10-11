@@ -34,6 +34,7 @@
           # Build tools & compilers
           gcc
           gnumake
+          kache
           pkg-config
           openssl
 
@@ -76,7 +77,34 @@
         ];
     };
 
-    homeManager = {
+    homeManager = { pkgs, ... }: {
+      # Cache C/C++ compiler calls, keep real compilers on PATH
+      home.sessionPath = [ "${pkgs.kache.shims}/bin" ];
+
+      programs.cargo = {
+        enable = true;
+        package = null; # Cargo comes from rustToolchain
+        settings = {
+          build.rustc-wrapper = "${pkgs.kache}/bin/kache";
+          env = {
+            HOST_CC = "${pkgs.kache}/bin/kache cc";
+            HOST_CXX = "${pkgs.kache}/bin/kache c++";
+            CC_KNOWN_WRAPPER_CUSTOM = "kache";
+          };
+        };
+      };
+
+      systemd.user.services.kache = {
+        Unit.Description = "Kache compiler cache daemon";
+        Service = {
+          ExecStart = "${pkgs.kache}/bin/kache daemon run";
+          Environment = [ "KACHE_LOG=kache=info" ];
+          Restart = "on-failure";
+          RestartSec = 5;
+        };
+        Install.WantedBy = [ "default.target" ];
+      };
+
       programs.git = {
         enable = true;
         package = null;
