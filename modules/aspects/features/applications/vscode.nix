@@ -59,6 +59,7 @@
         hashicorp.terraform
         jnoortheen.nix-ide
         mads-hartmann.bash-ide-vscode
+        mkhl.shfmt
         ms-azuretools.vscode-containers
         ms-azuretools.vscode-docker
         mechatroner.rainbow-csv
@@ -237,6 +238,10 @@
             };
             "[pkl]" = {
               "editor.defaultFormatter" = "Pkl.pkl-vscode";
+              "editor.formatOnSave" = true;
+            };
+            "[shellscript]" = {
+              "editor.defaultFormatter" = "mkhl.shfmt";
               "editor.formatOnSave" = true;
             };
             "[sql]" = {
