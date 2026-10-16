@@ -97,6 +97,7 @@ in
           skills =
             pkgs.lib.genAttrs agentSkillNames (name: "${agentSkills}/share/skills/agent-skills/${name}")
             // {
+              gh-stack = "${pkgs.gh-stack}/share/skills/gh-stack/gh-stack";
               humanizer = "${humanizer}/share/skills/humanizer/humanizer";
             };
         };
