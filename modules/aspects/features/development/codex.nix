@@ -28,6 +28,7 @@ in
   den.aspects.codex = {
     nixos = { pkgs, ... }: {
       environment.systemPackages = [
+        pkgs.chatgpt
         pkgs.codex-security
         pkgs.fff-mcp
       ];
