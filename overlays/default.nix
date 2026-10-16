@@ -4,6 +4,7 @@
   (import ./crypto/mo-miner.nix)
   (import ./cosmic/cosmic-viewer.nix)
   (import ./cosmic/xdg-desktop-portal-cosmic.nix)
+  (import ./development/hk.nix)
   (import ./kernel/asahi.nix)
   (import ./kernel/stock.nix)
   (import ./office/onlyoffice-desktopeditors.nix)
