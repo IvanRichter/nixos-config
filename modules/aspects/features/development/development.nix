@@ -109,11 +109,21 @@
         enable = true;
         package = null;
 
+        signing = {
+          format = "ssh";
+          key = "~/.ssh/keys/github_ed25519.pub";
+          signByDefault = true;
+          allowedSigners = ''
+            ivan@anriku.com namespaces="git" ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFOBwlAkmI2akQ+ZMiT/abYEcxSAZJ3Ordf6+6ktlj09
+            ivan@anriku.com namespaces="git" ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBb0kaPUxfcppuwg8htkUIdIENzoxD7AMdmNqHmDGuPv
+          '';
+        };
+
         settings = {
           safe.directory = "/home/ivan/nixos-config";
           user = {
-            email = "ivan.richter@anriku.com";
-            name = "IvanRichter";
+            email = "ivan@anriku.com";
+            name = "Ivan Richter";
           };
         };
       };

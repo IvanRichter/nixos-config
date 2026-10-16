@@ -121,6 +121,22 @@
         };
 
         shellAliases = {
+          g = "git";
+          gst = "git status";
+          gss = "git status --short";
+          gd = "git diff";
+          gds = "git diff --staged";
+          ga = "git add";
+          gc = "git commit --signoff";
+          gb = "git branch";
+          gsw = "git switch";
+          gswc = "git switch -c";
+          gf = "git fetch";
+          gl = "git pull --ff-only";
+          gp = "git push";
+          glog = "git log --oneline --decorate --graph";
+          gdeploy = "gh workflow run deploy.yaml --ref main";
+
           pbcopy = "wl-copy";
           pbpaste = "wl-paste";
           neofetch = "macchina";
