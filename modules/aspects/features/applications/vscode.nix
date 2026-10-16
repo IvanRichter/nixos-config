@@ -99,6 +99,7 @@
       # Marketplace-only extensions missing from nixpkgs
       marketplaceExtensions = [
         dataformTools
+        marketplace.barsikus007.nix-injection
         marketplace.googlecloudtools.datacloud
         marketplace.macabeus.vscode-fluent
         marketplace.openai.chatgpt
