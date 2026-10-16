@@ -12,6 +12,7 @@
         beads
         repomix
         rtk
+        t3code
 
         # Desktop automation
         dotool
