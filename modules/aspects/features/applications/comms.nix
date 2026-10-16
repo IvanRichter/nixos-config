@@ -6,6 +6,7 @@
       environment.systemPackages = with pkgs; [
         slacky
         telegram-desktop
+        whatsie
       ];
     };
 
