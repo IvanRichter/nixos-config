@@ -73,15 +73,11 @@
 
     hardware.uinput.enable = true;
 
-    # Right Cmd -> Delete
-    services.keyd.enable = true;
-    environment.etc."keyd/default.conf".text = ''
-      [ids]
-      *
-
-      [main]
-      rightmeta = delete
-    '';
+    # Right Meta -> Delete
+    services.keyd = {
+      enable = true;
+      keyboards.default.settings.main.rightmeta = "delete";
+    };
 
     # -- Power management & display tweaks --
     # Force s2idle + tweak PCI/USB behavior
