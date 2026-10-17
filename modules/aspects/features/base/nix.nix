@@ -5,7 +5,7 @@
 }:
 
 {
-  den.aspects.nix.nixos = {
+  den.aspects.nix.nixos = { host, ... }: {
     imports = [ inputs.nix-index-database.nixosModules.nix-index ];
 
     nix.settings.experimental-features = [
@@ -13,7 +13,10 @@
       "flakes"
     ];
 
-    programs.nh.enable = true;
+    programs.nh = {
+      enable = true;
+      flake = "/home/ivan/nixos-config#${host.name}";
+    };
 
     programs.nix-index.enable = true;
     programs.nix-index.enableFishIntegration = true;

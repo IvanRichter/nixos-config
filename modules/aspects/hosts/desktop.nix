@@ -18,18 +18,14 @@
   den.aspects.desktop.nixos =
     {
       pkgs,
-      lib,
       ...
     }:
 
     {
-      imports = [ ../../../hosts/desktop/hardware-configuration.nix ];
+      imports = [ "${inputs.self}/hardware/desktop/hardware-configuration.nix" ];
 
       boot.kernelPackages = pkgs.linuxPackages_latest;
 
-      programs.nh.flake = "/home/ivan/nixos-config#desktop";
-      time.timeZone = "Europe/Prague";
-      i18n.defaultLocale = "en_US.UTF-8";
       console.keyMap = "us";
 
       boot.loader = {
@@ -41,8 +37,6 @@
           biosSupport = false;
         };
       };
-
-      services.fwupd.enable = true;
 
       # Desktop tuning
       services.system76-scheduler = {
@@ -130,17 +124,5 @@
         "amd_iommu=on"
         "iommu=pt"
       ];
-
-      services.fstrim.enable = true;
-      services.fstrim.interval = "weekly";
-      systemd.services.fstrim.wantedBy = lib.mkForce [ ];
-      systemd.timers.fstrim.timerConfig.Persistent = false;
-
-      systemd.services."home-manager-ivan" = {
-        after = [ "network-online.target" ];
-        wants = [ "network-online.target" ];
-        # HM module sets 5m, force value
-        serviceConfig.TimeoutStartSec = lib.mkForce "10min";
-      };
     };
 }

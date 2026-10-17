@@ -26,6 +26,20 @@
       graphics-apps
     ];
 
-    nixos.documentation.man.enable = false;
+    nixos = { lib, ... }: {
+      documentation.man.enable = false;
+
+      i18n.defaultLocale = "en_US.UTF-8";
+      time.timeZone = "Europe/Prague";
+
+      services.fwupd.enable = true;
+
+      services.fstrim = {
+        enable = true;
+        interval = "weekly";
+      };
+      systemd.services.fstrim.wantedBy = lib.mkForce [ ];
+      systemd.timers.fstrim.timerConfig.Persistent = false;
+    };
   };
 }

@@ -23,7 +23,6 @@
     ];
 
     user.extraGroups = [
-      "docker"
       "video"
       "render"
       "plugdev"

@@ -1,9 +1,10 @@
 { den, ... }:
 
 {
+  den.aspects.docker.provides.to-users.user.extraGroups = [ "docker" ];
+
   den.aspects.docker.nixos =
     {
-      config,
       lib,
       pkgs,
       ...

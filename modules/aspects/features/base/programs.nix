@@ -1,6 +1,8 @@
 { den, ... }:
 
 {
+  den.aspects.programs.includes = [ den.aspects.tcpdump ];
+
   den.aspects.programs.nixos =
     { pkgs, ... }:
     {
@@ -24,10 +26,12 @@
           keybindings = true;
         };
 
-        tcpdump.enable = true;
         yazi.enable = true;
       };
-
-      users.users.ivan.extraGroups = [ "pcap" ];
     };
+
+  den.aspects.tcpdump = {
+    nixos.programs.tcpdump.enable = true;
+    provides.to-users.user.extraGroups = [ "pcap" ];
+  };
 }
