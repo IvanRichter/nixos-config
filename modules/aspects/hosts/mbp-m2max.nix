@@ -10,6 +10,10 @@
     apple-silicon
   ];
 
+  den.aspects.mbp-m2max.nixpkgs-overlays = _: {
+    kernel-asahi = import "${inputs.self}/overlays/kernel/asahi.nix";
+  };
+
   den.aspects.mbp-m2max.nixos =
     {
       lib,

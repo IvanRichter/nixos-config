@@ -3,7 +3,6 @@
 {
   den.aspects.workstation = {
     includes = with den.aspects; [
-      nixpkgs
       nix
       fonts
       graphics

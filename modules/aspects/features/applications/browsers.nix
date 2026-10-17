@@ -1,7 +1,11 @@
-{ den, ... }:
+{ den, inputs, ... }:
 
 {
   den.aspects.browsers = {
+    nixpkgs-overlays = _: {
+      vivaldi = import "${inputs.self}/overlays/browsers/vivaldi.nix";
+    };
+
     nixos =
       { pkgs, lib, ... }:
       let

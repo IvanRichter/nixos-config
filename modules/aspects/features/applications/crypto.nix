@@ -1,6 +1,11 @@
-{ den, ... }:
+{ den, inputs, ... }:
 
 {
+  den.aspects.crypto.nixpkgs-overlays = _: {
+    xmrig = import "${inputs.self}/overlays/crypto/xmrig.nix";
+    mo-miner = import "${inputs.self}/overlays/crypto/mo-miner.nix";
+  };
+
   den.aspects.crypto.nixos =
     {
       config,

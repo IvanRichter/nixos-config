@@ -1,6 +1,10 @@
-{ den, ... }:
+{ den, inputs, ... }:
 
 {
+  den.aspects.office.nixpkgs-overlays = _: {
+    onlyoffice = import "${inputs.self}/overlays/office/onlyoffice-desktopeditors.nix";
+  };
+
   den.aspects.office.nixos.programs.onlyoffice.enable = true;
 
   den.aspects.office.homeManager =

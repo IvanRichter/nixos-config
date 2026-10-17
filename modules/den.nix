@@ -19,6 +19,12 @@
 
   den.schema.host = { lib, ... }: {
     options.isLaptop = lib.mkEnableOption "laptop-specific configuration";
+
+    options.sharedHomePkgs = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = "Whether Home Manager uses the host's package set";
+    };
   };
 
   den.hosts.x86_64-linux.desktop = {
@@ -34,11 +40,13 @@
 
   den.schema.hm-host.includes = [
     {
-      nixos.home-manager = {
-        useGlobalPkgs = true;
-        useUserPackages = true;
-        backupFileExtension = "bak";
-        overwriteBackup = true;
+      nixos = { host, ... }: {
+        home-manager = {
+          useGlobalPkgs = host.sharedHomePkgs;
+          useUserPackages = true;
+          backupFileExtension = "bak";
+          overwriteBackup = true;
+        };
       };
     }
   ];

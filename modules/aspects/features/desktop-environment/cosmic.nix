@@ -1,7 +1,12 @@
-{ den, ... }:
+{ den, inputs, ... }:
 
 {
   den.aspects.cosmic = {
+    nixpkgs-overlays = _: {
+      cosmic-viewer = import "${inputs.self}/overlays/cosmic/cosmic-viewer.nix";
+      xdg-desktop-portal-cosmic = import "${inputs.self}/overlays/cosmic/xdg-desktop-portal-cosmic.nix";
+    };
+
     nixos =
       { pkgs, ... }:
       {

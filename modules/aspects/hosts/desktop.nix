@@ -1,4 +1,4 @@
-{ den, ... }:
+{ den, inputs, ... }:
 
 {
   den.aspects.desktop.includes = with den.aspects; [
@@ -10,6 +10,10 @@
     desktop-eid
     nvidia
   ];
+
+  den.aspects.desktop.nixpkgs-overlays = _: {
+    kernel-stock = import "${inputs.self}/overlays/kernel/stock.nix";
+  };
 
   den.aspects.desktop.nixos =
     {

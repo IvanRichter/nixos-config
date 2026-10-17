@@ -1,6 +1,12 @@
-{ den, ... }:
+{ den, inputs, ... }:
 
 {
+  den.aspects.vscode.nixpkgs-overlays = _: {
+    pkl-vscode = import "${inputs.self}/overlays/vscode/pkl.nix";
+    rust = inputs.rust-overlay.overlays.default;
+    vscode-marketplace = inputs.nix-vscode-extensions.overlays.default;
+  };
+
   den.aspects.vscode.homeManager =
     {
       config,
