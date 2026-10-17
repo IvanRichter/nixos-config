@@ -45,7 +45,6 @@
         jless
         parallel
         inotify-tools
-        tealdeer
         dos2unix
 
         # Network, transport, and low-level debugging

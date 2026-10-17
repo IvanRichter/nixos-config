@@ -25,8 +25,6 @@
           enable = true;
           keybindings = true;
         };
-
-        yazi.enable = true;
       };
     };
 

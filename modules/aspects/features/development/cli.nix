@@ -63,6 +63,13 @@
       };
 
       programs.bottom.enable = true;
+
+      programs.yazi = {
+        enable = true;
+        enableFishIntegration = true;
+      };
+
+      programs.tealdeer.enable = true;
     };
   };
 }
