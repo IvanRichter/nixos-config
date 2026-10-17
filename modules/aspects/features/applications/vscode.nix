@@ -25,13 +25,7 @@
         "ultra"
       ];
 
-      rustToolchain = pkgs.rust-bin.stable.latest.default.override {
-        extensions = [
-          "clippy"
-          "rust-src"
-          "rustfmt"
-        ];
-      };
+      rustfmt = pkgs.rust-bin.stable.latest.rustfmt;
 
       rustFormatter = pkgs.writeShellScript "rustfmt-with-project-rules" ''
         set -euo pipefail
@@ -43,14 +37,14 @@
           exec ${pkgs.nix}/bin/nix fmt --no-update-lock-file -- --quiet --stdin "$format_path"
         fi
         latest_edition="$(
-          ${rustToolchain}/bin/rustfmt --help=config | ${pkgs.gawk}/bin/awk -F '[][]' '
+          ${rustfmt}/bin/rustfmt --help=config | ${pkgs.gawk}/bin/awk -F '[][]' '
             /^[[:space:]]*edition / {
               count = split($2, editions, /\|/)
               print editions[count]
             }
           '
         )"
-        exec ${rustToolchain}/bin/rustfmt --edition "$latest_edition"
+        exec ${rustfmt}/bin/rustfmt --edition "$latest_edition"
       '';
 
       # Extensions in nixpkgs
