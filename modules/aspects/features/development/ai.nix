@@ -12,7 +12,6 @@
         beads
         repomix
         rtk
-        t3code
 
         # Desktop automation
         dotool
@@ -75,4 +74,19 @@
         lmstudio
       ];
   };
+
+  den.aspects.ai.homeManager =
+    { config, ... }:
+    {
+      programs.t3code = {
+        enable = true;
+
+        clientSettings = {
+          notificationMode = "notifications";
+          diffIgnoreWhitespace = false;
+          fontFamilyCode = config.stylix.fonts.monospace.name;
+          fontFamilySans = config.stylix.fonts.sansSerif.name;
+        };
+      };
+    };
 }
