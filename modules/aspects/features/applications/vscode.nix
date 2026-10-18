@@ -173,9 +173,15 @@
 
             "vscode-dataform-tools.formattingCli" = "sqlfluff";
             "vscode-dataform-tools.sqlfluffConfigPath" = "./.sqlfluff";
+            "window.commandCenter" = false;
+            "window.density.layout" = "compact";
+            "workbench.activityBar.compact" = true;
             "workbench.iconTheme" = "catppuccin-macchiato";
+            "workbench.layoutControl.enabled" = false;
             "workbench.sideBar.location" = "right";
             "workbench.editor.closeOnFileDelete" = true;
+            "workbench.editor.tabActionReserveSpace" = false;
+            "workbench.tips.enabled" = false;
             "vsicons.dontShowNewVersionMessage" = true;
 
             "files.associations" = {
