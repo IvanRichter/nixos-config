@@ -77,6 +77,7 @@
 
       {
         stylix.targets = {
+          qt.standardDialogs = "xdgdesktopportal";
           starship.enable = true;
           rio.enable = true;
           vscode.enable = false;
