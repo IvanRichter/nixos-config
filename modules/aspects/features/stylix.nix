@@ -48,6 +48,19 @@
 
           opacity.terminal = 0.8;
 
+          cursor = {
+            package = pkgs.cosmic-icons;
+            name = "Cosmic";
+            size = 24;
+          };
+
+          icons = {
+            enable = true;
+            package = pkgs.cosmic-icons;
+            dark = "Cosmic";
+            light = "Cosmic";
+          };
+
           fonts = {
             serif = {
               package = pkgs.noto-fonts;

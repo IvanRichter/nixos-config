@@ -155,7 +155,7 @@
           '';
 
           "cosmic/com.system76.CosmicTk/v1/apply_theme_global".text = "false";
-          "cosmic/com.system76.CosmicTk/v1/icon_theme".text = ''"Cosmic"'';
+          "cosmic/com.system76.CosmicTk/v1/icon_theme".text = builtins.toJSON config.stylix.icons.dark;
           "cosmic/com.system76.CosmicTk/v1/interface_density".text = "Standard";
 
           "cosmic/com.system76.CosmicComp/v1/active_hint".text = "true";
