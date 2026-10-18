@@ -454,7 +454,7 @@
             cat <<'HELP'
           Usage: mine [hard|slow|stop|logs|--help]
             mine       Normal CPU mining, GPU off
-            hard       Full CPU and GPU mining
+            hard       Switch to full CPU and GPU mining
             slow       Return to normal CPU mining and stop the GPU
             stop       Stop both miners
             logs       Follow both miners; Ctrl+C closes the logs
@@ -783,7 +783,7 @@
             defer_signals
             if [[ $target == normal ]]; then stop_gpu || return 1; fi
             unit=$record_unit
-            if [[ $unit != "xmrig-cpu-$target.service" ]]; then
+            if [[ $unit != "xmrig-cpu-$target.service" || ''${states[$unit]} != active ]]; then
               stop_service || return 1
               unit="xmrig-cpu-$target.service"
               run_job start || rc=$?
@@ -951,6 +951,11 @@
             else
               echo "CPU is stopped or transitioning; GPU is unchanged."
             fi
+            exit 0
+          fi
+
+          if [[ $requested_mode == hard ]] && any_running; then
+            switch_mode hard manual
             exit 0
           fi
 
