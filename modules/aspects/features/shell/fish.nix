@@ -158,6 +158,11 @@
         extraOptions = [ "--group-directories-first" ];
       };
 
+      programs.vivid = {
+        enable = true;
+        enableFishIntegration = true;
+      };
+
       programs.zoxide = {
         enable = true;
         enableFishIntegration = true;
