@@ -10,9 +10,6 @@
         gip
         gping
 
-        # Editors
-        micro-full
-
         # Archives
         unzip
         zip
@@ -56,33 +53,47 @@
       ];
     };
 
-    homeManager = {
-      programs.bat.enable = true;
+    homeManager =
+      {
+        config,
+        lib,
+        pkgs,
+        ...
+      }:
+      {
+        home.sessionVariables.EDITOR = lib.getExe config.programs.micro.package;
 
-      programs.broot = {
-        enable = true;
-        enableFishIntegration = true;
+        programs.bat.enable = true;
+
+        programs.broot = {
+          enable = true;
+          enableFishIntegration = true;
+        };
+
+        programs.bottom.enable = true;
+
+        programs.fzf = {
+          enable = true;
+          # Skim provides the Fish keybindings
+          enableFishIntegration = false;
+        };
+
+        programs.micro = {
+          enable = true;
+          package = pkgs.micro-full;
+        };
+
+        programs.skim = {
+          enable = true;
+          enableFishIntegration = true;
+        };
+
+        programs.yazi = {
+          enable = true;
+          enableFishIntegration = true;
+        };
+
+        programs.tealdeer.enable = true;
       };
-
-      programs.bottom.enable = true;
-
-      programs.fzf = {
-        enable = true;
-        # Skim provides the Fish keybindings
-        enableFishIntegration = false;
-      };
-
-      programs.skim = {
-        enable = true;
-        enableFishIntegration = true;
-      };
-
-      programs.yazi = {
-        enable = true;
-        enableFishIntegration = true;
-      };
-
-      programs.tealdeer.enable = true;
-    };
   };
 }
