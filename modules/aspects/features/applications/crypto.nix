@@ -30,7 +30,10 @@
           name = "${name}-gpu-check";
           runtimeInputs = [ pkgs.jaq ];
           text = ''
-            if (( $# > 1 )); then echo "Usage: ${name}-gpu-check [candidate.json]" >&2; exit 2; fi
+            if (($# > 1)); then
+              echo "Usage: ${name}-gpu-check [candidate.json]" >&2
+              exit 2
+            fi
             config_file=''${1:-${configFile}}
             # Check private JSON without starting the miner
             if [[ ! -f $config_file || -L $config_file ]] || ! jaq --slurp --exit-status '
@@ -87,7 +90,7 @@
               worker: $c.worker,
               login: ("XMR:" + $c.wallet + "." + $c.worker), pass: "x", is_keepalive: false}] |
             .pool_ids.primary = 1
-          ' ${pearlConfigFile} > /run/pearl-gpu/config.json
+          ' ${pearlConfigFile} >/run/pearl-gpu/config.json
           echo "Pearl: pearlhash on NVIDIA RTX 4060 Ti, GPU #$gpu; payouts in XMR; thermal pause/resume 80C/65C"
           exec ${lib.getExe pkgs.mo-miner} mine /run/pearl-gpu/config.json
         '';
@@ -99,7 +102,10 @@
           pkgs.jaq
         ];
         text = ''
-          if (( $# > 1 )); then echo "Usage: xmrig-cpu-check [candidate.json]" >&2; exit 2; fi
+          if (($# > 1)); then
+            echo "Usage: xmrig-cpu-check [candidate.json]" >&2
+            exit 2
+          fi
           config_file=''${1:-${configFile}}
           if ! test -r "$config_file"; then
             echo "Create ${configFile} as xmrig-cpu:xmrig-cpu with mode 0600 first." >&2
@@ -127,10 +133,8 @@
           umask 077
           check_dir=$(mktemp -d "$(dirname -- "$config_file")/.check.XXXXXX")
           trap 'rm -rf -- "$check_dir"' EXIT
-          trap 'exit 130' INT
-          trap 'exit 143' TERM
-          trap 'exit 129' HUP
-          if ! ${lib.getExe pkgs.xmrig} --config="$config_file" --dry-run 2>&1 | cat >"$check_dir/output"; then
+          trap 'exit "$((128 + BASH_TRAPSIG))"' INT TERM HUP
+          if ! ${lib.getExe pkgs.xmrig} --config="$config_file" --dry-run >"$check_dir/output" 2>&1; then
             # Filter variables are expanded by jaq, not Bash
             # shellcheck disable=SC2016
             if jaq --null-input --raw-output --join-output \
@@ -160,7 +164,7 @@
           pkgs.jaq
         ];
         text = ''
-          if (( $# != 1 )) || [[ $1 != normal && $1 != hard ]]; then
+          if (($# != 1)) || [[ $1 != normal && $1 != hard ]]; then
             echo "Usage: xmrig-cpu-prepare normal|hard" >&2
             exit 1
           fi
@@ -182,9 +186,7 @@
           }
 
           trap cleanup EXIT
-          trap 'exit 130' INT
-          trap 'exit 143' TERM
-          trap 'exit 129' HUP
+          trap 'exit "$((128 + BASH_TRAPSIG))"' INT TERM HUP
           umask 077
 
           # Read this process's allowed CPUs
@@ -208,8 +210,8 @@
             last=''${range#*-}
             first=$((10#$first))
             last=$((10#$last))
-            (( first <= last )) || fail "invalid CPU affinity range"
-            for (( cpu=first; cpu<=last; cpu++ )); do
+            ((first <= last)) || fail "invalid CPU affinity range"
+            for ((cpu = first; cpu <= last; cpu++)); do
               available+=("$cpu")
             done
           done
@@ -232,25 +234,25 @@
               workers+=("$cpu")
               continue
             fi
-            if [[ -z ''${selected_cores[$siblings]+present} ]] && (( core_count < 8 )); then
+            if [[ ! -v selected_cores[$siblings] ]] && ((core_count < 8)); then
               selected_cores["$siblings"]=1
               core_count=$((core_count + 1))
             fi
-            if [[ -n ''${selected_cores[$siblings]+present} ]] && (( ''${#workers[@]} < 16 )); then
+            if [[ -v selected_cores[$siblings] ]] && ((''${#workers[@]} < 16)); then
               workers+=("$cpu")
             fi
           done
-          if [[ $mode == normal ]] && (( core_count < 8 )); then
+          if [[ $mode == normal ]] && ((core_count < 8)); then
             fail "normal mode needs eight physical cores"
           fi
           worker_count=''${#workers[@]}
-          (( worker_count > 0 )) || fail "no available CPUs"
+          ((worker_count > 0)) || fail "no available CPUs"
           initialization=$worker_count
           if [[ $mode == normal ]]; then
             initialization=4
           fi
-          cpu_json=$(printf '%s\n' "''${workers[@]}" | jaq --compact-output --slurp '.') \
-            || fail "cannot encode CPU IDs"
+          cpu_json=$(printf '%s\n' "''${workers[@]}" | jaq --compact-output --slurp '.') ||
+            fail "cannot encode CPU IDs"
 
           # Create the replacement beside its destination, with private perms
           temporary=$(mktemp "''${target%/*}/.config-XXXXXX") || fail "cannot create temporary config"
@@ -293,7 +295,8 @@
           mv -fT -- "$temporary" "$target" || fail "cannot install effective config"
           temporary=""
 
-          ids=$(IFS=,; printf '%s' "''${workers[*]}")
+          printf -v ids '%s,' "''${workers[@]}"
+          ids=''${ids%,}
           printf 'Mining mode: %s; workers: %s; CPU IDs: %s; initialization threads: %s\n' \
             "$mode" "$worker_count" "$ids" "$initialization"
           if [[ $mode == hard ]]; then
@@ -309,15 +312,21 @@
           pkgs.util-linux
         ];
         text = ''
-          if (( $# > 1 )); then echo "Usage: mine-setup [pearl|--help]" >&2; exit 2; fi
+          if (($# > 1)); then
+            echo "Usage: mine-setup [pearl|--help]" >&2
+            exit 2
+          fi
           case "''${1:-}" in
-            --help|-h)
-              echo "Usage: mine-setup [pearl]"
-              echo "Edit a private copy in Micro and install it after a non-mining check."
-              exit 0
-              ;;
-            ""|pearl) ;;
-            *) echo "Usage: mine-setup [pearl|--help]" >&2; exit 2 ;;
+          --help | -h)
+            echo "Usage: mine-setup [pearl]"
+            echo "Edit a private copy in Micro and install it after a non-mining check."
+            exit 0
+            ;;
+          "" | pearl) ;;
+          *)
+            echo "Usage: mine-setup [pearl|--help]" >&2
+            exit 2
+            ;;
           esac
           if [[ ! -t 0 || ! -t 1 ]]; then
             echo "Run mine-setup in an interactive terminal." >&2
@@ -326,8 +335,8 @@
 
           kind=''${1:-xmr}
           case "$kind" in
-            xmr) service_user=xmrig-cpu config_file=${configFile} check=${lib.getExe checkConfig} ;;
-            pearl) service_user=pearl-gpu config_file=${pearlConfigFile} check=${lib.getExe pearlCheck} ;;
+          xmr) service_user=xmrig-cpu config_file=${configFile} check=${lib.getExe checkConfig} ;;
+          pearl) service_user=pearl-gpu config_file=${pearlConfigFile} check=${lib.getExe pearlCheck} ;;
           esac
           state_dir=''${config_file%/*}
           account=$(id -un)
@@ -343,8 +352,11 @@
           fi
           for unit in xmrig-cpu-normal.service xmrig-cpu-hard.service pearl-gpu.service; do
             case "$(systemctl show "$unit" --property=ActiveState --value)" in
-              inactive|failed) ;;
-              *) echo "Run mine stop before editing the configuration." >&2; exit 1 ;;
+            inactive | failed) ;;
+            *)
+              echo "Run mine stop before editing the configuration." >&2
+              exit 1
+              ;;
             esac
           done
           if [[ $account != "$service_user" ]]; then
@@ -357,7 +369,7 @@
             echo "Rebuild the desktop configuration to prepare $state_dir." >&2
             exit 1
           fi
-          if [[ -L "$config_file" || ( -e "$config_file" && ! -f "$config_file" ) ]]; then
+          if [[ -L "$config_file" || (-e "$config_file" && ! -f "$config_file") ]]; then
             echo "Expected a regular file at $config_file." >&2
             exit 1
           fi
@@ -365,9 +377,7 @@
           chmod 0700 "$state_dir"
           edit_dir=$(mktemp -d "$state_dir/.edit.XXXXXX")
           trap 'rm -rf -- "$edit_dir"' EXIT
-          trap 'exit 130' INT
-          trap 'exit 143' TERM
-          trap 'exit 129' HUP
+          trap 'exit "$((128 + BASH_TRAPSIG))"' INT TERM HUP
           candidate="$edit_dir/config.json"
           if [[ -e "$config_file" ]]; then
             cp -- "$config_file" "$candidate"
@@ -603,15 +613,11 @@
           }
 
           defer_signals() {
-            trap 'interrupted=130' INT
-            trap 'interrupted=143' TERM
-            trap 'interrupted=129' HUP
+            trap 'interrupted=$((128 + BASH_TRAPSIG))' INT TERM HUP
           }
 
           resume_signals() {
-            trap 'exit 130' INT
-            trap 'exit 143' TERM
-            trap 'exit 129' HUP
+            trap 'exit "$((128 + BASH_TRAPSIG))"' INT TERM HUP
             if ((interrupted)); then exit "$interrupted"; fi
           }
 
@@ -740,7 +746,7 @@
                 read_state
                 if [[ ''${invocations[$unit]} == "$expected" ]] && running "$unit"; then
                   alive=1
-                elif [[ -z ''${reported[$expected]:-} ]]; then
+                elif [[ ! -v reported[$expected] ]]; then
                   echo "$source mining stopped (''${results[$unit]})."
                   reported[$expected]=1
                 fi
@@ -1002,9 +1008,9 @@
         postPatch = (old.postPatch or "") + ''
           substituteInPlace main.c \
             --replace-fail 'wl_registry_bind(registry, name, &ext_idle_notifier_v1_interface, 1)' \
-              '(version >= 2 ? wl_registry_bind(registry, name, &ext_idle_notifier_v1_interface, 2) : NULL)' \
+            '(version >= 2 ? wl_registry_bind(registry, name, &ext_idle_notifier_v1_interface, 2) : NULL)' \
             --replace-fail 'register_timeout(cmd, cmd->timeout, true);' \
-              'register_timeout(cmd, cmd->timeout, false);' \
+            'register_timeout(cmd, cmd->timeout, false);' \
             --replace-fail 'if (cmd->resume_pending) {' 'if (false && cmd->resume_pending) {'
         '';
       });

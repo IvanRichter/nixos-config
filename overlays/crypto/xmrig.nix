@@ -66,14 +66,17 @@ _final: prev: {
           name = "xmrig-pgo-benchmark";
           # Build-only helper
           text = ''
-            if (( $# != 4 )); then
+            if (($# != 4)); then
               echo "Usage: xmrig-pgo-benchmark BINARY CONFIG STAGE WORKERS" >&2
               exit 2
             fi
             binary=$1 config=$2 stage=$3 workers=$4
             case "$workers" in
-              16|32) ;;
-              *) echo "Expected 16 or 32 benchmark workers" >&2; exit 2 ;;
+            16 | 32) ;;
+            *)
+              echo "Expected 16 or 32 benchmark workers" >&2
+              exit 2
+              ;;
             esac
             export LC_ALL=C
             umask 077
@@ -93,9 +96,7 @@ _final: prev: {
               exit "$rc"
             }
             trap cleanup EXIT
-            trap 'exit 130' INT
-            trap 'exit 143' TERM
-            trap 'exit 129' HUP
+            trap 'exit "$((128 + BASH_TRAPSIG))"' INT TERM HUP
 
             ${uutils}/bin/mkfifo "$workdir/output"
             command=(
@@ -109,7 +110,7 @@ _final: prev: {
             printf 'PGO %s (%s workers):' "$stage" "$workers"
             printf ' %q' "''${command[@]}"
             printf '\n'
-            started=$SECONDS
+            started=$BASH_MONOSECONDS
             "''${command[@]}" </dev/null >"$workdir/output" 2>&1 &
             pid=$!
 
@@ -134,12 +135,12 @@ _final: prev: {
             rc=0
             wait "$pid" || rc=$?
             pid=""
-            if (( rc != 0 || finished != 1 || !valid || !profile || !ready || !huge_pages_disabled )); then
+            if ((rc != 0 || finished != 1 || ! valid || ! profile || ! ready || ! huge_pages_disabled)); then
               printf 'PGO %s (%s workers) failed: exit=%s finished=%s checksum=%s profile=%s ready=%s huge-pages-disabled=%s\n' \
                 "$stage" "$workers" "$rc" "$finished" "$valid" "$profile" "$ready" "$huge_pages_disabled" >&2
               exit 1
             fi
-            printf 'PGO %s (%s workers) completed in %ss\n' "$stage" "$workers" "$((SECONDS - started))"
+            printf 'PGO %s (%s workers) completed in %ss\n' "$stage" "$workers" "$((BASH_MONOSECONDS - started))"
           '';
         };
 
@@ -211,11 +212,11 @@ _final: prev: {
             export LC_ALL=C
             # Sequential runs accumulate both profiles in the same dir
             ${runBenchmarks "training"}
-
             snapshot_profiles() (
+              local GLOBSORT=name
               shopt -s nullglob globstar dotglob
               profiles=("$pgoProfileDir"/**/*.gcda)
-              if (( ''${#profiles[@]} == 0 )); then
+              if ((''${#profiles[@]} == 0)); then
                 echo "PGO did not generate any gcda profile files" >&2
                 exit 1
               fi
@@ -245,7 +246,7 @@ _final: prev: {
                 consumed=$((consumed + 1))
               fi
             done < <(${uutilsFindutils}/bin/find . -type f -name '*.profile' -print0)
-            if (( consumed == 0 )); then
+            if ((consumed == 0)); then
               echo "GCC did not report consuming nonzero PGO counters" >&2
               exit 1
             fi

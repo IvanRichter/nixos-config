@@ -15,6 +15,7 @@
 
       lazysqlSetup = pkgs.writeShellScriptBin "lazysql-setup" ''
         set -euo pipefail
+        umask 077
 
         state_home="''${XDG_STATE_HOME:-$HOME/.local/state}"
         state_dir="$state_home/lazysql"
@@ -23,8 +24,8 @@
 
         secret="$(${pkgs.google-cloud-sdk}/bin/gcloud secrets versions access latest \
           --secret=gibbor-db-test-an-reader-password \
-          --project=he-platform-prd \
-          | tr -d '\n')"
+          --project=he-platform-prd)"
+        secret="''${secret//$'\n'/}"
 
         if [ -z "$secret" ]; then
           echo "lazysql-setup: fetched secret is empty" >&2
@@ -37,6 +38,8 @@
         fi
 
         tmp_config="$(mktemp)"
+        trap 'rm -f -- "$tmp_config"' EXIT
+        trap 'exit "$((128 + BASH_TRAPSIG))"' INT TERM HUP
         cp "$config_file" "$tmp_config"
         chmod 600 "$tmp_config"
 
@@ -44,12 +47,10 @@
 
         if grep -q "$placeholder" "$tmp_config"; then
           echo "lazysql-setup: placeholder still present after substitution" >&2
-          rm -f "$tmp_config"
           exit 1
         fi
 
         install -m 600 "$tmp_config" "$config_file"
-        rm -f "$tmp_config"
       '';
     in
     {
@@ -63,16 +64,15 @@
         config.lib.file.mkOutOfStoreSymlink "${config.xdg.stateHome}/lazysql/config.toml";
 
       home.activation.lazysqlConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-            set -euo pipefail
+        set -euo pipefail
 
-            state_home="''${XDG_STATE_HOME:-$HOME/.local/state}"
-            state_dir="$state_home/lazysql"
-            config_file="$state_dir/config.toml"
-            placeholder="${placeholder}"
+        state_home="''${XDG_STATE_HOME:-$HOME/.local/state}"
+        state_dir="$state_home/lazysql"
+        config_file="$state_dir/config.toml"
 
-            if [ ! -f "$config_file" ]; then
-              install -d -m 700 "$state_dir"
-              cat > "$config_file" <<EOF
+        if [ ! -f "$config_file" ]; then
+          install -d -m 700 "$state_dir"
+          cat >"$config_file" <<EOF
         ConfigFile = '/home/ivan/.config/lazysql/config.toml'
 
         [application]
@@ -93,8 +93,8 @@
         URLParams = ${empty}
         Commands = []
         EOF
-              chmod 600 "$config_file"
-            fi
+          chmod 600 "$config_file"
+        fi
       '';
     };
 }

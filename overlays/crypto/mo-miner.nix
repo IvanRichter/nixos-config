@@ -41,7 +41,7 @@ in
       CUDA_PATH = toolkit;
     };
     postPatch = ''
-      ${uutils}/bin/cat > thermal.js <<'EOF'
+      ${uutils}/bin/cat >thermal.js <<'EOF'
       "use strict";
 
       module.exports = ({ h, exit }) => {
@@ -94,13 +94,15 @@ in
       substituteInPlace scripts/cpu-cflags.sh \
         --replace-fail 'x86-64|x86-64-v2|' 'znver5|x86-64|x86-64-v2|' \
         --replace-fail '-mtune=generic -maes' '-mtune=znver5 -maes'
+      # Expand MOM_PGO_FLAGS in the generated script
+      # shellcheck disable=SC2016
       substituteInPlace scripts/cpu-optflags.sh \
         --replace-fail 'flags="-O3' 'flags="''${MOM_PGO_FLAGS:-} -O3'
       # Keep CPU tuning and control-flow protection on the host
       substituteInPlace binding.gyp --replace-fail '-fsycl-embed-ir' \
         '-fsycl-embed-ir -Xarch_device -fcf-protection=none -Xarch_host -march=znver5 -Xarch_host -mtune=znver5 <(mom_pgo_host_flags)'
       # Exercise host proof generation without GPU access or a pool connection
-      ${uutils}/bin/cat >> sycl/pearlhash/pearlhash.cpp <<'EOF'
+      ${uutils}/bin/cat >>sycl/pearlhash/pearlhash.cpp <<'EOF'
       #ifndef __SYCL_DEVICE_ONLY__
       __attribute__((constructor)) static void train_pearl_proofs() {
         if (!std::getenv("MOM_PGO_TRAIN")) return;
@@ -116,7 +118,7 @@ in
       #endif
       EOF
       # Fix feature selection for Zen 5 and exclude MSR access
-      ${uutils}/bin/cat > scripts/cpu-feature.sh <<'EOF'
+      ${uutils}/bin/cat >scripts/cpu-feature.sh <<'EOF'
       #!/usr/bin/env bash
       case "$1" in
         x86_64|aes|sse2|ssse3|sse4_1|avx2|avx512f|vaes) exit 0 ;;
@@ -125,7 +127,7 @@ in
       EOF
       substituteInPlace pool/connection.js \
         --replace-fail 'rejectUnauthorized: pool.tls_verify === true' \
-          'rejectUnauthorized: pool.tls_verify === true, servername: pool.url'
+        'rejectUnauthorized: pool.tls_verify === true, servername: pool.url'
       patchShebangs scripts
     '';
     configurePhase = ''
@@ -152,7 +154,7 @@ in
       build_miner -fprofile-instr-generate -fprofile-update=atomic
       MOM_PGO_TRAIN=1 LLVM_PROFILE_FILE="$pgo_dir/%p.profraw" \
         ${uutils}/bin/timeout --kill-after=10s 300s \
-          node -e 'require("./build/Release/mom.node")' > "$pgo_dir/training"
+        node -e 'require("./build/Release/mom.node")' >"$pgo_dir/training"
       # Reference output from upstream's proof generator for these three fixtures
       printf '%s  %s\n' 289a10b7dfcc5783da8afdfbc0856ce8bdb84dd583fa0b66e130abeef6cd3eb1 \
         "$pgo_dir/training" | ${uutils}/bin/sha256sum --check --status
@@ -163,7 +165,7 @@ in
         -Werror=profile-instr-out-of-date -Werror=profile-instr-unprofiled
       MOM_PGO_TRAIN=1 LLVM_PROFILE_FILE="$pgo_dir/validation.profraw" \
         ${uutils}/bin/timeout --kill-after=10s 300s \
-          node -e 'require("./build/Release/mom.node")' > "$pgo_dir/validation"
+        node -e 'require("./build/Release/mom.node")' >"$pgo_dir/validation"
       ${diffutils}/bin/cmp "$pgo_dir/training" "$pgo_dir/validation"
       test ! -e "$pgo_dir/validation.profraw"
       echo "PGO proof output verified without profiling instrumentation"
@@ -172,12 +174,12 @@ in
     installPhase = ''
       runHook preInstall
       ${uutils}/bin/mkdir -p "$out/libexec/mo-miner" "$out/share/licenses/mo-miner"
-      ${uutils}/bin/cp *.js package.json GPU-CONFIG.md "$out/libexec/mo-miner/"
+      ${uutils}/bin/cp ./*.js package.json GPU-CONFIG.md "$out/libexec/mo-miner/"
       ${uutils}/bin/cp -r helper miner pool "$out/libexec/mo-miner/"
       ${uutils}/bin/cp build/Release/mom.node "$out/libexec/mo-miner/"
       ${uutils}/bin/cp LICENSE "$out/share/licenses/mo-miner/"
       node -e 'const o = require("./opts"); const c = {}; o.set_default_opts(c, o.opt_help); console.log(JSON.stringify(c))' \
-        > "$out/libexec/mo-miner/defaults.json"
+        >"$out/libexec/mo-miner/defaults.json"
       makeWrapper ${lib.getExe prev.nodejs} "$out/bin/mo-miner" \
         --add-flags --force-node-api-uncaught-exceptions-policy=true \
         --add-flags "$out/libexec/mo-miner/mom.js" \

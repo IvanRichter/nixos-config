@@ -82,22 +82,21 @@
 
         secret="$(${pkgs.google-cloud-sdk}/bin/gcloud secrets versions access latest \
           --secret=gibbor-db-test-an-reader-password \
-          --project=he-platform-prd \
-          | tr -d '\n')"
+          --project=he-platform-prd)"
+        secret="''${secret//$'\n'/}"
 
         if [ -z "$secret" ]; then
           echo "tabularis-setup: fetched secret is empty for Gibbor" >&2
           exit 1
         fi
 
-        if ! printf '%s' "$secret" \
-          | ${pkgs.libsecret}/bin/secret-tool store \
+        if ! printf '%s' "$secret" |
+          ${pkgs.libsecret}/bin/secret-tool store \
             --label="Tabularis: Gibbor" \
             service tabularis \
             username "${connectionId}:db" \
             target default \
-            application rust-keyring
-        then
+            application rust-keyring; then
           unset secret
           echo "tabularis-setup: could not store the Gibbor password in the keyring" >&2
           exit 1
@@ -109,8 +108,7 @@
           service tabularis \
           username "${connectionId}:db" \
           target default \
-          >/dev/null
-        then
+          >/dev/null; then
           echo "tabularis-setup: keyring verification failed for Gibbor" >&2
           exit 1
         fi

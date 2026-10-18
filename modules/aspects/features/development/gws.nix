@@ -25,17 +25,17 @@
         text = ''
           if [ "$#" -gt 0 ]; then
             case "$1" in
-              -h|--help)
-                echo "Usage: gws-setup"
-                echo "Fetch ${secret} from ${project} and authorize gws with your Google account."
-                echo "Uses ~/.config/gws unless GOOGLE_WORKSPACE_CLI_CONFIG_DIR is set."
-                echo "Uses isolated HE gcloud credentials and leaves ADC unchanged."
-                exit 0
-                ;;
-              *)
-                echo "gws-setup: unexpected argument: $1" >&2
-                exit 1
-                ;;
+            -h | --help)
+              echo "Usage: gws-setup"
+              echo "Fetch ${secret} from ${project} and authorize gws with your Google account."
+              echo "Uses ~/.config/gws unless GOOGLE_WORKSPACE_CLI_CONFIG_DIR is set."
+              echo "Uses isolated HE gcloud credentials and leaves ADC unchanged."
+              exit 0
+              ;;
+            *)
+              echo "gws-setup: unexpected argument: $1" >&2
+              exit 1
+              ;;
             esac
           fi
 
@@ -66,8 +66,8 @@
             fi
             read -r -p "$1 [Y/n] " answer || return 1
             case "$answer" in
-              ""|y|Y|yes|Yes|YES) return 0 ;;
-              *) return 1 ;;
+            "" | y | Y | yes | Yes | YES) return 0 ;;
+            *) return 1 ;;
             esac
           }
 
@@ -97,6 +97,7 @@
 
           setup_dir="$(mktemp -d "$GOOGLE_WORKSPACE_CLI_CONFIG_DIR/.setup.XXXXXX")"
           trap 'rm -rf "$setup_dir"' EXIT
+          trap 'exit "$((128 + BASH_TRAPSIG))"' INT TERM HUP
           client_tmp="$setup_dir/client_secret.json"
 
           gcloud secrets versions access latest \
@@ -121,8 +122,8 @@
           echo "Shared gws client configured in $GOOGLE_WORKSPACE_CLI_CONFIG_DIR."
 
           authenticated() {
-            gws auth status >"$setup_dir/auth-status.json" 2>/dev/null \
-              && jq -e \
+            gws auth status >"$setup_dir/auth-status.json" 2>/dev/null &&
+              jq -e \
                 --arg project ${lib.escapeShellArg project} \
                 --argjson scopes ${lib.escapeShellArg (builtins.toJSON scopes)} '
                   .token_valid == true and .project_id == $project

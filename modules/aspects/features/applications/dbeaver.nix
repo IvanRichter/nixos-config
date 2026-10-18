@@ -76,23 +76,30 @@
         };
       };
       mssqlDataSourcesTemplateJson = builtins.toJSON mssqlDataSourcesTemplate;
+      findMariadbPlugin = ''
+        mariadb_plugin_jar() {
+          local -a jars=(${pkgs.dbeaver-bin}/opt/dbeaver/plugins/org.jkiss.dbeaver.ext.mysql_*.jar)
+          # Require one plugin so cache and activation use the same metadata
+          if ((''${#jars[@]} != 1)) || [[ ! -f ''${jars[0]} ]]; then
+            echo "DBeaver: expected exactly one MariaDB plugin JAR" >&2
+            return 1
+          fi
+          printf '%s\n' "''${jars[0]}"
+        }
+      '';
       mariadbDriverCache =
         pkgs.runCommandLocal "dbeaver-mariadb-driver-cache"
           {
             nativeBuildInputs = [ pkgs.unzip ];
           }
           ''
-                set -euo pipefail
+            set -euo pipefail
 
-                plugin_jar="$(find ${pkgs.dbeaver-bin}/opt/dbeaver/plugins -maxdepth 1 -name 'org.jkiss.dbeaver.ext.mysql_*.jar' | head -n1)"
+            ${findMariadbPlugin}
+            plugin_jar="''${ mariadb_plugin_jar;}"
 
-                if [ -z "$plugin_jar" ]; then
-                  echo "dbeaver-mariadb-driver-cache: MariaDB plugin jar not found" >&2
-                  exit 1
-                fi
-
-                version="$(${pkgs.unzip}/bin/unzip -p "$plugin_jar" plugin.xml \
-                  | ${pkgs.python3}/bin/python3 -c '
+            version="$(${pkgs.unzip}/bin/unzip -p "$plugin_jar" plugin.xml |
+              ${pkgs.python3}/bin/python3 -c '
             import re
             import sys
 
@@ -105,13 +112,13 @@
                 print(match.group(1))
             ')"
 
-                if [ -z "$version" ]; then
-                  echo "dbeaver-mariadb-driver-cache: MariaDB cache version not found in plugin metadata" >&2
-                  exit 1
-                fi
+            if [ -z "$version" ]; then
+              echo "dbeaver-mariadb-driver-cache: MariaDB cache version not found in plugin metadata" >&2
+              exit 1
+            fi
 
-                mkdir -p "$out"
-                ln -s ${mariadbDriverJar} "$out/mariadb-java-client-$version.jar"
+            mkdir -p "$out"
+            ln -s ${mariadbDriverJar} "$out/mariadb-java-client-$version.jar"
           '';
       mssqlDriverCache = pkgs.runCommandLocal "dbeaver-mssql-driver-cache" { } ''
         set -euo pipefail
@@ -121,48 +128,50 @@
       '';
 
       dbeaverSetup = pkgs.writeShellScriptBin "dbeaver-setup" ''
-            set -euo pipefail
+        set -euo pipefail
+        umask 077
 
-            state_home="''${XDG_STATE_HOME:-$HOME/.local/state}"
-            state_dir="$state_home/dbeaver"
-            placeholder="${placeholder}"
+        state_home="''${XDG_STATE_HOME:-$HOME/.local/state}"
+        state_dir="$state_home/dbeaver"
+        placeholder="${placeholder}"
+        setup_dir="$(mktemp -d)"
+        trap 'rm -rf -- "$setup_dir"' EXIT
+        trap 'exit "$((128 + BASH_TRAPSIG))"' INT TERM HUP
 
-            render_connection() {
-              local label="$1"
-              local template_file="$2"
-              local config_file="$3"
-              local secret_name="$4"
-              local project="$5"
-              local connection_id="$6"
-              local desired_template="$7"
-              local secret
-              local tmp_config
+        render_connection() {
+          local label="$1"
+          local template_file="$2"
+          local config_file="$3"
+          local secret_name="$4"
+          local project="$5"
+          local connection_id="$6"
+          local desired_template="$7"
+          local secret
+          local tmp_config="$setup_dir/config.json"
 
-              secret="$(${pkgs.google-cloud-sdk}/bin/gcloud secrets versions access latest \
-                --secret="$secret_name" \
-                --project="$project" \
-                | tr -d '\n')"
+          secret="$(${pkgs.google-cloud-sdk}/bin/gcloud secrets versions access latest \
+            --secret="$secret_name" \
+            --project="$project")"
+          secret="''${secret//$'\n'/}"
 
-              if [ -z "$secret" ]; then
-                echo "dbeaver-setup: fetched secret is empty for $label" >&2
-                exit 1
-              fi
+          if [ -z "$secret" ]; then
+            echo "dbeaver-setup: fetched secret is empty for $label" >&2
+            exit 1
+          fi
 
-              if [ ! -f "$template_file" ]; then
-                echo "dbeaver-setup: template not found for $label; run home-manager switch first" >&2
-                exit 1
-              fi
+          if [ ! -f "$template_file" ]; then
+            echo "dbeaver-setup: template not found for $label; run home-manager switch first" >&2
+            exit 1
+          fi
 
-              tmp_config="$(mktemp)"
-
-              CONNECTION_LABEL="$label" \
-                TEMPLATE_FILE="$template_file" \
-                OUTPUT_FILE="$tmp_config" \
-                SECRET="$secret" \
-                PLACEHOLDER="$placeholder" \
-                CONNECTION_ID="$connection_id" \
-                DESIRED_TEMPLATE="$desired_template" \
-                ${pkgs.python3}/bin/python3 <<'PY'
+          CONNECTION_LABEL="$label" \
+            TEMPLATE_FILE="$template_file" \
+            OUTPUT_FILE="$tmp_config" \
+            SECRET="$secret" \
+            PLACEHOLDER="$placeholder" \
+            CONNECTION_ID="$connection_id" \
+            DESIRED_TEMPLATE="$desired_template" \
+            ${pkgs.python3}/bin/python3 <<'PY'
         import json
         import os
         import sys
@@ -214,28 +223,28 @@
         output_path.write_text(json.dumps(template, indent=2) + "\n")
         PY
 
-              chmod 600 "$tmp_config"
-              install -m 600 "$tmp_config" "$config_file"
-              rm -f "$tmp_config"
-            }
+          chmod 600 "$tmp_config"
+          install -m 600 "$tmp_config" "$config_file"
+          rm -f "$tmp_config"
+        }
 
-            render_connection \
-              "Gibbor" \
-              "$state_dir/data-sources-gibbor.template.json" \
-              "$state_dir/data-sources-gibbor.json" \
-              "gibbor-db-test-an-reader-password" \
-              "he-platform-prd" \
-              "${connectionId}" \
-              '${dataSourcesTemplateJson}'
+        render_connection \
+          "Gibbor" \
+          "$state_dir/data-sources-gibbor.template.json" \
+          "$state_dir/data-sources-gibbor.json" \
+          "gibbor-db-test-an-reader-password" \
+          "he-platform-prd" \
+          "${connectionId}" \
+          '${dataSourcesTemplateJson}'
 
-            render_connection \
-              "${mssqlConnectionName}" \
-              "$state_dir/data-sources-ao-exter.template.json" \
-              "$state_dir/data-sources-ao-exter.json" \
-              "${mssqlSecretName}" \
-              "he-platform-prd" \
-              "${mssqlConnectionId}" \
-              '${mssqlDataSourcesTemplateJson}'
+        render_connection \
+          "${mssqlConnectionName}" \
+          "$state_dir/data-sources-ao-exter.template.json" \
+          "$state_dir/data-sources-ao-exter.json" \
+          "${mssqlSecretName}" \
+          "he-platform-prd" \
+          "${mssqlConnectionId}" \
+          '${mssqlDataSourcesTemplateJson}'
       '';
     in
     {
@@ -262,46 +271,44 @@
       };
 
       home.activation.dbeaverConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-            set -euo pipefail
+        set -euo pipefail
 
-            state_home="''${XDG_STATE_HOME:-$HOME/.local/state}"
-            data_home="''${XDG_DATA_HOME:-$HOME/.local/share}"
-            state_dir="$state_home/dbeaver"
-            gibbor_template_file="$state_dir/data-sources-gibbor.template.json"
-            gibbor_config_file="$state_dir/data-sources-gibbor.json"
-            mssql_template_file="$state_dir/data-sources-ao-exter.template.json"
-            mssql_config_file="$state_dir/data-sources-ao-exter.json"
-            drivers_config_dir="$data_home/DBeaverData/workspace6/.metadata/.config"
-            drivers_config_file="$drivers_config_dir/drivers.xml"
-            core_prefs_dir="$data_home/DBeaverData/workspace6/.metadata/.plugins/org.eclipse.core.runtime/.settings"
-            core_prefs_file="$core_prefs_dir/org.jkiss.dbeaver.core.prefs"
+        state_home="''${XDG_STATE_HOME:-$HOME/.local/state}"
+        data_home="''${XDG_DATA_HOME:-$HOME/.local/share}"
+        state_dir="$state_home/dbeaver"
+        gibbor_template_file="$state_dir/data-sources-gibbor.template.json"
+        gibbor_config_file="$state_dir/data-sources-gibbor.json"
+        mssql_template_file="$state_dir/data-sources-ao-exter.template.json"
+        mssql_config_file="$state_dir/data-sources-ao-exter.json"
+        drivers_config_dir="$data_home/DBeaverData/workspace6/.metadata/.config"
+        drivers_config_file="$drivers_config_dir/drivers.xml"
+        core_prefs_dir="$data_home/DBeaverData/workspace6/.metadata/.plugins/org.eclipse.core.runtime/.settings"
+        core_prefs_file="$core_prefs_dir/org.jkiss.dbeaver.core.prefs"
 
-            install -d -m 700 "$state_dir"
-            install -d -m 700 "$drivers_config_dir"
-            install -d -m 700 "$core_prefs_dir"
+        install -d -m 700 "$state_dir"
+        install -d -m 700 "$drivers_config_dir"
+        install -d -m 700 "$core_prefs_dir"
 
-            write_template() {
-              local template_json="$1"
-              local template_file="$2"
-              local config_file="$3"
-              local tmp_template
+        write_template() {
+          local template_json="$1"
+          local template_file="$2"
+          local config_file="$3"
 
-              tmp_template="$(mktemp)"
-              printf '%s\n' "$template_json" > "$tmp_template"
-              ${pkgs.python3}/bin/python3 -m json.tool "$tmp_template" "$template_file"
-              chmod 600 "$template_file"
-              rm -f "$tmp_template"
+          ${pkgs.python3}/bin/python3 -m json.tool - "$template_file" <<<"$template_json"
+          chmod 600 "$template_file"
 
-              if [ ! -f "$config_file" ]; then
-                install -m 600 "$template_file" "$config_file"
-              fi
-            }
+          if [ ! -f "$config_file" ]; then
+            install -m 600 "$template_file" "$config_file"
+          fi
+        }
 
-            write_template '${dataSourcesTemplateJson}' "$gibbor_template_file" "$gibbor_config_file"
-            write_template '${mssqlDataSourcesTemplateJson}' "$mssql_template_file" "$mssql_config_file"
+        write_template '${dataSourcesTemplateJson}' "$gibbor_template_file" "$gibbor_config_file"
+        write_template '${mssqlDataSourcesTemplateJson}' "$mssql_template_file" "$mssql_config_file"
 
-            driver_version="$(${pkgs.unzip}/bin/unzip -p "$(find ${pkgs.dbeaver-bin}/opt/dbeaver/plugins -maxdepth 1 -name 'org.jkiss.dbeaver.ext.mysql_*.jar' | head -n1)" plugin.xml \
-              | ${pkgs.python3}/bin/python3 -c '
+        ${findMariadbPlugin}
+        plugin_jar="''${ mariadb_plugin_jar;}"
+        driver_version="$(${pkgs.unzip}/bin/unzip -p "$plugin_jar" plugin.xml |
+          ${pkgs.python3}/bin/python3 -c '
         import re
         import sys
 
@@ -314,17 +321,17 @@
             print(match.group(1))
         ')"
 
-            if [ -z "$driver_version" ]; then
-              echo "dbeaver activation: MariaDB driver version not found in plugin metadata" >&2
-              exit 1
-            fi
+        if [ -z "$driver_version" ]; then
+          echo "dbeaver activation: MariaDB driver version not found in plugin metadata" >&2
+          exit 1
+        fi
 
-            DRIVERS_CONFIG_FILE="$drivers_config_file" \
-              DRIVERS_HOME="$data_home/DBeaverData/drivers" \
-              DRIVER_VERSION="$driver_version" \
-              MSSQL_DRIVER_ID="${mssqlDriverId}" \
-              MSSQL_DRIVER_VERSION="${mssqlDriverVersion}" \
-              ${pkgs.python3}/bin/python3 <<'PY'
+        DRIVERS_CONFIG_FILE="$drivers_config_file" \
+          DRIVERS_HOME="$data_home/DBeaverData/drivers" \
+          DRIVER_VERSION="$driver_version" \
+          MSSQL_DRIVER_ID="${mssqlDriverId}" \
+          MSSQL_DRIVER_VERSION="${mssqlDriverVersion}" \
+          ${pkgs.python3}/bin/python3 <<'PY'
         import os
         import xml.etree.ElementTree as ET
         from pathlib import Path
@@ -459,11 +466,11 @@
         tree.write(drivers_config_file, encoding="UTF-8", xml_declaration=True)
         PY
 
-            chmod 600 "$drivers_config_file"
+        chmod 600 "$drivers_config_file"
 
-            CORE_PREFS_FILE="$core_prefs_file" \
-              MSSQL_DRIVER_JAR="$data_home/DBeaverData/drivers/maven/maven-central/com.microsoft.sqlserver/mssql-jdbc-${mssqlDriverVersion}.jar" \
-              ${pkgs.python3}/bin/python3 <<'PY'
+        CORE_PREFS_FILE="$core_prefs_file" \
+          MSSQL_DRIVER_JAR="$data_home/DBeaverData/drivers/maven/maven-central/com.microsoft.sqlserver/mssql-jdbc-${mssqlDriverVersion}.jar" \
+          ${pkgs.python3}/bin/python3 <<'PY'
         import os
         from pathlib import Path
 
@@ -504,7 +511,7 @@
         prefs_file.write_text("\n".join(output) + "\n")
         PY
 
-            chmod 600 "$core_prefs_file"
+        chmod 600 "$core_prefs_file"
       '';
     };
 }

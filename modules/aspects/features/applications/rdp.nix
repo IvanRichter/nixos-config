@@ -11,11 +11,11 @@
 
         # Accept a path or file:// URL
         arg="''${1:-}"
-        [ -n "''${arg}" ] || { echo "Usage: rdp-open <file.rdp>"; exit 1; }
-        case "''${arg}" in
-          file://*) file="$(printf '%s' "''${arg}" | sed -E 's#^file://##')";;
-          *)        file="''${arg}";;
-        esac
+        [ -n "''${arg}" ] || {
+          echo "Usage: rdp-open <file.rdp>"
+          exit 1
+        }
+        file="''${arg#file://}"
 
         # Prefer Wayland client on Wayland
         if [ "''${RDP_FORCE_X11:-0}" = "1" ]; then
@@ -28,26 +28,26 @@
 
         # -- HiDPI check via DRM (max width across connectors) --
         panel_width_from_drm() {
-          local max=0 line w
+          local max=0 line w f
           for f in /sys/class/drm/*/modes; do
             [ -r "$f" ] || continue
             while IFS= read -r line; do
               case "$line" in
-                *x*)
-                  w="''${line%%x*}"
-                  if [ -n "''${w}" ] && [ "''${w}" -gt "''${max}" ] 2>/dev/null; then
-                    max="''${w}"
-                  fi
-                  ;;
+              *x*)
+                w="''${line%%x*}"
+                if [ -n "''${w}" ] && [ "''${w}" -gt "''${max}" ] 2>/dev/null; then
+                  max="''${w}"
+                fi
+                ;;
               esac
-            done < "$f"
+            done <"$f"
           done
           echo "''${max}"
         }
 
         min_width="''${RDP_HIDPI_MIN_WIDTH:-2560}"
         force_zoom=0
-        w="$(panel_width_from_drm)"
+        w="''${ panel_width_from_drm;}"
         [ "''${w}" -ge "''${min_width}" ] 2>/dev/null && force_zoom=1
         [ "''${NO_AUTO_HIDPI:-0}" = "1" ] && force_zoom=0
 
@@ -55,33 +55,35 @@
         base_flags=(/sec:nla /cert:ignore +clipboard /dynamic-resolution)
         drive_flags=()
         if [ "''${RDP_NO_DRIVES:-0}" != "1" ]; then
-          drive_flags+=(/drive:home,"''${HOME}")          # \\tsclient\home
-          [ -n "''${RDP_SHARE_DIR:-}" ] && drive_flags+=(/drive:shared,"''${RDP_SHARE_DIR}")
+          drive_flags+=("/drive:home,''${HOME}") # \\tsclient\home
+          [ -n "''${RDP_SHARE_DIR:-}" ] && drive_flags+=("/drive:shared,''${RDP_SHARE_DIR}")
         fi
 
         # Scaling flags with overrides
         scale_flags=()
         case "''${RDP_MODE:-scale}" in
-          smart)
-            scale_flags=(/smart-sizing)
-            [ -n "''${RDP_SMART_SIZE:-}" ] && scale_flags+=("/size:''${RDP_SMART_SIZE}")  # e.g. 1920x1200
-            # smart-sizing fights dynamic-resolution; drop it here
-            base_flags=(/sec:nla /cert:ignore +clipboard)
-            ;;
-          *)
-            if [ -n "''${RDP_SCALE_DISPLAY-}''${RDP_SCALE_DESKTOP-}''${RDP_SCALE_DEVICE-}" ]; then
-              [ -n "''${RDP_SCALE_DISPLAY-}" ] && scale_flags+=("/scale:''${RDP_SCALE_DISPLAY}")
-              [ -n "''${RDP_SCALE_DESKTOP-}" ] && scale_flags+=("/scale-desktop:''${RDP_SCALE_DESKTOP}")
-              [ -n "''${RDP_SCALE_DEVICE-}" ] && scale_flags+=("/scale-device:''${RDP_SCALE_DEVICE}")
-            elif [ "''${force_zoom}" = "1" ]; then
-              scale_flags=(/scale:180 /scale-desktop:200 /scale-device:180)
-            fi
-            ;;
+        smart)
+          scale_flags=(/smart-sizing)
+          [ -n "''${RDP_SMART_SIZE:-}" ] && scale_flags+=("/size:''${RDP_SMART_SIZE}") # e.g. 1920x1200
+          # smart-sizing fights dynamic-resolution; drop it here
+          base_flags=(/sec:nla /cert:ignore +clipboard)
+          ;;
+        *)
+          if [ -n "''${RDP_SCALE_DISPLAY-}''${RDP_SCALE_DESKTOP-}''${RDP_SCALE_DEVICE-}" ]; then
+            [ -n "''${RDP_SCALE_DISPLAY-}" ] && scale_flags+=("/scale:''${RDP_SCALE_DISPLAY}")
+            [ -n "''${RDP_SCALE_DESKTOP-}" ] && scale_flags+=("/scale-desktop:''${RDP_SCALE_DESKTOP}")
+            [ -n "''${RDP_SCALE_DEVICE-}" ] && scale_flags+=("/scale-device:''${RDP_SCALE_DEVICE}")
+          elif [ "''${force_zoom}" = "1" ]; then
+            scale_flags=(/scale:180 /scale-desktop:200 /scale-device:180)
+          fi
+          ;;
         esac
 
         [ "''${RDP_DEBUG:-0}" = "1" ] && {
           echo "client=$client width=$w force_zoom=$force_zoom mode=''${RDP_MODE:-scale}"
-          printf 'flags:'; printf ' %q' "''${base_flags[@]}" "''${drive_flags[@]}" "''${scale_flags[@]}"; echo
+          printf 'flags:'
+          printf ' %q' "''${base_flags[@]}" "''${drive_flags[@]}" "''${scale_flags[@]}"
+          echo
         }
 
         exec "$client" "''${file}" \
