@@ -7,8 +7,6 @@
     { pkgs, ... }:
     {
       programs = {
-        bat.enable = true;
-
         git = {
           enable = true;
           lfs.enable = true;
@@ -20,11 +18,6 @@
         };
 
         obs-studio.enable = true;
-
-        skim = {
-          enable = true;
-          keybindings = true;
-        };
       };
     };
 

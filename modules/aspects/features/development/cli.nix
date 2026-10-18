@@ -57,12 +57,25 @@
     };
 
     homeManager = {
+      programs.bat.enable = true;
+
       programs.broot = {
         enable = true;
         enableFishIntegration = true;
       };
 
       programs.bottom.enable = true;
+
+      programs.fzf = {
+        enable = true;
+        # Skim provides the Fish keybindings
+        enableFishIntegration = false;
+      };
+
+      programs.skim = {
+        enable = true;
+        enableFishIntegration = true;
+      };
 
       programs.yazi = {
         enable = true;

@@ -32,7 +32,6 @@
         jc
         choose
         ripgrep-all
-        fzf
         shfmt
         hyperfine
         just
