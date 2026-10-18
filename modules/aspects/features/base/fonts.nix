@@ -2,17 +2,15 @@
 
 {
   den.aspects.fonts.nixos =
-    { pkgs, ... }:
+    { config, pkgs, ... }:
     {
       fonts = {
+        # Fallback and compatibility fonts
         packages = with pkgs; [
-          roboto
           noto-fonts
           noto-fonts-cjk-sans
-          noto-fonts-color-emoji
           dejavu_fonts
           liberation_ttf
-          nerd-fonts.meslo-lg
           corefonts
         ];
 
@@ -26,40 +24,32 @@
 
           defaultFonts = {
             sansSerif = [
-              "Roboto"
               "Noto Sans"
               "DejaVu Sans"
             ];
-            serif = [
-              "Noto Serif"
-              "DejaVu Serif"
-            ];
-            monospace = [
-              "MesloLGS Nerd Font Mono"
-              "DejaVu Sans Mono"
-            ];
-            emoji = [ "Noto Color Emoji" ];
+            serif = [ "DejaVu Serif" ];
+            monospace = [ "DejaVu Sans Mono" ];
           };
 
-          # Route common stacks to Roboto
+          # Route common stacks to the primary sans-serif font
           localConf = ''
             <fontconfig>
-              <!-- Route common stacks to Roboto -->
+              <!-- Route common stacks to the primary sans-serif font -->
               <match target="pattern">
                 <test name="family"><string>system-ui</string></test>
-                <edit name="family" mode="assign"><string>Roboto</string></edit>
+                <edit name="family" mode="assign"><string>${config.stylix.fonts.sansSerif.name}</string></edit>
               </match>
               <match target="pattern">
                 <test name="family"><string>Segoe UI</string></test>
-                <edit name="family" mode="assign"><string>Roboto</string></edit>
+                <edit name="family" mode="assign"><string>${config.stylix.fonts.sansSerif.name}</string></edit>
               </match>
               <match target="pattern">
                 <test name="family"><string>Helvetica</string></test>
-                <edit name="family" mode="assign"><string>Roboto</string></edit>
+                <edit name="family" mode="assign"><string>${config.stylix.fonts.sansSerif.name}</string></edit>
               </match>
               <match target="pattern">
                 <test name="family"><string>Arial</string></test>
-                <edit name="family" mode="assign"><string>Roboto</string></edit>
+                <edit name="family" mode="assign"><string>${config.stylix.fonts.sansSerif.name}</string></edit>
               </match>
             </fontconfig>
           '';

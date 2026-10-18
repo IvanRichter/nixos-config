@@ -37,6 +37,7 @@
       };
     homeManager =
       {
+        config,
         host,
         lib,
         ...
@@ -137,7 +138,7 @@
 
           "cosmic/com.system76.CosmicTk/v1/interface_font".text = ''
             (
-                family: "Roboto",
+                family: "${config.stylix.fonts.sansSerif.name}",
                 weight: Normal,
                 stretch: Normal,
                 style: Normal,
@@ -146,7 +147,7 @@
 
           "cosmic/com.system76.CosmicTk/v1/monospace_font".text = ''
             (
-                family: "MesloLGS Nerd Font Mono",
+                family: "${config.stylix.fonts.monospace.name}",
                 weight: Normal,
                 stretch: Normal,
                 style: Normal,
