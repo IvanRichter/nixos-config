@@ -27,6 +27,108 @@
             bind ctrl-right forward-word
           '';
 
+          ghmerge = {
+            description = "Squash-merge a PR while preserving authorship and sign-off trailers";
+            body = ''
+              argparse 'h/help' 'b/body=' -- $argv; or return 2
+              set -l usage 'Usage: ghmerge PR_NUMBER [--body TEXT]'
+              if set -q _flag_help
+                echo "$usage"
+                return 0
+              end
+              if test (count $argv) -ne 1; or not string match -rq '^[1-9][0-9]*$' -- $argv[1]
+                echo "$usage" >&2
+                return 2
+              end
+
+              set -l jq ${pkgs.jq}/bin/jq
+              set -l repo (gh repo view --json nameWithOwner --jq .nameWithOwner); or return 1
+              set -l pr (gh api "repos/$repo/pulls/$argv[1]"); or return 1
+              if not printf '%s' "$pr" | $jq -e '.stack == null or .base.ref == .stack.base.ref' >/dev/null
+                echo 'Merge the lowest unmerged PR in the stack first' >&2
+                return 1
+              end
+              if not printf '%s' "$pr" | $jq -e '.state == "open" and .draft == false' >/dev/null
+                echo 'The PR must be open and ready for review.' >&2
+                return 1
+              end
+
+              set -l author_id (printf '%s' "$pr" | $jq -r .user.id)
+              set -l title (printf '%s' "$pr" | $jq -r '.title + " (#" + (.number | tostring) + ")"')
+              set -l sha (printf '%s' "$pr" | $jq -r .head.sha)
+              set -l count (printf '%s' "$pr" | $jq -r .commits)
+              set -l commits (gh api --paginate --slurp "repos/$repo/pulls/$argv[1]/commits?per_page=100"); or return 1
+              if not printf '%s' "$commits" | $jq -e --arg sha "$sha" --argjson count "$count" \
+                'add | length == $count and .[-1].sha == $sha' >/dev/null
+                echo 'The PR changed or its complete commit list could not be read. Refresh and retry.' >&2
+                return 1
+              end
+
+              # Preserve existing trailers without adding sign-offs
+              set -l trailers
+              for message in (printf '%s' "$commits" | $jq -j '.[][] | .commit.message, "\u0000"' | string split0)
+                set -a trailers (printf '%s' "$message" | git interpret-trailers --parse); or return 1
+              end
+
+              # Credit commit authors other than the PR author
+              set -a trailers (printf '%s' "$commits" | $jq -r --argjson author "$author_id" \
+                '.[][] | select(.author == null or .author.id != $author) | .commit.author | "Co-authored-by: \(.name) <\(.email)>"')
+              set -l footer (printf '%s\n' $trailers \
+                | string match -ri '^(?:Co-authored-by|Signed-off-by):.*' \
+                | string replace -ri '^co-authored-by:\s*' 'Co-authored-by: ' \
+                | string replace -ri '^signed-off-by:\s*' 'Signed-off-by: ' \
+                | ${pkgs.gawk}/bin/awk '!seen[$0]++' \
+                | string collect --allow-empty)
+
+              set -l body "$footer"
+              if test -n "$_flag_body"
+                set body (printf '%s\n\n%s' "$_flag_body" "$footer" | string collect)
+              end
+              set -l message (printf '%s\n\n%s' "$title" "$body" | string collect)
+
+              set -l endpoint "repos/$repo/pulls/$argv[1]/merge-async"
+              set -l result (gh api --method PUT "$endpoint" \
+                -f merge_method=squash \
+                -f merge_action=direct_merge \
+                -f "sha=$sha" \
+                -f "commit_title=$title" \
+                -f "commit_message=$body")
+              or begin
+                echo "Could not confirm the merge request for #$argv[1]; check its status on GitHub before retrying" >&2
+                return 1
+              end
+
+              set -l uuid (printf '%s' "$result" | $jq -r .details.uuid)
+              for attempt in (seq 60)
+                if test (printf '%s' "$result" | $jq -r .status) != pending
+                  break
+                end
+                sleep 2
+                set -l polled (gh api "$endpoint/$uuid"); or break
+                set result "$polled"
+              end
+              switch (printf '%s' "$result" | $jq -r .status)
+                case merged
+                case failed
+                  printf 'Merge failed: %s\n' (printf '%s' "$result" | $jq -r .details.message) >&2
+                  return 1
+                case '*'
+                  echo "Stopped waiting for #$argv[1]; GitHub may still complete the merge" >&2
+                  echo "Check: gh pr view $argv[1] --repo $repo" >&2
+                  return 1
+              end
+
+              set -l merged_sha (printf '%s' "$result" | $jq -r .details.sha)
+              echo "Merged #$argv[1] as $merged_sha"
+              if not gh api "repos/$repo/commits/$merged_sha" | $jq -e --arg message "$message" --argjson author "$author_id" \
+                '.author.id == $author and .commit.message == $message and .commit.verification.verified == true' >/dev/null
+                echo 'Merge succeeded, but could not verify the author, message and signature' >&2
+                return 1
+              end
+              echo 'Verified the squash author, message and commit signature'
+            '';
+          };
+
           clippy-pedantic = {
             description = "Run workspace-wide pedantic Clippy in a temporary target directory";
             body = ''
