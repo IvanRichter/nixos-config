@@ -1,18 +1,18 @@
 final: prev: {
   hk =
-    if prev.lib.versionAtLeast prev.hk.version "2.6.0" then
+    if prev.lib.versionAtLeast prev.hk.version "2.8.0" then
       prev.hk
     else
       prev.hk.overrideAttrs (
         finalAttrs: old: {
-          version = "2.6.0";
+          version = "2.8.0";
           src = final.fetchFromGitHub {
             owner = "jdx";
             repo = "hk";
             tag = "v${finalAttrs.version}";
-            hash = "sha256-deNbbrB98B0H3laHFD3eng7LdtYyyuYty86JZ2yygUM=";
+            hash = "sha256-swKjqQwTHKM88bTa6HloJsRtj9JoeWFE+WwjvjlcP7E=";
           };
-          cargoHash = "sha256-y8ZDsd0eBg/UPckTDPY/DVReTuc+DwCUeEWbaPtj2sM=";
+          cargoHash = "sha256-VG0foVC3NHKgJcVF25bnC81114g50U4mZUgEnYMsSTQ=";
           cargoDeps = final.rustPlatform.fetchCargoVendor {
             inherit (finalAttrs) pname version src;
             hash = finalAttrs.cargoHash;
