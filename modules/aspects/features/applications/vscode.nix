@@ -2,6 +2,7 @@
 
 {
   den.aspects.vscode.nixpkgs-overlays = _: {
+    git-pinned-diff = import "${inputs.self}/overlays/vscode/git-pinned-diff.nix";
     pkl-vscode = import "${inputs.self}/overlays/vscode/pkl.nix";
     rust = inputs.rust-overlay.overlays.default;
     vscode-marketplace = inputs.nix-vscode-extensions.overlays.default;
@@ -59,6 +60,7 @@
         hashicorp.terraform
         jnoortheen.nix-ide
         mads-hartmann.bash-ide-vscode
+        mashurr.git-pinned-commit-highlighter
         mkhl.shfmt
         ms-azuretools.vscode-containers
         ms-azuretools.vscode-docker
