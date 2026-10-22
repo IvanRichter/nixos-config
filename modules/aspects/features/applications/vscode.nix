@@ -157,7 +157,18 @@
           extensions = nixpkgsExtensions ++ marketplaceExtensions;
 
           userSettings = {
+            "chat.disableAIFeatures" = true;
+            "gitlens.ai.enabled" = false;
+            "gitlens.gitkraken.mcp.autoEnabled" = false;
+            "gitlens.plusFeatures.enabled" = false;
+            "gitlens.cloudPatches.enabled" = false;
+            "gitlens.launchpad.indicator.polling.enabled" = false;
+            "gitlens.codeLens.enabled" = false;
+            "gitlens.currentLine.enabled" = false;
+            "gitlens.statusBar.enabled" = false;
+            "gitlens.graph.statusBar.enabled" = false;
             "telemetry.telemetryLevel" = "off";
+            "telemetry.feedback.enabled" = false;
             "security.workspace.trust.untrustedFiles" = "open";
             "terminal.integrated.fontFamily" = "MesloLGS Nerd Font";
             "terminal.integrated.defaultProfile.linux" = "fish";
@@ -167,6 +178,8 @@
             "terminal.integrated.enableImages" = false;
             "terminal.integrated.smoothScrolling" = false;
             "terminal.integrated.fastScrollSensitivity" = 5;
+            "terminal.integrated.suggest.enabled" = false;
+            "terminal.integrated.tabs.enableAnimation" = false;
             "terminal.integrated.profiles.linux" = {
               fish = {
                 path = "/run/current-system/sw/bin/fish";
@@ -175,6 +188,10 @@
 
             "vscode-dataform-tools.formattingCli" = "sqlfluff";
             "vscode-dataform-tools.sqlfluffConfigPath" = "./.sqlfluff";
+            "vscode-dataform-tools.recommendErrorLensExtension" = false;
+            "sqlfluff.linter.run" = "onSave";
+            "onboarding.enabled" = false;
+            "update.showReleaseNotes" = false;
             "window.commandCenter" = false;
             "window.density.layout" = "compact";
             "workbench.activityBar.compact" = true;
@@ -184,7 +201,11 @@
             "workbench.editor.closeOnFileDelete" = true;
             "workbench.editor.tabActionReserveSpace" = false;
             "workbench.tips.enabled" = false;
-            "vsicons.dontShowNewVersionMessage" = true;
+            "workbench.startupEditor" = "none";
+            "workbench.welcomePage.walkthroughs.openOnInstall" = false;
+            "workbench.settings.enableNaturalLanguageSearch" = false;
+            "workbench.commandPalette.experimental.enableNaturalLanguageSearch" = false;
+            "workbench.enableExperiments" = false;
 
             "files.associations" = {
               "cloudbuild.yaml" = "yaml";
@@ -220,12 +241,28 @@
             "google.cloud.project" = "he-dlh-prd";
             "google.cloud.region" = "europe-west1";
             "google.datacloud.bigqueryRegion" = "europe-west1";
+            "google.datacloud.enableTelemetry" = false;
+            "google.datacloud.agent.skills.autoUpdate" = false;
+            "python.experiments.enabled" = false;
+            "jupyter.experiments.enabled" = false;
+            "jupyter.disableJupyterAutoStart" = true;
             "jupyter.jupyterLaunchTimeout" = 300000;
             "jupyter.runStartupCommands" = [
               "import bigframes"
               "%load_ext bigframes"
               "bigframes.options.bigquery.project = \"he-dlh-prd\""
               "bigframes.options.bigquery.application_name = \"datacloud.visual studio code\""
+            ];
+
+            "go.survey.prompt" = false;
+            "go.showWelcome" = false;
+            "go.toolsManagement.checkForUpdates" = "off";
+            "vue.welcome.show" = false;
+            "markdown-preview-enhanced.liveUpdate" = false;
+            "docker.lsp.experimental.vulnerabilityScanning" = false;
+            "errorLens.enabledDiagnosticLevels" = [
+              "error"
+              "warning"
             ];
 
             "editor.defaultFormatter" = "oxc.oxc-vscode";
@@ -276,6 +313,7 @@
             "workbench.colorTheme" = "One Dark Pro Night Flat";
 
             "extensions.autoUpdate" = "off";
+            "extensions.ignoreRecommendations" = true;
 
             "vscode-dataform-tools.gcpProjectId" = "he-dlh-prd";
             "vscode-dataform-tools.gcpLocation" = "europe-west1";
