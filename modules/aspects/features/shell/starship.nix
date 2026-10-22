@@ -8,6 +8,7 @@
         enable = true;
         enableFishIntegration = true;
         enableInteractive = false;
+        validateFiles.config = true;
 
         settings = {
           "$schema" = "https://starship.rs/config-schema.json";
