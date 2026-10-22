@@ -83,6 +83,11 @@
           package = pkgs.micro-full;
         };
 
+        xdg.configFile."micro/bindings.json".text = builtins.toJSON {
+          "Ctrl-q" = "None";
+          "Ctrl-x" = "Quit";
+        };
+
         programs.skim = {
           enable = true;
           enableFishIntegration = true;
