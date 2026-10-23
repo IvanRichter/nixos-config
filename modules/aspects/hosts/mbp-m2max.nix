@@ -49,6 +49,7 @@
 
     # Firmware
     hardware.asahi.enable = true;
+    hardware.asahi.avd.vaapi-support = true;
 
     # Avoid --impure until firmware can be loaded from the ESP at boot:
     # https://github.com/nix-community/nixos-apple-silicon/issues/538
