@@ -42,6 +42,7 @@
         # Nix tooling
         nix-output-monitor
         nixfmt
+        nixpkgs-review
 
         # System info
 
