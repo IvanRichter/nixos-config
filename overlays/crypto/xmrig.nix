@@ -171,7 +171,10 @@ _final: prev: {
       (prev.xmrig.override {
         inherit stdenv;
         libuv = zen5Library prev.libuv;
-        openssl = zen5Library prev.openssl;
+        openssl = (zen5Library prev.openssl).overrideAttrs (old: {
+          # Linux 7.3 restricts AF_ALG AES-CBC to privileged processes
+          configureFlags = (old.configureFlags or [ ]) ++ [ "no-afalgeng" ];
+        });
         hwloc = zen5Library prev.hwloc;
         withHttp = false;
         enableRandomx = true;
@@ -186,7 +189,6 @@ _final: prev: {
       }).overrideAttrs
         (old: {
           preferLocalBuild = true;
-          # O3 measured slightly faster than Ofast on the 9950X
           postPatch = (old.postPatch or "") + ''
             substituteInPlace cmake/flags.cmake --replace-fail '-Ofast' '-O3'
           '';
