@@ -15,9 +15,10 @@ _final: prev: {
         uutilsFindutils = prev.buildPackages.uutils-findutils;
         uutilsDiffutils = prev.buildPackages.uutils-diffutils;
 
-        stdenv = prev.overrideCC prev.gccStdenv prev.buildPackages.gcc_latest;
+        llvm = prev.llvmPackages_latest;
+        stdenv = prev.overrideCC prev.stdenv (llvm.clang.override { bintools = llvm.bintools; });
         zen5Flags = "-march=znver5 -mtune=znver5";
-        xmrigFlags = "${zen5Flags} -fno-plt -fipa-pta";
+        xmrigFlags = "${zen5Flags} -O3 -fno-plt -flto=full";
         benchmarkWorkers = [
           16
           32
@@ -156,14 +157,15 @@ _final: prev: {
         zen5Library =
           package:
           (package.override { inherit stdenv; }).overrideAttrs (old: {
+            nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ llvm.llvm ];
             env = (old.env or { }) // {
-              NIX_CFLAGS_COMPILE = (old.env.NIX_CFLAGS_COMPILE or "") + " ${zen5Flags} -flto=auto";
+              NIX_CFLAGS_COMPILE = (old.env.NIX_CFLAGS_COMPILE or "") + " ${zen5Flags} -flto=full";
             };
             preConfigure = (old.preConfigure or "") + ''
-              export LDFLAGS="''${LDFLAGS:-} -flto=auto"
-              export AR=${stdenv.cc.cc}/bin/gcc-ar
-              export RANLIB=${stdenv.cc.cc}/bin/gcc-ranlib
-              export NM=${stdenv.cc.cc}/bin/gcc-nm
+              export LDFLAGS="''${LDFLAGS:-} -fuse-ld=lld -flto=full"
+              export AR=${llvm.llvm}/bin/llvm-ar
+              export RANLIB=${llvm.llvm}/bin/llvm-ranlib
+              export NM=${llvm.llvm}/bin/llvm-nm
             '';
             preferLocalBuild = true;
           });
@@ -189,13 +191,11 @@ _final: prev: {
       }).overrideAttrs
         (old: {
           preferLocalBuild = true;
-          postPatch = (old.postPatch or "") + ''
-            substituteInPlace cmake/flags.cmake --replace-fail '-Ofast' '-O3'
-          '';
+          nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ llvm.llvm ];
           preConfigure = (old.preConfigure or "") + ''
             pgoProfileDir="$NIX_BUILD_TOP/xmrig-pgo"
             ${uutils}/bin/mkdir -m 0700 "$pgoProfileDir"
-            pgoGenerate="${xmrigFlags} -fprofile-generate=$pgoProfileDir -fprofile-update=atomic -fprofile-reproducible=multithreaded"
+            pgoGenerate="${xmrigFlags} -fprofile-generate=$pgoProfileDir -fprofile-update=atomic"
             cmakeFlagsArray+=(
               "-DCMAKE_C_FLAGS=$pgoGenerate"
               "-DCMAKE_CXX_FLAGS=$pgoGenerate"
@@ -203,7 +203,8 @@ _final: prev: {
           '';
 
           cmakeFlags = (old.cmakeFlags or [ ]) ++ [
-            "-DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON"
+            "-DCMAKE_INTERPROCEDURAL_OPTIMIZATION=OFF"
+            "-DCMAKE_EXE_LINKER_FLAGS=-fuse-ld=lld"
             "-DWITH_OPENCL=OFF"
             "-DWITH_CUDA=OFF"
             "-DWITH_NVML=OFF"
@@ -212,16 +213,22 @@ _final: prev: {
 
           postBuild = (old.postBuild or "") + ''
             export LC_ALL=C
-            # Sequential runs accumulate both profiles in the same dir
+            # LLVM automatically merges both runs into the same raw profile
             ${runBenchmarks "training"}
+            shopt -s nullglob
+            rawProfiles=("$pgoProfileDir"/*.profraw)
+            if ((''${#rawProfiles[@]} == 0)); then
+              echo "PGO did not generate any profraw files" >&2
+              exit 1
+            fi
+            ${llvm.llvm}/bin/llvm-profdata merge --failure-mode=any \
+              --output="$pgoProfileDir/profile.profdata" "''${rawProfiles[@]}"
+            ${llvm.llvm}/bin/llvm-profdata show "$pgoProfileDir/profile.profdata"
+
             snapshot_profiles() (
               local GLOBSORT=name
               shopt -s nullglob globstar dotglob
-              profiles=("$pgoProfileDir"/**/*.gcda)
-              if ((''${#profiles[@]} == 0)); then
-                echo "PGO did not generate any gcda profile files" >&2
-                exit 1
-              fi
+              profiles=("$pgoProfileDir"/**/*.profraw "$pgoProfileDir/profile.profdata")
               for profile in "''${profiles[@]}"; do
                 if [[ ! -s $profile ]]; then
                   echo "PGO generated an empty profile: $profile" >&2
@@ -231,32 +238,29 @@ _final: prev: {
               ${uutils}/bin/sha256sum -- "''${profiles[@]}"
             )
             snapshot_profiles >"$NIX_BUILD_TOP/profiles.before.sha256"
-            printf 'PGO generated %s gcda profile files\n' \
-              "$(${uutils}/bin/wc -l <"$NIX_BUILD_TOP/profiles.before.sha256")"
 
-            # Preserve object paths
             cmake --build . --target clean
-            ${uutilsFindutils}/bin/find . -type f -name '*.profile' -delete
-            pgoUse="${xmrigFlags} -fprofile-use=$pgoProfileDir -fprofile-partial-training -Werror=missing-profile -Werror=coverage-mismatch -fdump-ipa-profile-details"
+            ${uutilsFindutils}/bin/find . -type f -name '*.opt.yaml' -delete
+            pgoUse="${xmrigFlags} -fprofile-use=$pgoProfileDir/profile.profdata -Werror=profile-instr-out-of-date -Werror=profile-instr-unprofiled -fsave-optimization-record=yaml -foptimization-record-passes=pgo-instrumentation -mllvm -pgo-emit-branch-prob"
             cmake . "-DCMAKE_C_FLAGS=$pgoUse" "-DCMAKE_CXX_FLAGS=$pgoUse"
             cmake --build . --parallel "$NIX_BUILD_CORES"
 
-            # Fail unless GCC reports reading nonzero feedback counters
+            # Fail unless LLVM reports applying nonzero profile counts to branches
             consumed=0
             while IFS= read -r -d "" dump; do
-              if ${ripgrep}/bin/rg --no-config -q -- 'Read edge from .*count:[[:space:]]*[1-9][0-9]*' "$dump"; then
+              if ${ripgrep}/bin/rg --no-config -q -- 'total count : [1-9][0-9]*' "$dump"; then
                 consumed=$((consumed + 1))
               fi
-            done < <(${uutilsFindutils}/bin/find . -type f -name '*.profile' -print0)
+            done < <(${uutilsFindutils}/bin/find . -type f -name '*.opt.yaml' -print0)
             if ((consumed == 0)); then
-              echo "GCC did not report consuming nonzero PGO counters" >&2
+              echo "LLVM did not report applying nonzero PGO counts" >&2
               exit 1
             fi
-            printf 'PGO verified feedback in %s compiler profile dumps\n' "$consumed"
+            printf 'PGO verified feedback in %s optimization records\n' "$consumed"
 
             requiredFlags=(
-              -march=znver5 -mtune=znver5 -O3 -fno-plt -fipa-pta
-              "-fprofile-use=$pgoProfileDir"
+              -march=znver5 -mtune=znver5 -O3 -fno-plt
+              "-fprofile-use=$pgoProfileDir/profile.profdata"
             )
             for name in flags.make link.txt; do
               flags="CMakeFiles/xmrig.dir/$name"
@@ -270,11 +274,11 @@ _final: prev: {
                   exit 1
                 fi
               done
-              if ! ${ripgrep}/bin/rg --no-config -q -- '(^|[[:space:]])-flto(=[^[:space:]]+)?([[:space:]]|$)' "$flags"; then
-                echo "Missing final LTO flag in $flags" >&2
+              if ! ${ripgrep}/bin/rg --no-config -q -- '(^|[[:space:]])-flto=full([[:space:]]|$)' "$flags"; then
+                echo "Missing final full LTO flag in $flags" >&2
                 exit 1
               fi
-              if ${ripgrep}/bin/rg --no-config -q -- '-fprofile-generate|-fprofile-arcs|-ftest-coverage' "$flags"; then
+              if ${ripgrep}/bin/rg --no-config -q -- '-fprofile-(instr-)?generate|-fprofile-arcs|-ftest-coverage' "$flags"; then
                 echo "Profiling instrumentation remains enabled in $flags" >&2
                 exit 1
               fi
@@ -285,10 +289,10 @@ _final: prev: {
             # Detect added/deleted profiles and modified profile contents
             snapshot_profiles >"$NIX_BUILD_TOP/profiles.after.sha256"
             if ! ${uutilsDiffutils}/bin/cmp -s "$NIX_BUILD_TOP/profiles.before.sha256" "$NIX_BUILD_TOP/profiles.after.sha256"; then
-              echo "The optimized build or validation changed the gcda profile set" >&2
+              echo "The optimized build or validation changed the PGO profile set" >&2
               exit 1
             fi
-            echo "PGO profile set is unchanged after optimized validation"
+            echo "PGO raw and indexed profiles are unchanged after optimized validation"
           '';
         });
 }
