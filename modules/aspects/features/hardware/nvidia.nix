@@ -21,6 +21,13 @@
         videoAcceleration = true;
       };
 
+      # Load the NVIDIA display modules for COSMIC
+      boot.kernelModules = [
+        "nvidia"
+        "nvidia_modeset"
+        "nvidia_drm"
+      ];
+
       # VAAPI on NVIDIA
       environment.sessionVariables = {
         LIBVA_DRIVER_NAME = "nvidia";

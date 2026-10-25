@@ -14,7 +14,6 @@
     in
     {
       services.xserver = {
-        enable = isX86;
         videoDrivers = lib.optionals isX86 [ "nvidia" ];
         xkb = {
           layout = "us,cz";
