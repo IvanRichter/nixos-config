@@ -43,23 +43,6 @@
         useStockConfig = false;
 
         settings = {
-          # CFS latency tuning
-          cfsProfiles = {
-            default = {
-              latency = 4;
-              wakeup-granularity = 0.5;
-              bandwidth-size = 3;
-              preempt = "full";
-            };
-
-            responsive = {
-              latency = 2;
-              nr-latency = 6;
-              wakeup-granularity = 0.25;
-              bandwidth-size = 2;
-            };
-          };
-
           # Per-process scheduler control
           processScheduler = {
             refreshInterval = 30;
