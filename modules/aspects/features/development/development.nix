@@ -3,7 +3,6 @@
 {
   den.aspects.development = {
     nixpkgs-overlays = _: {
-      hk = import "${inputs.self}/overlays/development/hk.nix";
       bigframes = import "${inputs.self}/overlays/python/bigframes.nix";
       rust = inputs.rust-overlay.overlays.default;
     };
