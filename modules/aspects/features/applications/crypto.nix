@@ -1007,8 +1007,6 @@
       idleClient = (pkgs.swayidle.override { systemdSupport = false; }).overrideAttrs (old: {
         postPatch = (old.postPatch or "") + ''
           substituteInPlace main.c \
-            --replace-fail 'wl_registry_bind(registry, name, &ext_idle_notifier_v1_interface, 1)' \
-            '(version >= 2 ? wl_registry_bind(registry, name, &ext_idle_notifier_v1_interface, 2) : NULL)' \
             --replace-fail 'register_timeout(cmd, cmd->timeout, true);' \
             'register_timeout(cmd, cmd->timeout, false);' \
             --replace-fail 'if (cmd->resume_pending) {' 'if (false && cmd->resume_pending) {'
