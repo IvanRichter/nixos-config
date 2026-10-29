@@ -15,8 +15,6 @@
       den.aspects.rdp
       den.aspects.gcloud
       den.aspects.gws
-      den.aspects.lazysql
-      den.aspects.dbeaver
       den.aspects.tabularis
       den.aspects.macchina
       den.aspects.zellij
