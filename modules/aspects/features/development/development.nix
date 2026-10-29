@@ -59,7 +59,7 @@
           ghgrab
           hk
           act
-          actionlint
+          jactionlint
           shellcheck
           pinact
 
