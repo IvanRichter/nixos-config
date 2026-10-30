@@ -276,8 +276,8 @@
             "editor.inlayHints.enabled" = "offUnlessPressed";
             "js/ts.updateImportsOnFileMove.enabled" = "always";
             "oxc.enable.oxfmt" = true;
-            "oxc.enable.oxlint" = false;
-            "oxc.path.oxfmt" = "${pkgs.oxfmt}/bin/oxfmt";
+            "oxc.path.oxfmt" = "";
+            "oxc.path.oxlint" = "";
             "oxc.requireConfig" = false;
             "[nix]" = {
               "editor.defaultFormatter" = "jnoortheen.nix-ide";
