@@ -6,23 +6,14 @@
       vivaldi = import "${inputs.self}/overlays/browsers/vivaldi.nix";
     };
 
-    nixos =
-      { pkgs, lib, ... }:
-      let
-        isX86 = pkgs.stdenv.hostPlatform.system == "x86_64-linux";
-      in
-      {
-        programs.firefox.enable = true;
+    nixos = { pkgs, ... }: {
+      programs.firefox.enable = true;
 
-        environment.systemPackages =
-          with pkgs;
-          [
-            servo
-          ]
-          ++ lib.optionals isX86 [
-            tor-browser
-          ];
-      };
+      environment.systemPackages = with pkgs; [
+        servo
+        tor-browser
+      ];
+    };
     homeManager =
       { lib, pkgs, ... }:
       {
