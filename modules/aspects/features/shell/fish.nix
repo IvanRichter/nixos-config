@@ -27,11 +27,48 @@
             bind ctrl-right forward-word
           '';
 
+          gpf = {
+            description = "Force-push a branch with lease and inclusion checks";
+            body = ''
+              argparse 'h/help' -- $argv; or return 2
+              set -l usage 'Usage: gpf [REMOTE [BRANCH]]'
+              if set -q _flag_help
+                echo "$usage"
+                return 0
+              end
+              if test (count $argv) -gt 2
+                echo "$usage" >&2
+                return 2
+              end
+
+              set -l remote origin
+              if set -q argv[1]
+                set remote "$argv[1]"
+              end
+
+              set -l branch
+              if set -q argv[2]
+                set branch "$argv[2]"
+              else
+                set branch (git symbolic-ref --quiet --short HEAD)
+                or begin
+                  echo 'Check out a local branch or pass its name explicitly' >&2
+                  return 1
+                end
+              end
+              git check-ref-format "refs/heads/$branch"; or return 2
+
+              # Keep matching branch names and omit an expected SHA for the inclusion check
+              git push --force-with-lease="refs/heads/$branch" --force-if-includes \
+                -- "$remote" "refs/heads/$branch:refs/heads/$branch"
+            '';
+          };
+
           ghmerge = {
             description = "Squash-merge a PR while preserving authorship and sign-off trailers";
             body = ''
-              argparse 'h/help' 'b/body=' -- $argv; or return 2
-              set -l usage 'Usage: ghmerge PR_NUMBER [--body TEXT]'
+              argparse 'h/help' 'b/body=' 'bypass' -- $argv; or return 2
+              set -l usage 'Usage: ghmerge PR_NUMBER [--body TEXT] [--bypass]'
               if set -q _flag_help
                 echo "$usage"
                 return 0
@@ -86,10 +123,16 @@
               end
               set -l message (printf '%s\n\n%s' "$title" "$body" | string collect)
 
+              set -l bypass false
+              if set -q _flag_bypass
+                set bypass true
+              end
+
               set -l endpoint "repos/$repo/pulls/$argv[1]/merge-async"
               set -l result (gh api --method PUT "$endpoint" \
                 -f merge_method=squash \
                 -f merge_action=direct_merge \
+                -F "bypass_rules=$bypass" \
                 -f "sha=$sha" \
                 -f "commit_title=$title" \
                 -f "commit_message=$body")
