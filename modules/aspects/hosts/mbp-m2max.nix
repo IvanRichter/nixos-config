@@ -51,15 +51,8 @@
     hardware.asahi.enable = true;
     hardware.asahi.avd.vaapi-support = true;
 
-    # Avoid --impure until firmware can be loaded from the ESP at boot:
-    # https://github.com/nix-community/nixos-apple-silicon/issues/538
-    hardware.asahi.peripheralFirmwareDirectory =
-      (builtins.fetchTree {
-        type = "path";
-        path = "/boot/vendorfw";
-        # Refresh with `nix hash path /boot/vendorfw` after firmware changes
-        narHash = "sha256-ItcB63aNJUQV80uWJSeWBKjOjm+Sey+jgFvNTAmyYyE=";
-      }).outPath;
+    # Extract peripheral firmware from the ESP in the initrd
+    hardware.asahi.peripheralFirmwareDirectory = null;
 
     # Keyboard / input
     boot.kernelModules = [
