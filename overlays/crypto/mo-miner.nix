@@ -7,6 +7,14 @@ let
 
   dpcpp = prev.pkgsCuda.intel-llvm;
   toolkit = dpcpp.unified-runtime.setupVars.CUDA_PATH;
+  # Intel LLVM ships SYCL resources but omits the host profiling runtime
+  clangResources = prev.symlinkJoin {
+    name = "mo-miner-clang-resources";
+    paths = [
+      "${lib.getLib dpcpp.unwrapped}/lib/clang/${dpcpp.llvmMajorVersion}"
+      dpcpp.baseLlvm.compiler-rt
+    ];
+  };
 in
 {
   mo-miner = dpcpp.stdenv.mkDerivation {
@@ -39,6 +47,7 @@ in
       MOM_CPU_MARCH = "znver5";
       MOM_LTO = "full";
       CUDA_PATH = toolkit;
+      NIX_CFLAGS_LINK = "-resource-dir=${clangResources}";
     };
     postPatch = ''
       ${uutils}/bin/cat >thermal.js <<'EOF'
@@ -134,8 +143,7 @@ in
       runHook preConfigure
       export HOME="$TMPDIR" npm_config_nodedir=${prev.nodejs}
       export CXXFLAGS="-fvisibility=hidden --cuda-path=${toolkit}"
-      # Match the target dir of Intel LLVM's bundled profiling runtime
-      export LDFLAGS="--target=x86_64-pc-linux-gnu -fuse-ld=lld --cuda-path=${toolkit}"
+      export LDFLAGS="-fuse-ld=lld --cuda-path=${toolkit}"
       export PATH="${toolkit}/bin:$PATH"
       runHook postConfigure
     '';
