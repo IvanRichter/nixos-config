@@ -54,14 +54,6 @@ prev.lib.optionalAttrs prev.stdenv.hostPlatform.isLinux {
   # Use OpenSSL through native-tls
   tabularis = prev.tabularis.overrideAttrs (
     finalAttrs: old: {
-      version = "0.30.0";
-      src = prev.fetchFromGitHub {
-        owner = "TabularisDB";
-        repo = "tabularis";
-        tag = "v${finalAttrs.version}";
-        hash = "sha256-KV/u7H56bqyN49lmhL9iz3H3IUCQdtg4NpcxgBg+mso=";
-      };
-
       postPatch = (old.postPatch or "") + enableNativeTls;
       cargoHash = "sha256-3i7iz3LzBbLZSN27tUIHya0myuYuiI1F5IN6tWP51/o=";
       cargoDeps = prev.rustPlatform.fetchCargoVendor {
@@ -74,16 +66,6 @@ prev.lib.optionalAttrs prev.stdenv.hostPlatform.isLinux {
         postPatch = enableNativeTls;
         hash = finalAttrs.cargoHash;
       };
-
-      pnpmDeps = old.pnpmDeps.override {
-        inherit (finalAttrs) src version;
-        hash = "sha256-kucuLDfHJ1ckEyYRPWXNBb9Vj6KmDhnOsdv+dU2VkFU=";
-      };
-
-      # HTTP client tests need a CA bundle in the build sandbox
-      preCheck = (old.preCheck or "") + ''
-        export SSL_CERT_FILE=${prev.cacert}/etc/ssl/certs/ca-bundle.crt
-      '';
     }
   );
 
