@@ -1,7 +1,6 @@
 final: prev:
 let
   llvm = final.llvmPackages_latest;
-  bindgen = final.rust-bindgen-unwrapped.override { clang = llvm.clang; };
 in
 prev.lib.optionalAttrs (prev.stdenv.hostPlatform.system == "x86_64-linux") {
   linuxPackages_latest = final.linuxPackagesFor (
@@ -11,11 +10,6 @@ prev.lib.optionalAttrs (prev.stdenv.hostPlatform.system == "x86_64-linux") {
           bintools = llvm.bintools;
         }
       );
-
-      buildLinux = final.buildLinux.override {
-        rust-bindgen-unwrapped = bindgen;
-        callPackage = final.newScope { rust-bindgen-unwrapped = bindgen; };
-      };
 
       extraMakeFlags = (args.extraMakeFlags or [ ]) ++ [
         "LLVM=1"
