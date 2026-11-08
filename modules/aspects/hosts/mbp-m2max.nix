@@ -49,6 +49,7 @@
 
     # Firmware
     hardware.asahi.enable = true;
+    hardware.asahi.avd.codecs = [ "all" ];
     hardware.asahi.avd.vaapi-support = true;
 
     # Extract peripheral firmware from the ESP in the initrd
