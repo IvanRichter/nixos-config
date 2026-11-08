@@ -11,7 +11,7 @@ prev.lib.optionalAttrs (prev.stdenv.hostPlatform.system == "aarch64-linux") {
             (prev.stdenv.mkDerivation args).overrideAttrs (old: {
               src = final.fetchurl {
                 url = prev.lib.replaceStrings [ "_amd64.deb" ] [ "_arm64.deb" ] old.src.url;
-                hash = "sha256-zhQaEDBR4iComDndXchREXKuW5iejem9oOB8NLC3cCw=";
+                hash = "sha256-4XYHfBeXfqL2nJPhCCE4ay9C+qW5I9X5vToS4ZzjsEA=";
               };
             });
         };
