@@ -17,6 +17,7 @@
       utils
       games
       ai
+      claude
       codex
       cli
       comms
