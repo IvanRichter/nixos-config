@@ -64,6 +64,62 @@
             '';
           };
 
+          ghci = {
+            description = "Run the complete CI workflow for a PR's current revision";
+            body = ''
+              argparse 'h/help' -- $argv; or return 2
+              set -l usage 'Usage: ghci PR_NUMBER'
+              if set -q _flag_help
+                echo "$usage"
+                return 0
+              end
+              if test (count $argv) -ne 1; or not string match -rq '^[1-9][0-9]*$' -- $argv[1]
+                echo "$usage" >&2
+                return 2
+              end
+
+              set -l jq ${pkgs.jq}/bin/jq
+              set -l repo (gh repo view --json nameWithOwner --jq .nameWithOwner); or return 1
+              set -l pr (gh api "repos/$repo/pulls/$argv[1]"); or return 1
+              if not printf '%s' "$pr" | $jq -e '.state == "open" and (.draft == false or .user.id == 13511443)' >/dev/null
+                echo 'The PR must be open; draft CI is available only for IvanRichter.' >&2
+                return 1
+              end
+
+              set -l sha (printf '%s' "$pr" | $jq -r .head.sha)
+              # Failed and pending checks return nonzero statuses with valid JSON
+              set -l checks (gh pr checks "$argv[1]" --repo "$repo" --json workflow,link)
+              if test -z "$checks"
+                return 1
+              end
+              set -l run_id (printf '%s' "$checks" | $jq -er \
+                '[.[] | select(.workflow == "Continuous integration") | .link | capture("/actions/runs/(?<id>[0-9]+)").id | tonumber] | max // empty')
+              or begin
+                echo 'No CI run is available for this PR yet. Wait for GitHub or update the PR description to create a fresh run.' >&2
+                return 1
+              end
+              set -l run (gh api "repos/$repo/actions/runs/$run_id"); or return 1
+              if not printf '%s' "$run" | $jq -e --arg sha "$sha" \
+                '.path == ".github/workflows/ci.yaml" and .event == "pull_request" and .head_sha == $sha' >/dev/null
+                echo 'No CI run matches the current PR revision. Refresh and retry.' >&2
+                return 1
+              end
+              set -l url (printf '%s' "$run" | $jq -r .html_url)
+              if test (printf '%s' "$run" | $jq -r .status) != completed
+                echo "CI is already active: $url"
+                return 0
+              end
+
+              # Rerun every job so deferred checks are evaluated again
+              gh run rerun "$run_id" --repo "$repo"
+              or begin
+                echo 'GitHub only permits reruns within 30 days. Update the PR description for a fresh run if this one has expired.' >&2
+                return 1
+              end
+              printf 'CI requested for #%s at %s\n%s\n' "$argv[1]" "$sha" "$url"
+            '';
+          };
+
           ghmerge = {
             description = "Squash-merge a PR while preserving authorship and sign-off trailers";
             body = ''
@@ -85,12 +141,17 @@
                 echo 'Merge the lowest unmerged PR in the stack first' >&2
                 return 1
               end
-              if not printf '%s' "$pr" | $jq -e '.state == "open" and .draft == false' >/dev/null
-                echo 'The PR must be open and ready for review.' >&2
+              if not printf '%s' "$pr" | $jq -e '.state == "open"' >/dev/null
+                echo 'The PR must be open.' >&2
                 return 1
               end
 
               set -l author_id (printf '%s' "$pr" | $jq -r .user.id)
+              if not set -q _flag_bypass; and test (printf '%s' "$pr" | $jq -r .draft) = true
+                echo 'The PR must be ready for review, or use --bypass to mark it ready before merging.' >&2
+                return 1
+              end
+
               set -l title (printf '%s' "$pr" | $jq -r '.title + " (#" + (.number | tostring) + ")"')
               set -l sha (printf '%s' "$pr" | $jq -r .head.sha)
               set -l count (printf '%s' "$pr" | $jq -r .commits)
@@ -126,6 +187,10 @@
               set -l bypass false
               if set -q _flag_bypass
                 set bypass true
+              end
+
+              if test (printf '%s' "$pr" | $jq -r .draft) = true
+                gh pr ready "$argv[1]" --repo "$repo"; or return 1
               end
 
               set -l endpoint "repos/$repo/pulls/$argv[1]/merge-async"
