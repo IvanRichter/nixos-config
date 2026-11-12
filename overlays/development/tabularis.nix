@@ -71,7 +71,7 @@ prev.lib.optionalAttrs prev.stdenv.hostPlatform.isLinux {
 
   tabularis-sqlserver-plugin = prev.stdenvNoCC.mkDerivation (finalAttrs: {
     pname = "tabularis-sqlserver-plugin";
-    version = "1.0.0-beta.4";
+    version = "1.0.1";
 
     src =
       let
@@ -79,11 +79,11 @@ prev.lib.optionalAttrs prev.stdenv.hostPlatform.isLinux {
           {
             aarch64-linux = {
               arch = "arm64";
-              hash = "sha256-clDiWuw5Uf5Fi7ZkPd3LUXi7XBzF1v7/hQN+jKYtTyI=";
+              hash = "sha256-CX2p81KgTgri6mOOykKvWv39jh+0Rpa9buZx1bz9yI0=";
             };
             x86_64-linux = {
               arch = "x64";
-              hash = "sha256-iPZEMZwNmJek2lnbfGI69NpVmb/iDkwOV3Saia3m8J0=";
+              hash = "sha256-Dxf7wTfC8ZzeG+ydFgkGVV4/VeBPpEQgfAP+axQV0yY=";
             };
           }
           .${prev.stdenv.hostPlatform.system};
