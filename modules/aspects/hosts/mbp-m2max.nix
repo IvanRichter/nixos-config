@@ -52,9 +52,6 @@
     hardware.asahi.avd.codecs = [ "all" ];
     hardware.asahi.avd.vaapi-support = true;
 
-    # Extract peripheral firmware from the ESP in the initrd
-    hardware.asahi.peripheralFirmwareDirectory = null;
-
     # Keyboard / input
     boot.kernelModules = [
       "hid_apple"
