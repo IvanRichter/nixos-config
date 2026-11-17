@@ -17,14 +17,23 @@
 
   den.schema.user.classes = lib.mkDefault [ "homeManager" ];
 
-  den.schema.host = { lib, ... }: {
-    options.isLaptop = lib.mkEnableOption "laptop-specific configuration";
+  den.schema.host = {
+    includes = [
+      den.batteries.user-aspects
+      den.batteries.mutual-provider
+    ];
 
-    options.sharedHomePkgs = lib.mkOption {
-      type = lib.types.bool;
-      default = true;
-      description = "Whether Home Manager uses the host's package set";
-    };
+    imports = [
+      ({ lib, ... }: {
+        options.isLaptop = lib.mkEnableOption "laptop-specific configuration";
+
+        options.sharedHomePkgs = lib.mkOption {
+          type = lib.types.bool;
+          default = true;
+          description = "Whether Home Manager uses the host's package set";
+        };
+      })
+    ];
   };
 
   den.hosts.x86_64-linux.desktop = {
@@ -49,26 +58,24 @@
         };
       };
     }
-    (
-      { user, ... }:
-      {
-        name = "home-manager-service/${user.userName}";
+    {
+      name = "home-manager-service";
 
-        nixos =
-          {
-            config,
-            lib,
-            utils,
-            ...
-          }:
-          lib.mkIf (lib.elem "homeManager" user.classes && !config.home-manager.startAsUserService) {
-            systemd.services."home-manager-${utils.escapeSystemdPath user.userName}" = {
-              after = [ "network-online.target" ];
-              wants = [ "network-online.target" ];
-              serviceConfig.TimeoutStartSec = lib.mkForce "10min";
-            };
+      nixos =
+        {
+          user,
+          config,
+          lib,
+          utils,
+          ...
+        }:
+        lib.mkIf (lib.elem "homeManager" user.classes && !config.home-manager.startAsUserService) {
+          systemd.services."home-manager-${utils.escapeSystemdPath user.userName}" = {
+            after = [ "network-online.target" ];
+            wants = [ "network-online.target" ];
+            serviceConfig.TimeoutStartSec = lib.mkForce "10min";
           };
-      }
-    )
+        };
+    }
   ];
 }
