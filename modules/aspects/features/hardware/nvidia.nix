@@ -12,6 +12,9 @@
         ];
       };
 
+      # Enable the NVIDIA driver
+      services.xserver.videoDrivers = [ "nvidia" ];
+
       # Userspace and open kernel module
       hardware.nvidia = {
         branch = "bleeding_edge";

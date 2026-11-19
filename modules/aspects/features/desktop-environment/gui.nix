@@ -2,19 +2,10 @@
 
 {
   den.aspects.gui.nixos =
-    {
-      config,
-      lib,
-      pkgs,
-      ...
-    }:
+    { config, ... }:
 
-    let
-      isX86 = pkgs.stdenv.hostPlatform.system == "x86_64-linux";
-    in
     {
       services.xserver = {
-        videoDrivers = lib.optionals isX86 [ "nvidia" ];
         xkb = {
           layout = "us,cz";
           variant = ",qwerty";
