@@ -1,6 +1,8 @@
 { den, ... }:
 
 {
+  den.aspects.razer.provides.to-users.user.extraGroups = [ "openrazer" ];
+
   den.aspects.razer.nixos =
     {
       config,
@@ -29,7 +31,5 @@
       environment.systemPackages = with pkgs; [
         polychromatic
       ];
-
-      hardware.openrazer.users = [ "ivan" ];
     };
 }
