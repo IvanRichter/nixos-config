@@ -18,10 +18,7 @@
   den.schema.user.classes = lib.mkDefault [ "homeManager" ];
 
   den.schema.host = {
-    includes = [
-      den.batteries.user-aspects
-      den.batteries.mutual-provider
-    ];
+    includes = [ den.batteries.mutual-provider ];
 
     imports = [
       ({ lib, ... }: {

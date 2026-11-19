@@ -5,7 +5,7 @@
     onlyoffice = import "${inputs.self}/overlays/office/onlyoffice-desktopeditors.nix";
   };
 
-  den.aspects.office.nixos.programs.onlyoffice.enable = true;
+  den.aspects.office.provides.to-hosts.nixos.programs.onlyoffice.enable = true;
 
   den.aspects.office.homeManager =
     { pkgs, lib, ... }:
