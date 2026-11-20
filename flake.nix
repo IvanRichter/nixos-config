@@ -25,6 +25,7 @@
 
     # Asahi/Apple Silicon support
     apple-silicon.url = "github:nix-community/nixos-apple-silicon";
+    apple-silicon.inputs.nixpkgs.follows = "nixpkgs";
 
     # nix-index prebuilt database + comma runner
     nix-index-database.url = "github:nix-community/nix-index-database";
