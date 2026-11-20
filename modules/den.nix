@@ -68,8 +68,6 @@
         }:
         lib.mkIf (lib.elem "homeManager" user.classes && !config.home-manager.startAsUserService) {
           systemd.services."home-manager-${utils.escapeSystemdPath user.userName}" = {
-            after = [ "network-online.target" ];
-            wants = [ "network-online.target" ];
             serviceConfig.TimeoutStartSec = lib.mkForce "10min";
           };
         };
