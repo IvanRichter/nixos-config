@@ -20,17 +20,13 @@
   den.schema.host = {
     includes = [ den.batteries.mutual-provider ];
 
-    imports = [
-      ({ lib, ... }: {
-        options.isLaptop = lib.mkEnableOption "laptop-specific configuration";
+    options.isLaptop = lib.mkEnableOption "laptop-specific configuration";
 
-        options.sharedHomePkgs = lib.mkOption {
-          type = lib.types.bool;
-          default = true;
-          description = "Whether Home Manager uses the host's package set";
-        };
-      })
-    ];
+    options.sharedHomePkgs = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = "Whether Home Manager uses the host's package set";
+    };
   };
 
   den.hosts.x86_64-linux.desktop = {
