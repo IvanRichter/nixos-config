@@ -17,9 +17,6 @@
   den.aspects.mbp-m2max.nixos = {
     imports = [ "${inputs.self}/hardware/mbp-m2max/hardware-configuration.nix" ];
 
-    # Platform & licensing
-    nixpkgs.hostPlatform = "aarch64-linux";
-
     # SSH
     services.openssh.enable = true;
 
@@ -92,9 +89,6 @@
       SUBSYSTEM=="usb", TEST=="power/wakeup", ATTR{power/wakeup}="disabled"
       SUBSYSTEM=="bluetooth", TEST=="power/wakeup", ATTR{power/wakeup}="disabled"
     '';
-
-    # Run fsck in initrd if journal looks dirty
-    boot.initrd.checkJournalingFS = true;
   };
 
   den.aspects.apple-silicon.nixos.imports = [
