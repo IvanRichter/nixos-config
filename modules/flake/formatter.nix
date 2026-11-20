@@ -9,6 +9,6 @@
   perSystem =
     { system, ... }:
     {
-      formatter = inputs.nixpkgs.legacyPackages.${system}.nixfmt;
+      formatter = inputs.nixpkgs.legacyPackages.${system}.nixfmt-tree;
     };
 }
