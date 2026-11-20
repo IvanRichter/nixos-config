@@ -20,8 +20,8 @@
         # Prefer Wayland client on Wayland
         if [ "''${RDP_FORCE_X11:-0}" = "1" ]; then
           client=xfreerdp
-        elif [ -n "''${WAYLAND_DISPLAY:-}" ] && command -v sdl-freerdp3 >/dev/null 2>&1; then
-          client=sdl-freerdp3
+        elif [ -n "''${WAYLAND_DISPLAY:-}" ] && command -v sdl-freerdp >/dev/null 2>&1; then
+          client=sdl-freerdp
         else
           client=xfreerdp
         fi
