@@ -69,14 +69,6 @@
       "appledrm.show_notch=1"
     ];
 
-    # Align systemd sleep with kernel
-    systemd.sleep.settings = {
-      Sleep = {
-        SuspendState = "mem";
-        SuspendMode = "s2idle";
-      };
-    };
-
     # Lid behavior
     services.logind.settings = {
       Login = {
@@ -100,21 +92,6 @@
       SUBSYSTEM=="usb", TEST=="power/wakeup", ATTR{power/wakeup}="disabled"
       SUBSYSTEM=="bluetooth", TEST=="power/wakeup", ATTR{power/wakeup}="disabled"
     '';
-
-    # -- Sleep hook --
-    environment.etc."systemd/system-sleep/10-safe-suspend".text = ''
-      #!/bin/sh
-      set -eu
-      case "$1" in
-        pre)
-          sync
-          ;;
-        post)
-          :
-          ;;
-      esac
-    '';
-    environment.etc."systemd/system-sleep/10-safe-suspend".mode = "0755";
 
     # Run fsck in initrd if journal looks dirty
     boot.initrd.checkJournalingFS = true;
