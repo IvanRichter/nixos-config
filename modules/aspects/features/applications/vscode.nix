@@ -308,8 +308,7 @@
             "rust-analyzer.procMacro.enable" = false;
             "rust-analyzer.rustfmt.overrideCommand" = [ "${rustFormatter}" ];
             "nix.formatterPath" = [ "${pkgs.nixfmt}/bin/nixfmt" ];
-            "editor.fontFamily" =
-              "'JetBrainsMono Nerd Font', 'MesloLGS Nerd Font', 'Droid Sans Mono', 'monospace'";
+            "editor.fontFamily" = "'${config.stylix.fonts.monospace.name}', monospace";
             "workbench.colorTheme" = "One Dark Pro Night Flat";
 
             "extensions.autoUpdate" = "off";
