@@ -15,11 +15,7 @@
       services.flatpak.enable = false;
       xdg.portal.enable = true;
 
-      environment.sessionVariables = {
-        NIXOS_OZONE_WL = "1";
-        ELECTRON_OZONE_PLATFORM_HINT = "wayland";
-        MOZ_ENABLE_WAYLAND = "1";
-      };
+      environment.sessionVariables.NIXOS_OZONE_WL = "1";
 
       environment.variables = {
         GDK_SCALE = "1";
