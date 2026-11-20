@@ -94,7 +94,6 @@
       powerManagement.cpuFreqGovernor = "performance";
       boot.kernelParams = [
         "amd_pstate=active"
-        "amd_iommu=on"
         "iommu=pt"
       ];
     };
