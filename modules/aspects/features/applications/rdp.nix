@@ -52,7 +52,7 @@
         [ "''${NO_AUTO_HIDPI:-0}" = "1" ] && force_zoom=0
 
         # Clipboard + dynamic res + local drive mapping for reliable file transfer
-        base_flags=(/sec:nla /cert:ignore +clipboard /dynamic-resolution)
+        base_flags=(/sec:nla /cert:tofu +clipboard /dynamic-resolution)
         drive_flags=()
         if [ "''${RDP_NO_DRIVES:-0}" != "1" ]; then
           drive_flags+=("/drive:home,''${HOME}") # \\tsclient\home
@@ -66,7 +66,7 @@
           scale_flags=(/smart-sizing)
           [ -n "''${RDP_SMART_SIZE:-}" ] && scale_flags+=("/size:''${RDP_SMART_SIZE}") # e.g. 1920x1200
           # smart-sizing fights dynamic-resolution; drop it here
-          base_flags=(/sec:nla /cert:ignore +clipboard)
+          base_flags=(/sec:nla /cert:tofu +clipboard)
           ;;
         *)
           if [ -n "''${RDP_SCALE_DISPLAY-}''${RDP_SCALE_DESKTOP-}''${RDP_SCALE_DEVICE-}" ]; then
