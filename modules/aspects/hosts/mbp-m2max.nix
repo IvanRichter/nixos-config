@@ -7,6 +7,7 @@
 {
   den.aspects.mbp-m2max.includes = with den.aspects; [
     workstation
+    laptop
     apple-silicon
   ];
 
@@ -66,20 +67,11 @@
       "appledrm.show_notch=1"
     ];
 
-    # Lid behavior
-    services.logind.settings = {
-      Login = {
-        HandleLidSwitch = "suspend";
-        HandleLidSwitchExternalPower = "suspend";
-        HandleLidSwitchDocked = "suspend";
-        IdleAction = "ignore";
-        LidSwitchIgnoreInhibited = false;
-        KillUserProcesses = true;
-      };
+    # Session behavior
+    services.logind.settings.Login = {
+      IdleAction = "ignore";
+      KillUserProcesses = true;
     };
-
-    # Power profiles
-    services.power-profiles-daemon.enable = true;
 
     # Disable OOM killer
     systemd.oomd.enable = false;

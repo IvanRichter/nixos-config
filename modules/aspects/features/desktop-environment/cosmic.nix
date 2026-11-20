@@ -43,7 +43,7 @@
         ...
       }:
       let
-        inherit (host) isLaptop;
+        isLaptop = host.hasAspect den.aspects.laptop;
         roundCornerRadii = ''
           (
               radius_0: (0.0, 0.0, 0.0, 0.0),

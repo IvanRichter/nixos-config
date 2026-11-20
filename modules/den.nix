@@ -20,8 +20,6 @@
   den.schema.host = {
     includes = [ den.batteries.mutual-provider ];
 
-    options.isLaptop = lib.mkEnableOption "laptop-specific configuration";
-
     options.sharedHomePkgs = lib.mkOption {
       type = lib.types.bool;
       default = true;
@@ -36,7 +34,6 @@
 
   den.hosts.aarch64-linux.mbp-m2max = {
     hostName = "mbp-nixos";
-    isLaptop = true;
     users.ivan = { };
   };
 
