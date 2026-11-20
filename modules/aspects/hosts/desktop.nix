@@ -91,6 +91,12 @@
         ];
       };
 
+      # sched_ext scheduler, switch or stop it at runtime with scxctl
+      services.scx-loader = {
+        enable = true;
+        config.default_sched = "scx_lavd";
+      };
+
       powerManagement.cpuFreqGovernor = "performance";
       boot.kernelParams = [
         "amd_pstate=active"
