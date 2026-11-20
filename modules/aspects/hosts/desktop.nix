@@ -28,16 +28,6 @@
 
       console.keyMap = "us";
 
-      boot.loader = {
-        systemd-boot.enable = false;
-        efi.canTouchEfiVariables = true;
-        limine = {
-          enable = true;
-          efiSupport = true;
-          biosSupport = false;
-        };
-      };
-
       # Desktop tuning
       services.system76-scheduler = {
         useStockConfig = false;

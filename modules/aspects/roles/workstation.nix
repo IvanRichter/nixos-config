@@ -28,6 +28,17 @@
     ];
 
     nixos = { lib, ... }: {
+      boot.loader = {
+        systemd-boot.enable = false;
+        efi.canTouchEfiVariables = true;
+        limine = {
+          enable = true;
+          efiSupport = true;
+          biosSupport = false;
+          maxGenerations = 5;
+        };
+      };
+
       documentation.man.enable = false;
 
       i18n.defaultLocale = "en_US.UTF-8";

@@ -20,18 +20,6 @@
     # Platform & licensing
     nixpkgs.hostPlatform = "aarch64-linux";
 
-    # Bootloader
-    boot.loader = {
-      systemd-boot.enable = false;
-      efi.canTouchEfiVariables = true;
-      limine = {
-        enable = true;
-        efiSupport = true;
-        biosSupport = false;
-        maxGenerations = 15;
-      };
-    };
-
     # SSH
     services.openssh.enable = true;
 
