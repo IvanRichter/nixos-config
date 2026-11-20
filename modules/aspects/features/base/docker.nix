@@ -16,8 +16,6 @@
       virtualisation.docker = {
         enable = true;
         enableOnBoot = false;
-        # Make BuildKit the default
-        daemon.settings.features.buildkit = true;
       };
 
       systemd.services.docker = {
@@ -29,7 +27,5 @@
       boot.binfmt = lib.mkIf isAarch64 {
         emulatedSystems = [ "x86_64-linux" ];
       };
-
-      environment.systemPackages = [ pkgs.docker-buildx ];
     };
 }
