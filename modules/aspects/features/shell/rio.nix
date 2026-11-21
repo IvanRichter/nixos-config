@@ -2,12 +2,13 @@
 
 {
   den.aspects.rio.homeManager =
-    { ... }:
+    { config, lib, ... }:
 
     {
       programs.rio = {
         enable = true;
         settings = {
+          colors.light-black = lib.mkForce config.lib.stylix.colors.withHashtag.base04;
           cursor = {
             shape = "beam";
           };
