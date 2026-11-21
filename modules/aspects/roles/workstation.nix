@@ -4,6 +4,7 @@
   den.aspects.workstation = {
     includes = with den.aspects; [
       nix
+      users
       fonts
       graphics
       stylix
