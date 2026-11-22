@@ -2,10 +2,14 @@
 
 {
   den.aspects.video = {
-    nixos = { pkgs, ... }: {
+    nixos = { host, pkgs, ... }: {
+      programs.vlc = {
+        enable = true;
+        chromecast.openFirewall = host.hasAspect den.aspects.laptop;
+      };
+
       environment.systemPackages = with pkgs; [
         ffmpeg-full
-        vlc
         stremio-linux-shell
       ];
     };
