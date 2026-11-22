@@ -23,6 +23,11 @@
       flake = false;
     };
 
+    avoid-ai-writing = {
+      url = "github:conorbronsdon/avoid-ai-writing";
+      flake = false;
+    };
+
     # Asahi/Apple Silicon support
     apple-silicon.url = "github:nix-community/nixos-apple-silicon";
     apple-silicon.inputs.nixpkgs.follows = "nixpkgs";

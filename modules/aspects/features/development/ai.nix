@@ -129,11 +129,21 @@
             cp -R "${inputs.humanizer}" humanizer
             installSkill humanizer
           '';
+      avoidAiWriting =
+        pkgs.runCommand "avoid-ai-writing-skills"
+          {
+            pname = "avoid-ai-writing";
+            nativeBuildInputs = [ pkgs.installAgentSkills ];
+          }
+          ''
+            installSkill "${inputs.avoid-ai-writing}/skills/avoid-ai-writing"
+          '';
       skills =
         pkgs.lib.genAttrs agentSkillNames (name: "${agentSkills}/share/skills/agent-skills/${name}")
         // {
           gh-stack = "${pkgs.gh-stack}/share/skills/gh-stack/gh-stack";
           humanizer = "${humanizer}/share/skills/humanizer/humanizer";
+          avoid-ai-writing = "${avoidAiWriting}/share/skills/avoid-ai-writing/avoid-ai-writing";
         };
     in
     {
