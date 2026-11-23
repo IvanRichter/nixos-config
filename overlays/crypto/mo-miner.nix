@@ -19,12 +19,12 @@ in
 {
   mo-miner = dpcpp.stdenv.mkDerivation {
     pname = "mo-miner";
-    version = "0.9.4";
+    version = "0.9.5";
     src = prev.fetchFromGitHub {
       owner = "MoneroOcean";
       repo = "mo-miner";
-      tag = "v0.9.4";
-      hash = "sha256-0gosDa0Kfs11+TZU0AzecjRCE2p4NRjgTXAiYMNtJtQ=";
+      tag = "v0.9.5";
+      hash = "sha256-XbGJy0LvnoZikpf9aVn+h5YftAGgNpkiJT+aWJvAMWY=";
     };
     nativeBuildInputs = [
       dpcpp.baseLlvm.bintools
