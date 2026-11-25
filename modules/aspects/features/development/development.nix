@@ -62,6 +62,7 @@
           google-cloud-sql-proxy
           terraform
           pulumi-bin
+          prometheus.cli
           ansible
 
           # Git & CI
