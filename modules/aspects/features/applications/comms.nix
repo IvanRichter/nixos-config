@@ -10,6 +10,17 @@
       ];
     };
 
-    homeManager.programs.vesktop.enable = true;
+    homeManager.programs.vesktop = {
+      enable = true;
+      vencord = {
+        useSystem = true;
+        mutableSettings = true;
+        settings = {
+          autoUpdate = false;
+          autoUpdateNotification = false;
+          plugins.NoTrack.disableAnalytics = true;
+        };
+      };
+    };
   };
 }

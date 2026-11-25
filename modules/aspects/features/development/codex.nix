@@ -2,6 +2,9 @@
 
 let
   systemSettings = {
+    analytics.enabled = false;
+    feedback.enabled = false;
+    check_for_update_on_startup = false;
     model_reasoning_effort = "max";
     personality = "pragmatic";
     service_tier = "default";

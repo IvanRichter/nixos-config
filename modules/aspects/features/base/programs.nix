@@ -15,6 +15,10 @@
         npm = {
           enable = true;
           package = pkgs.nodejs_latest;
+          npmrc = ''
+            prefix = ''${HOME}/.npm
+            update-notifier = false
+          '';
         };
 
         obs-studio.enable = true;

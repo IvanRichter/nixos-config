@@ -46,6 +46,7 @@
       time.timeZone = "Europe/Prague";
 
       services.fwupd.enable = true;
+      systemd.timers.fwupd-refresh.enable = false;
 
       services.fstrim = {
         enable = true;

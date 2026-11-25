@@ -159,6 +159,7 @@
           userSettings = {
             "chat.disableAIFeatures" = true;
             "gitlens.ai.enabled" = false;
+            "gitlens.telemetry.enabled" = false;
             "gitlens.gitkraken.mcp.autoEnabled" = false;
             "gitlens.plusFeatures.enabled" = false;
             "gitlens.cloudPatches.enabled" = false;
@@ -260,6 +261,7 @@
             "vue.welcome.show" = false;
             "markdown-preview-enhanced.liveUpdate" = false;
             "docker.lsp.experimental.vulnerabilityScanning" = false;
+            "docker.lsp.telemetry" = "off";
             "errorLens.enabledDiagnosticLevels" = [
               "error"
               "warning"

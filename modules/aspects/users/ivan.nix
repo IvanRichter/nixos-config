@@ -42,6 +42,10 @@
         openDefaultPorts = true;
         overrideDevices = false;
         overrideFolders = false;
+        settings.options = {
+          urAccepted = -1;
+          crashReportingEnabled = false;
+        };
       };
 
       security.sudo-rs.enable = true;

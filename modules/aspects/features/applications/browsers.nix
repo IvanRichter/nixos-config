@@ -7,7 +7,55 @@
     };
 
     nixos = { pkgs, ... }: {
-      programs.firefox.enable = true;
+      programs.firefox = {
+        enable = true;
+        policies = {
+          CaptivePortal = false;
+          DisableFirefoxStudies = true;
+          DisableTelemetry = true;
+          FirefoxHome = {
+            SponsoredTopSites = false;
+            SponsoredStories = false;
+            Stories = false;
+            Weather = false;
+            Locked = true;
+          };
+          FirefoxSuggest = {
+            WebSuggestions = false;
+            SponsoredSuggestions = false;
+            ImproveSuggest = false;
+            OnlineEnabled = false;
+            Locked = true;
+          };
+          UserMessaging = {
+            ExtensionRecommendations = false;
+            FeatureRecommendations = false;
+            FirefoxLabs = false;
+            MoreFromMozilla = false;
+            WhatsNew = false;
+            Locked = true;
+          };
+        };
+      };
+      environment.sessionVariables.MOZ_CRASHREPORTER_DISABLE = "1";
+
+      programs.chromium = {
+        enable = true;
+        extraOpts = {
+          MetricsReportingEnabled = false;
+          UrlKeyedAnonymizedDataCollectionEnabled = false;
+          DomainReliabilityAllowed = false;
+          ChromeVariations = 2;
+          FeedbackSurveysEnabled = false;
+          SpellCheckServiceEnabled = false;
+        };
+      };
+
+      # Vivaldi has no setting for its daily user-count ping, update check, or crash reports
+      networking.hosts."0.0.0.0" = [
+        "update.vivaldi.com"
+        "crash.vivaldi.com"
+      ];
 
       environment.systemPackages = with pkgs; [
         servo

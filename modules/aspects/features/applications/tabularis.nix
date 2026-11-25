@@ -281,5 +281,23 @@
 
         trap - EXIT
       '';
+
+      home.activation.tabularisUpdateChecks = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+        config_file="''${XDG_CONFIG_HOME:-$HOME/.config}/tabularis/config.json"
+        jaq=${lib.getExe pkgs.jaq}
+        filter='.checkForUpdates = false | .autoCheckUpdatesOnStartup = false'
+
+        if [ ! -e "$config_file" ]; then
+          install -d "$(dirname "$config_file")"
+          $jaq -n "{} | $filter" > "$config_file"
+        elif [ "$($jaq '[.checkForUpdates, .autoCheckUpdatesOnStartup] == [false, false]' "$config_file")" != true ]; then
+          tmp=$(mktemp "$config_file.XXXXXX")
+          if $jaq "$filter" "$config_file" > "$tmp"; then
+            mv "$tmp" "$config_file"
+          else
+            rm -f "$tmp"
+          fi
+        fi
+      '';
     };
 }

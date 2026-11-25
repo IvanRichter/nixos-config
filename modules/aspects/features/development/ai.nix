@@ -2,6 +2,8 @@
 
 {
   den.aspects.ai.nixos = { pkgs, ... }: {
+    environment.sessionVariables.T3CODE_TELEMETRY_ENABLED = "false";
+
     environment.systemPackages =
       let
         isX86 = pkgs.stdenv.hostPlatform.system == "x86_64-linux";
@@ -77,7 +79,12 @@
   };
 
   den.aspects.ai.homeManager =
-    { config, pkgs, ... }:
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
     let
       agentSkillEntries = builtins.readDir "${inputs.agent-skills}/skills";
       agentSkillNames = builtins.attrNames (
@@ -163,6 +170,7 @@
 
       programs.t3code = {
         enable = true;
+        userSettings.enableProviderUpdateChecks = false;
 
         clientSettings = {
           notificationMode = "notifications";
@@ -171,5 +179,20 @@
           fontFamilySans = config.stylix.fonts.sansSerif.name;
         };
       };
+
+      # LM Studio rewrites settings.json at runtime
+      home.activation.lmstudioSettings = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+        settings="$HOME/.lmstudio/settings.json"
+        jaq=${lib.getExe pkgs.jaq}
+
+        if [ -f "$settings" ] && [ "$($jaq '.developer.autoUpdateExtensionPacks' "$settings")" != false ]; then
+          tmp=$(mktemp "$settings.XXXXXX")
+          if $jaq '.developer += {autoUpdateExtensionPacks: false}' "$settings" > "$tmp"; then
+            mv "$tmp" "$settings"
+          else
+            rm -f "$tmp"
+          fi
+        fi
+      '';
     };
 }

@@ -8,6 +8,16 @@
     };
 
     nixos = { pkgs, ... }: {
+      environment.sessionVariables = {
+        CHECKPOINT_DISABLE = "1";
+        DO_NOT_TRACK = "1";
+        GH_NO_EXTENSION_UPDATE_NOTIFIER = "1";
+        NO_UPDATE_NOTIFIER = "1";
+        PNPM_CONFIG_UPDATE_NOTIFIER = "false";
+        PULUMI_SKIP_UPDATE_CHECK = "true";
+        TRUNK_SKIP_VERSION_CHECK = "true";
+      };
+
       environment.systemPackages =
 
         let
