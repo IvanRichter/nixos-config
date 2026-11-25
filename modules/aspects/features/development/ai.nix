@@ -4,6 +4,8 @@
   den.aspects.ai.nixos = { pkgs, ... }: {
     environment.sessionVariables.T3CODE_TELEMETRY_ENABLED = "false";
 
+    networking.firewall.allowedTCPPorts = [ 3773 ];
+
     environment.systemPackages =
       let
         isX86 = pkgs.stdenv.hostPlatform.system == "x86_64-linux";
