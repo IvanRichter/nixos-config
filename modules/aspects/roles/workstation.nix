@@ -20,6 +20,7 @@
       ai
       claude
       codex
+      orca
       cli
       comms
       development
