@@ -158,6 +158,7 @@
     {
       programs.codex.skills = skills;
       programs.claude-code.skills = skills;
+      programs.pi-coding-agent.enable = true;
 
       programs.mcp = {
         enable = true;
