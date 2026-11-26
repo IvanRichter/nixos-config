@@ -51,6 +51,8 @@
         };
       };
 
+      programs.ladybird.enable = true;
+
       # Vivaldi has no setting for its daily user-count ping, update check, or crash reports
       networking.hosts."0.0.0.0" = [
         "update.vivaldi.com"
