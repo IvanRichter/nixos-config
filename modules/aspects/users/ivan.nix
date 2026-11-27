@@ -8,7 +8,7 @@
       (den.batteries.user-shell "fish")
       den.batteries.host-aspects
       den.aspects.starship
-      den.aspects.rio
+      den.aspects.kitty
       den.aspects.fish
       den.aspects.vscode
       den.aspects.office
@@ -26,10 +26,40 @@
       "plugdev"
     ];
 
-    homeManager = {
-      programs.home-manager.enable = true;
-      xdg.enable = true;
-    };
+    homeManager =
+      { config, ... }:
+      let
+        home = config.home.homeDirectory;
+      in
+      {
+        programs.home-manager.enable = true;
+        xdg.enable = true;
+
+        xdg.userDirs = {
+          enable = true;
+          createDirectories = true;
+          desktop = "${home}/desktop";
+          documents = "${home}/documents";
+          download = "${home}/downloads";
+          music = "${home}/music";
+          pictures = "${home}/pictures";
+          projects = "${home}/projects";
+          publicShare = "${home}/public";
+          templates = "${home}/templates";
+          videos = "${home}/videos";
+          extraConfig = {
+            ANRIKU = "${home}/anriku";
+            NIXOS = "${home}/nixos-config";
+            WORK = "${home}/work";
+          };
+        };
+
+        gtk.gtk3.bookmarks = [
+          "file://${home}/anriku"
+          "file://${home}/nixos-config"
+          "file://${home}/work"
+        ];
+      };
 
     provides.to-hosts.nixos = {
       programs.fish.useBabelfish = true;

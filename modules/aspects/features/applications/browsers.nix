@@ -65,7 +65,15 @@
       ];
     };
     homeManager =
-      { lib, pkgs, ... }:
+      {
+        config,
+        lib,
+        pkgs,
+        ...
+      }:
+      let
+        colors = config.lib.stylix.colors.withHashtag;
+      in
       {
         programs.chromium.enable = true;
 
@@ -105,7 +113,7 @@
           "image/svg+xml" = [ "vivaldi-stable.desktop" ];
         };
 
-        # Apply a COSMIC-matched Vivaldi theme when the profile exists
+        # Vivaldi theme
         home.activation.vivaldiTheme = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
           ${pkgs.python3}/bin/python - <<'PY'
           import json
@@ -114,7 +122,7 @@
 
           home = Path(os.environ.get("HOME", "/home/ivan"))
 
-          theme_id = "AnrikuCosmic"
+          theme_id = "Stylix"
 
           def update_prefs(prefs_path: Path) -> None:
             try:
@@ -131,17 +139,17 @@
               "engineVersion": 1,
               "version": 1,
               "id": theme_id,
-              "name": "Anriku Cosmic",
+              "name": "Stylix",
               "accentFromPage": False,
               "accentOnWindow": False,
               "accentSaturationLimit": 1,
               "alpha": 1,
               "blur": 0,
-              "colorAccentBg": "#000000",
-              "colorBg": "#1e1e1e",
-              "colorFg": "#d6d6d6",
-              "colorHighlightBg": "#4af4fd",
-              "colorWindowBg": "#000000",
+              "colorAccentBg": "${colors.base01}",
+              "colorBg": "${colors.base00}",
+              "colorFg": "${colors.base05}",
+              "colorHighlightBg": "${colors.base0D}",
+              "colorWindowBg": "${colors.base01}",
               "contrast": 0,
               "dimBlurred": False,
               "preferSystemAccent": False,
@@ -157,7 +165,8 @@
 
             user_themes = [
               t for t in user_themes
-              if not isinstance(t, dict) or t.get("id") != theme_id
+              # Also drops the earlier COSMIC-matched theme
+              if not isinstance(t, dict) or t.get("id") not in (theme_id, "AnrikuCosmic")
             ]
             user_themes.append(theme)
 

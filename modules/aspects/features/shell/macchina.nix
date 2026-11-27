@@ -16,7 +16,6 @@
             "Battery"
             "OperatingSystem"
             "DesktopEnvironment"
-            "WindowManager"
             "Distribution"
             "Terminal"
             "Shell"
@@ -74,8 +73,7 @@
             kernel = "Kernel";
             battery = "Battery Info";
             os = "Operating System";
-            de = "Desktop Environment";
-            wm = "Window Manager";
+            de = "Window Manager";
             distro = "Distribution";
             terminal = "Terminal Emulator";
             shell = "Shell";

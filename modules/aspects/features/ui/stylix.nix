@@ -10,27 +10,27 @@
       { pkgs, ... }:
 
       let
-        oneDarkProNightFlat = builtins.toFile "one-dark-pro-night-flat.yaml" ''
+        tokyoNight = builtins.toFile "tokyo-night.yaml" ''
           system: "base16"
-          name: "One Dark Pro Night Flat"
+          name: "Tokyo Night"
           variant: "dark"
           palette:
-            base00: "#16191d"
-            base01: "#1e2227"
-            base02: "#2c313c"
-            base03: "#5c6370"
-            base04: "#7f848e"
-            base05: "#abb2bf"
-            base06: "#d7dae0"
-            base07: "#ffffff"
-            base08: "#e06c75"
-            base09: "#d19a66"
-            base0A: "#e5c07b"
-            base0B: "#98c379"
-            base0C: "#56b6c2"
-            base0D: "#61afef"
-            base0E: "#c678dd"
-            base0F: "#f44747"
+            base00: "#1a1b26"
+            base01: "#16161e"
+            base02: "#2f3549"
+            base03: "#444b6a"
+            base04: "#787c99"
+            base05: "#a9b1d6"
+            base06: "#cbccd1"
+            base07: "#d5d6db"
+            base08: "#f7768e"
+            base09: "#ff9e64"
+            base0A: "#e0af68"
+            base0B: "#9ece6a"
+            base0C: "#7dcfff"
+            base0D: "#7aa2f7"
+            base0E: "#bb9af7"
+            base0F: "#db4b4b"
         '';
       in
       {
@@ -40,17 +40,17 @@
           enable = true;
           polarity = "dark";
 
-          # Both hosts use COSMIC Greeter
-          targets.regreet.enable = false;
+          base16Scheme = tokyoNight;
 
-          # Use inlined One Dark Pro Night Flat scheme
-          base16Scheme = oneDarkProNightFlat;
-
-          opacity.terminal = 0.8;
+          opacity = {
+            desktop = 0.7;
+            popups = 0.7;
+            terminal = 0.7;
+          };
 
           cursor = {
-            package = pkgs.cosmic-icons;
-            name = "Cosmic";
+            package = pkgs.simp1e-cursors;
+            name = "Simp1e-Tokyo-Night";
             size = 24;
           };
 
@@ -85,6 +85,7 @@
           };
         };
       };
+
     homeManager =
       { ... }:
 
@@ -92,7 +93,7 @@
         stylix.targets = {
           qt.standardDialogs = "xdgdesktopportal";
           starship.enable = true;
-          rio.enable = true;
+          kitty.enable = true;
           vscode.enable = false;
         };
 

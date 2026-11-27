@@ -19,7 +19,7 @@
         enable = true;
         user = "ivan";
         group = "users";
-        downloadDir = "/home/ivan/Downloads";
+        downloadDir = "/home/ivan/downloads";
       };
     };
 }

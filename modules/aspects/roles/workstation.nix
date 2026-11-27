@@ -8,7 +8,8 @@
       fonts
       graphics
       stylix
-      cosmic
+      niri
+      regreet
       gui
       networking
       docker

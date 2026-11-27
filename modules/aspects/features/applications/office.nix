@@ -10,6 +10,9 @@
   den.aspects.office.homeManager =
     { pkgs, lib, ... }:
     {
+      # PDFs still open in Vivaldi by default
+      home.packages = [ pkgs.papers ];
+
       xdg.mimeApps.enable = true;
 
       # Make ONLYOFFICE the default app for .docx, .xlsx, and .pptx

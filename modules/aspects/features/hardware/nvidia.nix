@@ -24,7 +24,7 @@
         videoAcceleration = true;
       };
 
-      # Load the NVIDIA display modules for COSMIC
+      # Load the NVIDIA display modules early for the Wayland compositor
       boot.kernelModules = [
         "nvidia"
         "nvidia_modeset"

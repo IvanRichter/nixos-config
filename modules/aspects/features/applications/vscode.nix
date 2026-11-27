@@ -82,7 +82,7 @@
         ms-toolsai.jupyter
         ms-python.vscode-pylance
         golang.go
-        zhuangtongfa.material-theme
+        enkia.tokyo-night
       ];
 
       marketplace =
@@ -311,7 +311,49 @@
             "rust-analyzer.rustfmt.overrideCommand" = [ "${rustFormatter}" ];
             "nix.formatterPath" = [ "${pkgs.nixfmt}/bin/nixfmt" ];
             "editor.fontFamily" = "'${config.stylix.fonts.monospace.name}', monospace";
-            "workbench.colorTheme" = "One Dark Pro Night Flat";
+            "workbench.colorTheme" = "Tokyo Night";
+
+            # Make change markers and diff tints visible
+            "scm.diffDecorationsGutterWidth" = 4;
+            "workbench.colorCustomizations" = {
+              "[Tokyo Night]" =
+                let
+                  inherit (config.lib.stylix.colors.withHashtag) base04 base0D;
+                  modified = config.lib.stylix.colors.withHashtag.base0A;
+                  added = config.lib.stylix.colors.withHashtag.base0B;
+                  deleted = config.lib.stylix.colors.withHashtag.base08;
+                in
+                {
+                  "editorGutter.modifiedBackground" = modified;
+                  "editorGutter.modifiedSecondaryBackground" = modified;
+                  "editorGutter.addedBackground" = added;
+                  "editorGutter.addedSecondaryBackground" = added;
+                  "editorGutter.deletedBackground" = deleted;
+                  "editorGutter.deletedSecondaryBackground" = deleted;
+                  "minimapGutter.modifiedBackground" = modified;
+                  "minimapGutter.addedBackground" = added;
+                  "minimapGutter.deletedBackground" = deleted;
+                  "editorOverviewRuler.modifiedForeground" = modified;
+                  "editorOverviewRuler.addedForeground" = added;
+                  "editorOverviewRuler.deletedForeground" = deleted;
+
+                  "diffEditor.insertedLineBackground" = "${added}26";
+                  "diffEditor.removedLineBackground" = "${deleted}26";
+                  "diffEditor.insertedTextBackground" = "${added}4d";
+                  "diffEditor.removedTextBackground" = "${deleted}4d";
+
+                  "gitDecoration.modifiedResourceForeground" = modified;
+                  "gitDecoration.stageModifiedResourceForeground" = modified;
+                  "gitDecoration.addedResourceForeground" = added;
+                  "gitDecoration.untrackedResourceForeground" = added;
+                  "gitDecoration.renamedResourceForeground" = added;
+                  "gitDecoration.deletedResourceForeground" = deleted;
+                  "gitDecoration.stageDeletedResourceForeground" = deleted;
+                  "gitDecoration.conflictingResourceForeground" = deleted;
+                  "gitDecoration.ignoredResourceForeground" = base04;
+                  "gitDecoration.submoduleResourceForeground" = base0D;
+                };
+            };
 
             "extensions.autoUpdate" = "off";
             "extensions.ignoreRecommendations" = true;

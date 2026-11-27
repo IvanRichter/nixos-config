@@ -1,5 +1,5 @@
 {
-  description = "COSMIC DE + NVIDIA + Apple Silicon";
+  description = "niri + NVIDIA + Apple Silicon";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";

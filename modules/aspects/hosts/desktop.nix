@@ -30,6 +30,7 @@
 
       # Desktop tuning
       services.system76-scheduler = {
+        enable = true;
         useStockConfig = false;
 
         settings = {
