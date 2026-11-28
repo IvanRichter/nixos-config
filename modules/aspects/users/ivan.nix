@@ -12,6 +12,7 @@
       den.aspects.fish
       den.aspects.vscode
       den.aspects.office
+      den.aspects.logseq
       den.aspects.rdp
       den.aspects.gcloud
       den.aspects.gws
