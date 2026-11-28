@@ -1,17 +1,17 @@
 _final: prev:
 let
   pname = "orca-ide";
-  version = "1.4.277";
+  version = "1.4.280";
 
   asset =
     {
       aarch64-linux = {
         name = "orca-linux-arm64.AppImage";
-        hash = "sha256-1ycXkncGbkHw9LYprW2xZdz1t0BUh2Yc91frEWt/Pfw=";
+        hash = "sha256-NNsHbb9RyJ8Bpz2572oXxCu5kSTpXeGX71efLN2fquY=";
       };
       x86_64-linux = {
         name = "orca-linux.AppImage";
-        hash = "sha256-MiDfIq0phOcdceLwDriA2IThnFFmx3+YRRnyH55ZXkw=";
+        hash = "sha256-f6TZdb3RUXh7sSU3kIRk+HaV7MPxwmz1UyIO6G08BsI=";
       };
     }
     .${prev.stdenv.hostPlatform.system};
