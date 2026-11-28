@@ -173,10 +173,7 @@ _final: prev: {
       (prev.xmrig.override {
         inherit stdenv;
         libuv = zen5Library prev.libuv;
-        openssl = (zen5Library prev.openssl).overrideAttrs (old: {
-          # Linux 7.3 restricts AF_ALG AES-CBC to privileged processes
-          configureFlags = (old.configureFlags or [ ]) ++ [ "no-afalgeng" ];
-        });
+        openssl = zen5Library prev.openssl;
         hwloc = zen5Library prev.hwloc;
         withHttp = false;
         enableRandomx = true;
